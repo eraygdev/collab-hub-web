@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 export default function ProjectCard({ project }) {
-  const categories = project.categories || ['Backend', 'Microservices', 'Java', 'Spring Boot', 'Redis', 'Docker'];
+  const categories = project.categories || [];
   
   const [visibleCount, setVisibleCount] = useState(categories.length);
   const containerRef = useRef(null);
@@ -11,14 +11,12 @@ export default function ProjectCard({ project }) {
       if (!containerRef.current) return;
       const containerWidth = containerRef.current.offsetWidth;
       
-      // Tahmini bir badge genişliği (yaklaşık 70-90px) ve + sayaç genişliği (40px) hesabı
       let currentWidth = 0;
       let count = 0;
       const badgeWidthEstimate = 75; 
       const plusBadgeWidth = 40;
 
       for (let i = 0; i < categories.length; i++) {
-        // Eğer son eleman kalıyorsa ve hepsi sığmıyorsa + sayaç payı bırakmalıyız
         const needed = currentWidth + badgeWidthEstimate + (i < categories.length - 1 ? plusBadgeWidth : 0);
         if (needed <= containerWidth) {
           currentWidth += badgeWidthEstimate + 6; // gap-1.5 (yaklaşık 6px)
@@ -28,7 +26,6 @@ export default function ProjectCard({ project }) {
         }
       }
 
-      // En az 1 veya 2 tane kesin gösterilsin istiyorsan burayı minimum sınırlayabilirsin (örn: en az 1)
       setVisibleCount(Math.max(1, count));
     }
 
@@ -61,7 +58,7 @@ export default function ProjectCard({ project }) {
           {project.description}
         </p>
 
-        {/* Kategori Baloncukları Alanı (Dinamik Ölçüm Ref'i) */}
+        {/* Kategori Baloncukları Alanı */}
         <div ref={containerRef} className="mt-auto pt-3 border-t border-gray-100 flex items-center gap-1.5 overflow-hidden whitespace-nowrap">
           {visibleCategories.map((cat, index) => (
             <span

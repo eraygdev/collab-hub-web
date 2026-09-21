@@ -18,7 +18,8 @@ export default function App() {
         <Navbar onOpenSidebar={() => setIsSidebarOpen(true)} />
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* max-w ve padding kısıtlamalarını buradan kaldırdık, arka plan tam ekran yayılacak */}
+        <main className="flex-1 flex flex-col w-full">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
