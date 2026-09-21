@@ -10,7 +10,7 @@ export default function ProjectDetail() {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-3xl mx-auto text-center">
           <div className="text-6xl mb-4">🔍</div>
-          <h2 className="text-2xl font-bold mb-2 text-black">Proje bulunamadı</h2>
+          <h2 className="text-2xl font-bold text-black mb-2">Proje bulunamadı</h2>
           <p className="text-gray-500 mb-6">Aradığın proje silinmiş veya taşınmış olabilir.</p>
           <Link
             to="/"
@@ -44,12 +44,11 @@ export default function ProjectDetail() {
             <span className="text-xs text-gray-500">📅 {project.createdAt}</span>
           </div>
 
-          {/* ✅ Başlık: net siyah, kalın */}
           <h1 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight mb-4">
             {project.title}
           </h1>
 
-          <p className="text-base sm:text-lg text-gray-700 leading-relaxed max-w-3xl">
+          <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
             {project.description}
           </p>
         </div>
@@ -61,14 +60,13 @@ export default function ProjectDetail() {
           </svg>
         </div>
 
-        {/* Ana İçerik: Sol = Açıklama, Sağ = Sidebar */}
+        {/* Ana İçerik */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
           {/* Sol Sütun */}
           <div className="lg:col-span-2">
             {/* Kategoriler */}
             <div className="mb-10">
-              {/* ✅ Başlık: net ve okunur */}
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
                 Teknolojiler & Kategoriler
               </h2>
@@ -95,11 +93,11 @@ export default function ProjectDetail() {
             </div>
           </div>
 
-          {/* Sağ Sütun - Sticky Sidebar */}
+          {/* Sağ Sütun - Sidebar */}
           <aside className="lg:col-span-1">
             <div className="lg:sticky lg:top-24 space-y-4">
 
-              {/* ✅ CTA Kartı: açık tema, yumuşak vurgular */}
+              {/* CTA Kartı */}
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold text-black mb-3">Bu projeye katıl</h3>
                 <p className="text-sm text-gray-600 leading-relaxed mb-6">
@@ -118,7 +116,6 @@ export default function ProjectDetail() {
               {/* Bilgi Kartı */}
               <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
                 <h3 className="text-sm font-bold text-gray-900 mb-4">Proje Bilgileri</h3>
-
                 <dl className="space-y-3 text-sm">
                   <div className="flex items-center justify-between">
                     <dt className="text-gray-500">Yazar</dt>
