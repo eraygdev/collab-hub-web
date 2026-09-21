@@ -23,7 +23,7 @@ function App() {
         </p>
         
         <button 
-          onClick={() => alert('Kalpler sizinle! ❤️')}
+          onClick={() => alert('❤️')}
           className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 transform active:scale-95"
         >
           Kalbe Dokun
