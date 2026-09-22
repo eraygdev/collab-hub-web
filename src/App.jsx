@@ -11,7 +11,6 @@ import Register from './pages/Register';
 import ProjectDetail from './pages/ProjectDetail';
 import NotFound from './pages/NotFound';
 
-// ScrollToTop — URL her değiştiğinde scroll'u en üste çeker
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -22,30 +21,51 @@ function ScrollToTop() {
   return null;
 }
 
-export default function App() {
+// Layout — Navbar, Sidebar, Footer burada
+function Layout({ children, hideFooter }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
+    <div className="min-h-screen bg-white flex flex-col font-sans text-gray-900 selection:bg-black selection:text-white">
+      <Navbar onOpenSidebar={() => setIsSidebarOpen(true)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      <main className="flex-1 flex flex-col w-full bg-gray-50">
+        {children}
+      </main>
+
+      {!hideFooter && <Footer />}
+    </div>
+  );
+}
+
+// Hangi sayfalarda footer gizlensin
+const HIDE_FOOTER_ROUTES = ['/login', '/register'];
+
+function AppContent() {
+  const location = useLocation();
+  const hideFooter = HIDE_FOOTER_ROUTES.includes(location.pathname);
+
+  return (
+    <Layout hideFooter={hideFooter}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/project/:id" element={<ProjectDetail />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Layout>
+  );
+}
+
+export default function App() {
+  return (
     <BrowserRouter>
       <ScrollToTop />
-      <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900 selection:bg-black selection:text-white">
-        <Navbar onOpenSidebar={() => setIsSidebarOpen(true)} />
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-        <main className="flex-1 flex flex-col w-full">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/create-project" element={<CreateProject />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/project/:id" element={<ProjectDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-
-        <Footer />
-      </div>
+      <AppContent />
     </BrowserRouter>
   );
 }

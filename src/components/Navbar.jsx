@@ -19,9 +19,9 @@ export default function Navbar({ onOpenSidebar }) {
 
           <Link 
             to="/" 
-            className="text-[26px] font-extrabold tracking-tight text-gray-900/70 hover:text-gray-600 transition-colors cursor-pointer"
+            className="text-[26px] font-extrabold text-gray-900/70 hover:text-gray-600 transition-colors cursor-pointer font-dm"
           >
-            Collab-Hub
+            Collab-Hub.
           </Link>
         </div>
 
