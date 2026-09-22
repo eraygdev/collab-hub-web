@@ -21,7 +21,6 @@ function ScrollToTop() {
   return null;
 }
 
-// Layout — Navbar, Sidebar, Footer burada
 function Layout({ children, hideFooter }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -30,7 +29,7 @@ function Layout({ children, hideFooter }) {
       <Navbar onOpenSidebar={() => setIsSidebarOpen(true)} />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <main className="flex-1 flex flex-col w-full bg-gray-50">
+      <main className={`flex-1 flex flex-col w-full bg-gray-50 ${hideFooter ? 'overflow-hidden' : ''}`}>
         {children}
       </main>
 
@@ -39,7 +38,6 @@ function Layout({ children, hideFooter }) {
   );
 }
 
-// Hangi sayfalarda footer gizlensin
 const HIDE_FOOTER_ROUTES = ['/login', '/register'];
 
 function AppContent() {
