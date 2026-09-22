@@ -16,7 +16,7 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-12 lg:py-16">
+    <div className="w-full flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
       <div className="w-full max-w-md">
 
         {/* Başlık */}
@@ -71,17 +71,9 @@ export default function Login() {
 
             {/* Şifre */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="block text-xs font-medium text-gray-700">
-                  Şifre
-                </label>
-                <button
-                  type="button"
-                  className="text-xs text-gray-500 hover:text-black transition-colors cursor-pointer"
-                >
-                  Şifremi unuttum
-                </button>
-              </div>
+              <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1.5">
+                Şifre
+              </label>
               <div className="relative">
                 <input
                   id="password"
@@ -108,6 +100,16 @@ export default function Login() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   )}
+                </button>
+              </div>
+
+              {/* Şifremi unuttum — input'un altına */}
+              <div className="flex justify-end mt-1.5">
+                <button
+                  type="button"
+                  className="text-xs text-gray-500 hover:text-black transition-colors cursor-pointer"
+                >
+                  Şifremi unuttum
                 </button>
               </div>
             </div>
