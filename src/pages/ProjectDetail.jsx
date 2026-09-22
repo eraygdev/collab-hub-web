@@ -16,7 +16,7 @@ export default function ProjectDetail() {
             to="/"
             className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
           >
-            ← Ana Sayfaya Dön
+            🠔 Ana Sayfaya Dön
           </Link>
         </div>
       </div>

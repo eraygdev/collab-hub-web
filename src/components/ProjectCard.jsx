@@ -1,68 +1,14 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
+const MAX_VISIBLE = 3; // kaç kategori gösterilsin
 
 export default function ProjectCard({ project }) {
   const categories = project.categories || [];
   const navigate = useNavigate();
 
-  const [visibleCount, setVisibleCount] = useState(categories.length);
-  const containerRef = useRef(null);
-  const badgeRefs = useRef([]);
-
-  useLayoutEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const GAP = 6; // gap-1.5
-    const PLUS_BADGE_WIDTH = 40; // +X badge'inin yaklaşık genişliği
-
-    const calculate = () => {
-      const containerWidth = container.offsetWidth;
-      const badges = badgeRefs.current.filter(Boolean);
-      if (!badges.length) return;
-
-      // Adım 1: Tüm badge'ler + gap toplamı sığıyor mu? (X olmadan)
-      const widths = badges.map((b) => b.offsetWidth);
-      const totalAll = widths.reduce((sum, w) => sum + w, 0) + GAP * (widths.length - 1);
-
-      if (totalAll <= containerWidth) {
-        setVisibleCount(categories.length);
-        return;
-      }
-
-      // Adım 2: Sığmıyorsa, +X için yer ayırarak hesapla
-      let used = 0;
-      let count = 0;
-      for (let i = 0; i < widths.length; i++) {
-        const isLast = i === widths.length - 1;
-        const gapCost = i > 0 ? GAP : 0;
-        const reserveForPlus = !isLast ? PLUS_BADGE_WIDTH + GAP : 0;
-
-        if (used + gapCost + widths[i] + reserveForPlus <= containerWidth) {
-          used += gapCost + widths[i];
-          count++;
-        } else {
-          break;
-        }
-      }
-
-      setVisibleCount(Math.max(1, count));
-    };
-
-    // İlk ölçümü bir sonraki frame'e ertele (fontlar vs. yüklensin)
-    const rafId = requestAnimationFrame(calculate);
-
-    const observer = new ResizeObserver(calculate);
-    observer.observe(container);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      observer.disconnect();
-    };
-  }, [categories]);
-
-  const visibleCategories = categories.slice(0, visibleCount);
-  const hiddenCount = categories.length - visibleCount;
+  const visibleCategories = categories.slice(0, MAX_VISIBLE);
+  const hiddenCount = Math.max(0, categories.length - MAX_VISIBLE);
 
   return (
     <div
@@ -87,18 +33,11 @@ export default function ProjectCard({ project }) {
           {project.description}
         </p>
 
-        <div
-          ref={containerRef}
-          className="mt-auto pt-3 border-t border-gray-100 flex items-center gap-1.5 overflow-hidden whitespace-nowrap"
-        >
-          {/* Tüm badge'ler DOM'da kalır, sadece görsel olarak gizlenir → ölçüm doğru olur */}
-          {categories.map((cat, index) => (
+        <div className="mt-auto pt-3 border-t border-gray-100 flex items-center gap-1.5 overflow-hidden whitespace-nowrap">
+          {visibleCategories.map((cat, index) => (
             <span
               key={index}
-              ref={(el) => (badgeRefs.current[index] = el)}
-              className={`px-2.5 py-1 text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-full shrink-0 ${
-                index < visibleCount ? '' : 'invisible absolute'
-              }`}
+              className="px-2.5 py-1 text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-full shrink-0"
             >
               {cat}
             </span>
