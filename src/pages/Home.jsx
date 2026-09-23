@@ -1,10 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProjectCard from '../components/ProjectCard';
 import CategoryModal from '../components/CategoryModal';
-import { mockProjects } from '../data/mockProjects';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Home() {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,13 +17,34 @@ export default function Home() {
 
   const VISIBLE_LIMIT = 12;
 
+  // Projeleri API'den çek.
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch(`${API}/api/projects`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Projeler yüklenemedi');
+        return res.json();
+      })
+      .then((data) => {
+        setProjects(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoadError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  // Projelerden tüm kategorileri çıkar.
   const allCategories = useMemo(() => {
     const set = new Set();
-    mockProjects.forEach((p) => {
+    projects.forEach((p) => {
       (p.categories || []).forEach((c) => set.add(c));
     });
     return Array.from(set).sort();
-  }, []);
+  }, [projects]);
 
   const toggleCategory = (cat) => {
     setSelectedCategories((prev) =>
@@ -29,24 +55,21 @@ export default function Home() {
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCategories([]);
-    setMatchMode('or'); // modu da sıfırla
+    setMatchMode('or');
   };
 
   const filteredProjects = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
-    return mockProjects.filter((project) => {
+    return projects.filter((project) => {
       const categories = project.categories || [];
 
-      // matchMode'a göre VE veya VEYA kontrolü
       let categoryMatch = true;
       if (selectedCategories.length > 0) {
         if (matchMode === 'and') {
-          // HEPSİ projede olmalı
           categoryMatch = selectedCategories.every((cat) =>
             categories.includes(cat)
           );
         } else {
-          // EN AZ BİRİ projede olmalı
           categoryMatch = selectedCategories.some((cat) =>
             categories.includes(cat)
           );
@@ -64,7 +87,7 @@ export default function Home() {
 
       return inTitle || inDescription || inCategories;
     });
-  }, [searchTerm, selectedCategories, matchMode]);
+  }, [projects, searchTerm, selectedCategories, matchMode]);
 
   const hasActiveFilters =
     searchTerm.trim() !== '' || selectedCategories.length > 0;
@@ -128,48 +151,50 @@ export default function Home() {
           </div>
 
           {/* Kategori Chip'leri */}
-          <div className="mb-3">
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedCategories([])}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
-                  selectedCategories.length === 0
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-                }`}
-              >
-                Tümü
-              </button>
-
-              {allCategories.slice(0, VISIBLE_LIMIT).map((cat) => {
-                const isSelected = selectedCategories.includes(cat);
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => toggleCategory(cat)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
-
-              {allCategories.length > VISIBLE_LIMIT && (
+          {allCategories.length > 0 && (
+            <div className="mb-3">
+              <div className="flex flex-wrap gap-2">
                 <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-gray-300 text-gray-600 hover:border-gray-500 hover:text-black transition-colors cursor-pointer"
+                  onClick={() => setSelectedCategories([])}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
+                    selectedCategories.length === 0
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                  }`}
                 >
-                  +{allCategories.length - VISIBLE_LIMIT} daha
+                  Tümü
                 </button>
-              )}
-            </div>
-          </div>
 
-          {/* VE / VEYA Modu — sadece 2+ kategori seçiliyken görünür */}
+                {allCategories.slice(0, VISIBLE_LIMIT).map((cat) => {
+                  const isSelected = selectedCategories.includes(cat);
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => toggleCategory(cat)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
+                        isSelected
+                          ? 'bg-black text-white border-black'
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+
+                {allCategories.length > VISIBLE_LIMIT && (
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-gray-300 text-gray-600 hover:border-gray-500 hover:text-black transition-colors cursor-pointer"
+                  >
+                    +{allCategories.length - VISIBLE_LIMIT} daha
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* VE / VEYA Modu */}
           {selectedCategories.length > 1 && (
             <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
               <span className="text-gray-500">Eşleşme:</span>
@@ -204,7 +229,7 @@ export default function Home() {
           )}
 
           {/* Sonuç bilgisi */}
-          {hasActiveFilters && (
+          {hasActiveFilters && !loading && (
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-xs text-gray-500">
                 {filteredProjects.length} proje bulundu
@@ -221,27 +246,66 @@ export default function Home() {
             </div>
           )}
 
-          {/* Projeler */}
-          {filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
+          {/* Yükleniyor */}
+          {loading && (
+            <div className="text-center py-20 text-sm text-gray-500">
+              Projeler yükleniyor...
             </div>
-          ) : (
+          )}
+
+          {/* Hata */}
+          {loadError && !loading && (
             <div className="text-center py-20">
-              <div className="text-5xl mb-3">🔍</div>
-              <h3 className="text-lg font-bold text-black mb-1">Sonuç bulunamadı</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Arama veya filtre kriterlerine uyan proje yok.
-              </p>
+              <div className="text-5xl mb-3">⚠️</div>
+              <h3 className="text-lg font-bold text-black mb-1">Projeler yüklenemedi</h3>
+              <p className="text-sm text-gray-500 mb-4">{loadError}</p>
               <button
-                onClick={clearFilters}
+                onClick={() => window.location.reload()}
                 className="px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
               >
-                Filtreleri Temizle
+                Tekrar Dene
               </button>
             </div>
+          )}
+
+          {/* Projeler */}
+          {!loading && !loadError && (
+            <>
+              {filteredProjects.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {filteredProjects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <div className="text-5xl mb-3">🔍</div>
+                  <h3 className="text-lg font-bold text-black mb-1">
+                    {projects.length === 0 ? 'Henüz proje yok' : 'Sonuç bulunamadı'}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {projects.length === 0
+                      ? 'İlk projeyi sen oluştur!'
+                      : 'Arama veya filtre kriterlerine uyan proje yok.'}
+                  </p>
+                  {projects.length === 0 ? (
+                    <Link
+                      to="/create-project"
+                      className="px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors inline-block"
+                    >
+                      Proje Oluştur
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={clearFilters}
+                      className="px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                    >
+                      Filtreleri Temizle
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           )}
 
         </div>

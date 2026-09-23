@@ -6,18 +6,17 @@ export default function CategoryModal({
   onConfirm,
   categories,
   selectedCategories,
+  maxSelection,
 }) {
   const [search, setSearch] = useState('');
   const [localSelected, setLocalSelected] = useState([]);
 
-  // Modal açıldığında gerçek seçimleri local'e kopyala
   useEffect(() => {
     if (isOpen) {
       setLocalSelected(selectedCategories);
     }
   }, [isOpen, selectedCategories]);
 
-  // Body scroll kilitle + Esc ile kapat (Esc = iptal)
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
 
@@ -33,26 +32,28 @@ export default function CategoryModal({
     };
   }, [isOpen, onClose]);
 
-  // Modal kapanınca aramayı temizle
   useEffect(() => {
     if (!isOpen) setSearch('');
   }, [isOpen]);
 
-  // Arama filtresi
   const filtered = useMemo(() => {
     const term = search.toLowerCase().trim();
     if (!term) return categories;
     return categories.filter((c) => c.toLowerCase().includes(term));
   }, [categories, search]);
 
-  // Local'de toggle (Home'u etkilemez)
   const toggleLocal = (cat) => {
-    setLocalSelected((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
+    setLocalSelected((prev) => {
+      if (prev.includes(cat)) {
+        return prev.filter((c) => c !== cat);
+      }
+      if (maxSelection && prev.length >= maxSelection) {
+        return prev;
+      }
+      return [...prev, cat];
+    });
   };
 
-  // Tamam'a basınca gerçek state'e aktar
   const handleConfirm = () => {
     onConfirm(localSelected);
     onClose();
@@ -81,12 +82,15 @@ export default function CategoryModal({
             <div>
               <h2 className="text-lg font-bold text-black">Kategoriler</h2>
               <p className="text-xs text-gray-500 mt-0.5">
-                {localSelected.length > 0
+                {maxSelection
+                  ? `${localSelected.length} / ${maxSelection} seçili`
+                  : localSelected.length > 0
                   ? `${localSelected.length} kategori seçili`
                   : 'Filtrelemek için kategori seç'}
               </p>
             </div>
             <button
+              type="button"
               onClick={onClose}
               className="p-2 rounded-lg text-gray-500 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
               aria-label="Kapat"
@@ -121,11 +125,16 @@ export default function CategoryModal({
               <div className="flex flex-wrap gap-2">
                 {filtered.map((cat) => {
                   const isSelected = localSelected.includes(cat);
+                  const isDisabled =
+                    maxSelection && !isSelected && localSelected.length >= maxSelection;
+
                   return (
                     <button
                       key={cat}
+                      type="button"
                       onClick={() => toggleLocal(cat)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
+                      disabled={isDisabled}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                         isSelected
                           ? 'bg-black text-white border-black'
                           : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
@@ -146,6 +155,7 @@ export default function CategoryModal({
           {/* Footer */}
           <div className="p-4 border-t border-gray-100 flex items-center justify-between gap-3">
             <button
+              type="button"
               onClick={() => setLocalSelected([])}
               className="text-xs text-gray-500 hover:text-black underline transition-colors cursor-pointer"
             >
@@ -153,12 +163,14 @@ export default function CategoryModal({
             </button>
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={onClose}
                 className="px-5 py-2.5 text-sm font-semibold bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 İptal
               </button>
               <button
+                type="button"
                 onClick={handleConfirm}
                 className="px-5 py-2.5 text-sm font-semibold bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
               >

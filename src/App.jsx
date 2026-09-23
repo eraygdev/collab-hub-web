@@ -5,6 +5,8 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import CreateProject from './pages/CreateProject';
 import Login from './pages/Login';
@@ -46,6 +48,8 @@ function AppContent() {
     <Layout hideFooter={hideFooter}>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/login" element={<Login />} />

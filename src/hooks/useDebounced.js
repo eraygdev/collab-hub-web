@@ -1,0 +1,13 @@
+import { useState, useEffect } from 'react';
+
+// Bir değeri geciktirerek döner (debounce) — her karakterde işlem yapmayı önler.
+export function useDebounced(value, delay = 400) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+
+  return debounced;
+}
