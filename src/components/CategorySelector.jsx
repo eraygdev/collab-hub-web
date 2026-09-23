@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import CategoryModal from './CategoryModal';
-
-const MAX_SELECTION = 5;
-const VISIBLE_LIMIT = 12;
+import { PROJECT_LIMITS } from '../constants/limits';
 
 // Chip listesi + "Daha fazla" modal ile çoklu kategori seçimi.
 // categories: [{id, name, slug}]
 // selected: [id, id, ...]
 export default function CategorySelector({ categories, selected, onChange, disabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const MAX_SELECTION = PROJECT_LIMITS.maxCategories;
+  const VISIBLE_LIMIT = PROJECT_LIMITS.visibleCategories;
 
   const selectedNames = categories
     .filter((c) => selected.includes(c.id))

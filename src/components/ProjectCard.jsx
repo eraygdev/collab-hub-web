@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const MAX_VISIBLE = 3;
@@ -6,9 +6,12 @@ const MAX_VISIBLE = 3;
 export default function ProjectCard({ project }) {
   const categories = project.categories || [];
   const navigate = useNavigate();
+  const [imageError, setImageError] = useState(false);
 
   const visibleCategories = categories.slice(0, MAX_VISIBLE);
   const hiddenCount = Math.max(0, categories.length - MAX_VISIBLE);
+
+  const showImage = project.imageUrl && !imageError;
 
   return (
     <div
@@ -20,15 +23,12 @@ export default function ProjectCard({ project }) {
     >
       {/* Kapak görseli */}
       <div className="relative w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400 shrink-0 overflow-hidden">
-        {project.imageUrl ? (
+        {showImage ? (
           <img
             src={project.imageUrl}
             alt={project.title}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement.innerHTML = '<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>';
-            }}
+            onError={() => setImageError(true)}
           />
         ) : (
           <svg className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -52,6 +52,31 @@ export default function ProjectCard({ project }) {
       </div>
 
       <div className="p-4 flex flex-col flex-1">
+        {/* Yazar satırı */}
+        {project.author && (
+          <div className="flex items-center gap-1.5 mb-2">
+            <div className="w-4 h-4 rounded-full bg-gray-200 overflow-hidden shrink-0">
+              {project.authorAvatar ? (
+                <img
+                  src={project.authorAvatar}
+                  alt={project.author}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                </div>
+              )}
+            </div>
+            <span className="text-xs text-gray-500 truncate">{project.author}</span>
+          </div>
+        )}
+
         <h3 className="text-base font-bold text-black mb-2 tracking-tight line-clamp-2 min-h-[3rem]">
           {project.title}
         </h3>

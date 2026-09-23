@@ -1,50 +1,122 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ProjectCard from '../components/ProjectCard';
 import CategoryModal from '../components/CategoryModal';
+import { useDebounced } from '../hooks/useDebounced';
+import { SEARCH_LIMITS } from '../constants/limits';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+const LIMIT = 20;
+const VISIBLE_LIMIT = 12;
 
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [loadError, setLoadError] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [matchMode, setMatchMode] = useState('or'); // 'or' | 'and'
+  const [matchMode, setMatchMode] = useState('or');
 
-  const VISIBLE_LIMIT = 12;
+  const debouncedSearch = useDebounced(searchTerm, 400);
 
-  // Projeleri API'den çek.
+  // Tüm kategorileri backend'den çek (bir kez)
+  const [allCategories, setAllCategories] = useState([]);
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    fetch(`${API}/api/projects`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Projeler yüklenemedi');
-        return res.json();
-      })
+    fetch(`${API}/api/categories`)
+      .then((res) => res.json())
       .then((data) => {
-        setProjects(Array.isArray(data) ? data : []);
-        setLoading(false);
+        if (Array.isArray(data)) {
+          setAllCategories(data.map((c) => c.name).sort());
+        }
       })
-      .catch((err) => {
-        setLoadError(err.message);
-        setLoading(false);
-      });
+      .catch(() => setAllCategories([]));
   }, []);
 
-  // Projelerden tüm kategorileri çıkar.
-  const allCategories = useMemo(() => {
-    const set = new Set();
-    projects.forEach((p) => {
-      (p.categories || []).forEach((c) => set.add(c));
+  // Backend'den proje çek
+  const fetchProjects = async (searchValue, categoryNames, mode, offsetValue) => {
+    const token = localStorage.getItem('token');
+    const params = new URLSearchParams({
+      limit: LIMIT,
+      offset: offsetValue,
     });
-    return Array.from(set).sort();
-  }, [projects]);
+    if (searchValue) params.set('search', searchValue);
+    if (categoryNames.length > 0) {
+      params.set('categories', categoryNames.join(','));
+      params.set('mode', mode);
+    }
+
+    const res = await fetch(`${API}/api/projects?${params.toString()}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      let data = {};
+      try {
+        data = JSON.parse(text);
+      } catch {}
+      throw new Error(data.error || 'Projeler yüklenemedi');
+    }
+
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  };
+
+  // Arama / kategori / mod değişince ilk sayfayı çek
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      setLoadError('');
+      try {
+        const data = await fetchProjects(
+          debouncedSearch,
+          selectedCategories,
+          matchMode,
+          0
+        );
+        if (cancelled) return;
+        setProjects(data);
+        setHasMore(data.length === LIMIT);
+        setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        setLoadError(err.message);
+        setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedSearch, selectedCategories, matchMode]);
+
+  // Daha fazla yükle
+  const handleLoadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      const data = await fetchProjects(
+        debouncedSearch,
+        selectedCategories,
+        matchMode,
+        projects.length
+      );
+      setProjects((prev) => [...prev, ...data]);
+      setHasMore(data.length === LIMIT);
+    } catch {
+      // sessizce geç
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const toggleCategory = (cat) => {
     setSelectedCategories((prev) =>
@@ -57,37 +129,6 @@ export default function Home() {
     setSelectedCategories([]);
     setMatchMode('or');
   };
-
-  const filteredProjects = useMemo(() => {
-    const term = searchTerm.toLowerCase().trim();
-    return projects.filter((project) => {
-      const categories = project.categories || [];
-
-      let categoryMatch = true;
-      if (selectedCategories.length > 0) {
-        if (matchMode === 'and') {
-          categoryMatch = selectedCategories.every((cat) =>
-            categories.includes(cat)
-          );
-        } else {
-          categoryMatch = selectedCategories.some((cat) =>
-            categories.includes(cat)
-          );
-        }
-      }
-
-      if (!categoryMatch) return false;
-      if (!term) return true;
-
-      const inTitle = project.title.toLowerCase().includes(term);
-      const inDescription = project.description.toLowerCase().includes(term);
-      const inCategories = categories.some((c) =>
-        c.toLowerCase().includes(term)
-      );
-
-      return inTitle || inDescription || inCategories;
-    });
-  }, [projects, searchTerm, selectedCategories, matchMode]);
 
   const hasActiveFilters =
     searchTerm.trim() !== '' || selectedCategories.length > 0;
@@ -145,6 +186,7 @@ export default function Home() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Proje ara..."
+                maxLength={SEARCH_LIMITS.maxLength}
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-300 transition-all"
               />
             </div>
@@ -232,7 +274,7 @@ export default function Home() {
           {hasActiveFilters && !loading && (
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-xs text-gray-500">
-                {filteredProjects.length} proje bulundu
+                {projects.length} proje gösteriliyor
                 {selectedCategories.length > 0 && (
                   <> · {selectedCategories.length} kategori seçili</>
                 )}
@@ -271,37 +313,49 @@ export default function Home() {
           {/* Projeler */}
           {!loading && !loadError && (
             <>
-              {filteredProjects.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {filteredProjects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-                </div>
+              {projects.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {projects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </div>
+
+                  {hasMore && (
+                    <div className="text-center mt-10">
+                      <button
+                        onClick={handleLoadMore}
+                        disabled={loadingMore}
+                        className="px-6 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loadingMore ? 'Yükleniyor...' : 'Daha Fazla Yükle'}
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-20">
                   <div className="text-5xl mb-3">🔍</div>
-                  <h3 className="text-lg font-bold text-black mb-1">
-                    {projects.length === 0 ? 'Henüz proje yok' : 'Sonuç bulunamadı'}
-                  </h3>
+                  <h3 className="text-lg font-bold text-black mb-1">Sonuç bulunamadı</h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    {projects.length === 0
-                      ? 'İlk projeyi sen oluştur!'
-                      : 'Arama veya filtre kriterlerine uyan proje yok.'}
+                    {hasActiveFilters
+                      ? 'Arama veya filtre kriterlerine uyan proje yok.'
+                      : 'İlk projeyi sen oluştur!'}
                   </p>
-                  {projects.length === 0 ? (
-                    <Link
-                      to="/create-project"
-                      className="px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors inline-block"
-                    >
-                      Proje Oluştur
-                    </Link>
-                  ) : (
+                  {hasActiveFilters ? (
                     <button
                       onClick={clearFilters}
                       className="px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                     >
                       Filtreleri Temizle
                     </button>
+                  ) : (
+                    <Link
+                      to="/create-project"
+                      className="px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors inline-block"
+                    >
+                      Proje Oluştur
+                    </Link>
                   )}
                 </div>
               )}

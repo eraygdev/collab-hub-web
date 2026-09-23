@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
@@ -7,13 +7,15 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [starLoading, setStarLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  // Projeyi API'den çek (token'ı da gönder ki "ben yıldızladım mı?" bilgisi gelsin).
+  // Projeyi API'den çek.
   useEffect(() => {
     setLoading(true);
     setError('');
@@ -39,7 +41,7 @@ export default function ProjectDetail() {
   // Yıldızla / yıldızı geri al.
   const handleToggleStar = async () => {
     if (!user) {
-      window.location.href = '/login';
+      navigate('/login');
       return;
     }
 
@@ -59,7 +61,6 @@ export default function ProjectDetail() {
       if (!res.ok) throw new Error('İşlem başarısız');
 
       const data = await res.json();
-      // Anında güncelle: stars ve starred
       setProject((prev) => ({
         ...prev,
         stars: data.stars,
@@ -69,6 +70,37 @@ export default function ProjectDetail() {
       // Sessizce başarısız
     } finally {
       setStarLoading(false);
+    }
+  };
+
+  // Projeyi sil.
+  const handleDelete = async () => {
+    if (!confirm('Bu projeyi silmek istediğine emin misin? Bu işlem geri alınamaz.')) {
+      return;
+    }
+
+    setDeleting(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(`${API}/api/projects/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        let data = {};
+        try { data = JSON.parse(text); } catch {}
+        alert(data.error || 'Silme başarısız oldu');
+        setDeleting(false);
+        return;
+      }
+
+      navigate('/');
+    } catch {
+      alert('Sunucuya bağlanılamadı');
+      setDeleting(false);
     }
   };
 
@@ -112,6 +144,9 @@ export default function ProjectDetail() {
     );
   }
 
+  // Kullanıcı bu projenin yazarı mı?
+const isAuthor = user && project.authorId && user.user_id === project.authorId;
+
   return (
     <div className="w-full bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -122,6 +157,32 @@ export default function ProjectDetail() {
           <span className="text-gray-300">/</span>
           <span className="text-gray-900 font-medium truncate">{project.title}</span>
         </nav>
+
+        {/* Yazar işlemleri */}
+        {isAuthor && (
+          <div className="mb-4 flex items-center gap-2">
+            <Link
+              to={`/project/${project.id}/edit`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Düzenle
+            </Link>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              {deleting ? 'Siliniyor...' : 'Sil'}
+            </button>
+          </div>
+        )}
 
         {/* Başlık + Meta */}
         <div className="mb-8">
@@ -232,6 +293,13 @@ export default function ProjectDetail() {
                   Katkıda bulunmak için ekibe katıl veya projeyi yıldızla.
                 </p>
                 <div className="space-y-2">
+                {isAuthor ? (
+                  // Yazar: yıldızla butonu yerine bilgilendirme
+                  <div className="w-full px-4 py-2.5 bg-gray-50 text-gray-500 text-sm font-medium rounded-lg text-center border border-gray-200">
+                    ⭐ Bu proje senin · {project.stars} yıldız
+                  </div>
+                ) : (
+                  // Yazar değil: yıldızla butonu
                   <button
                     onClick={handleToggleStar}
                     disabled={starLoading}
@@ -247,10 +315,11 @@ export default function ProjectDetail() {
                       ? `★ Yıldızlandı (${project.stars})`
                       : `☆ Yıldızla (${project.stars})`}
                   </button>
-                  <button className="w-full px-4 py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer">
-                    👥 Ekibe Katıl
-                  </button>
-                </div>
+                )}
+                <button className="w-full px-4 py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer">
+                  👥 Ekibe Katıl
+                </button>
+              </div>
               </div>
 
               {/* Bilgi Kartı */}

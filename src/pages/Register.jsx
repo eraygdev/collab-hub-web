@@ -1,11 +1,31 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Register() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Giriş yapmışsa dashboard'a yönlendir.
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
   const handleGithub = () => {
     window.location.href = `${API}/api/auth/github/login`;
   };
+
+  if (loading || user) {
+    return (
+      <div className="w-full px-4 py-10 text-center text-sm text-gray-500">
+        Yükleniyor...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-12">

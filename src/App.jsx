@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import CreateProject from './pages/CreateProject';
+import EditProject from './pages/EditProject';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProjectDetail from './pages/ProjectDetail';
@@ -52,6 +53,7 @@ function AppContent() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/project/:id/edit" element={<EditProject />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
