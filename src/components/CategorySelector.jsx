@@ -11,10 +11,6 @@ export default function CategorySelector({ categories, selected, onChange, disab
   const MAX_SELECTION = PROJECT_LIMITS.maxCategories;
   const VISIBLE_LIMIT = PROJECT_LIMITS.visibleCategories;
 
-  const selectedNames = categories
-    .filter((c) => selected.includes(c.id))
-    .map((c) => c.name);
-
   const visibleCategories = categories.slice(0, VISIBLE_LIMIT);
 
   const toggle = (id) => {
@@ -25,15 +21,6 @@ export default function CategorySelector({ categories, selected, onChange, disab
       if (selected.length >= MAX_SELECTION) return;
       onChange([...selected, id]);
     }
-  };
-
-  // Modal'dan gelen isim array'ini id array'e çevir
-  const handleModalConfirm = (namesArray) => {
-    const ids = categories
-      .filter((c) => namesArray.includes(c.name))
-      .map((c) => c.id);
-    if (ids.length > MAX_SELECTION) return;
-    onChange(ids);
   };
 
   return (
@@ -92,9 +79,9 @@ export default function CategorySelector({ categories, selected, onChange, disab
       <CategoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={handleModalConfirm}
-        categories={categories.map((c) => c.name)}
-        selectedCategories={selectedNames}
+        onConfirm={onChange}
+        categories={categories}
+        selectedCategories={selected}
         maxSelection={MAX_SELECTION}
       />
     </div>

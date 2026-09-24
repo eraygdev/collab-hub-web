@@ -55,9 +55,13 @@ export default function ImagePreview({ url, debouncedUrl }) {
 
   return (
     <img
-      src={url}
-      alt="Önizleme"
-      className="mt-2 w-full max-h-56 object-cover rounded-lg border border-gray-200"
-    />
+    src={url}
+    alt="Önizleme"
+    loading="lazy"
+    decoding="async"
+    width="800"
+    height="450"
+    className="mt-2 w-full max-h-56 object-cover rounded-lg border border-gray-200"
+  />
   );
 }

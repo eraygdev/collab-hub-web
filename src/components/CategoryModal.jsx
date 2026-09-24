@@ -39,18 +39,18 @@ export default function CategoryModal({
   const filtered = useMemo(() => {
     const term = search.toLowerCase().trim();
     if (!term) return categories;
-    return categories.filter((c) => c.toLowerCase().includes(term));
+    return categories.filter((c) => c.name.toLowerCase().includes(term));
   }, [categories, search]);
 
-  const toggleLocal = (cat) => {
+  const toggleLocal = (id) => {
     setLocalSelected((prev) => {
-      if (prev.includes(cat)) {
-        return prev.filter((c) => c !== cat);
+      if (prev.includes(id)) {
+        return prev.filter((c) => c !== id);
       }
       if (maxSelection && prev.length >= maxSelection) {
         return prev;
       }
-      return [...prev, cat];
+      return [...prev, id];
     });
   };
 
@@ -63,21 +63,17 @@ export default function CategoryModal({
 
   return (
     <>
-      {/* Karanlık arka plan */}
       <div
         onClick={onClose}
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
         aria-hidden="true"
       />
 
-      {/* Modal kutusu */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
           className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
-
-          {/* Header */}
           <div className="flex items-center justify-between p-5 border-b border-gray-100">
             <div>
               <h2 className="text-lg font-bold text-black">Kategoriler</h2>
@@ -101,7 +97,6 @@ export default function CategoryModal({
             </button>
           </div>
 
-          {/* Arama */}
           <div className="p-5 pb-3">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -119,20 +114,19 @@ export default function CategoryModal({
             </div>
           </div>
 
-          {/* Kategori listesi */}
           <div className="flex-1 overflow-y-auto p-5 pt-2">
             {filtered.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {filtered.map((cat) => {
-                  const isSelected = localSelected.includes(cat);
+                  const isSelected = localSelected.includes(cat.id);
                   const isDisabled =
                     maxSelection && !isSelected && localSelected.length >= maxSelection;
 
                   return (
                     <button
-                      key={cat}
+                      key={cat.id}
                       type="button"
-                      onClick={() => toggleLocal(cat)}
+                      onClick={() => toggleLocal(cat.id)}
                       disabled={isDisabled}
                       className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                         isSelected
@@ -140,7 +134,7 @@ export default function CategoryModal({
                           : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
                       }`}
                     >
-                      {cat}
+                      {cat.name}
                     </button>
                   );
                 })}
@@ -152,7 +146,6 @@ export default function CategoryModal({
             )}
           </div>
 
-          {/* Footer */}
           <div className="p-4 border-t border-gray-100 flex items-center justify-between gap-3">
             <button
               type="button"

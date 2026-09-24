@@ -75,11 +75,15 @@ export default function UserMenu() {
       >
         {showImage ? (
           <img
-            src={user.avatar_url}
-            alt={user.username}
-            className="w-full h-full object-cover"
-            onError={() => setAvatarError(true)}
-          />
+          src={user.avatar_url}
+          alt={user.username}
+          loading="lazy"
+          decoding="async"
+          width="36"
+          height="36"
+          className="w-full h-full object-cover"
+          onError={() => setAvatarError(true)}
+        />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <svg className="w-5 h-5 text-gray-500 mt-1" fill="currentColor" viewBox="0 0 24 24">

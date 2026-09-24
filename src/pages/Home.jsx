@@ -24,42 +24,38 @@ export default function Home() {
 
   const debouncedSearch = useDebounced(searchTerm, 400);
 
-  // Tüm kategorileri backend'den çek (bir kez)
   const [allCategories, setAllCategories] = useState([]);
   useEffect(() => {
     fetch(`${API}/api/categories`)
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setAllCategories(data.map((c) => c.name).sort());
-        }
+        if (Array.isArray(data)) setAllCategories(data);
       })
       .catch(() => setAllCategories([]));
   }, []);
 
-  // Backend'den proje çek
-  const fetchProjects = async (searchValue, categoryNames, mode, offsetValue) => {
+  // fetchProjects — opsiyonel signal desteği ile
+  const fetchProjects = async (searchValue, categoryIds, mode, offsetValue, signal) => {
     const token = localStorage.getItem('token');
     const params = new URLSearchParams({
       limit: LIMIT,
       offset: offsetValue,
     });
     if (searchValue) params.set('search', searchValue);
-    if (categoryNames.length > 0) {
-      params.set('categories', categoryNames.join(','));
+    if (categoryIds.length > 0) {
+      params.set('categoryIds', categoryIds.join(','));
       params.set('mode', mode);
     }
 
     const res = await fetch(`${API}/api/projects?${params.toString()}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
+      signal,
     });
 
     if (!res.ok) {
       const text = await res.text();
       let data = {};
-      try {
-        data = JSON.parse(text);
-      } catch {}
+      try { data = JSON.parse(text); } catch {}
       throw new Error(data.error || 'Projeler yüklenemedi');
     }
 
@@ -69,7 +65,7 @@ export default function Home() {
 
   // Arama / kategori / mod değişince ilk sayfayı çek
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     const load = async () => {
       setLoading(true);
@@ -79,23 +75,23 @@ export default function Home() {
           debouncedSearch,
           selectedCategories,
           matchMode,
-          0
+          0,
+          controller.signal
         );
-        if (cancelled) return;
         setProjects(data);
         setHasMore(data.length === LIMIT);
         setLoading(false);
       } catch (err) {
-        if (cancelled) return;
+        if (err.name === 'AbortError') return; // iptal edildi, sessizce geç
         setLoadError(err.message);
         setLoading(false);
       }
     };
 
     load();
-    return () => {
-      cancelled = true;
-    };
+
+    // Cleanup: yeni istek başlarken öncekini iptal et
+    return () => controller.abort();
   }, [debouncedSearch, selectedCategories, matchMode]);
 
   // Daha fazla yükle
@@ -118,9 +114,9 @@ export default function Home() {
     }
   };
 
-  const toggleCategory = (cat) => {
+  const toggleCategory = (id) => {
     setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
     );
   };
 
@@ -166,7 +162,6 @@ export default function Home() {
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-10 pb-10">
         <div className="max-w-7xl mx-auto">
 
-          {/* Başlık + Arama */}
           <div className="mb-6 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
             <div className="shrink-0">
               <h2 className="text-2xl font-bold text-black tracking-tight">Keşfet</h2>
@@ -192,7 +187,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Kategori Chip'leri */}
           {allCategories.length > 0 && (
             <div className="mb-3">
               <div className="flex flex-wrap gap-2">
@@ -208,18 +202,18 @@ export default function Home() {
                 </button>
 
                 {allCategories.slice(0, VISIBLE_LIMIT).map((cat) => {
-                  const isSelected = selectedCategories.includes(cat);
+                  const isSelected = selectedCategories.includes(cat.id);
                   return (
                     <button
-                      key={cat}
-                      onClick={() => toggleCategory(cat)}
+                      key={cat.id}
+                      onClick={() => toggleCategory(cat.id)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${
                         isSelected
                           ? 'bg-black text-white border-black'
                           : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
                       }`}
                     >
-                      {cat}
+                      {cat.name}
                     </button>
                   );
                 })}
@@ -236,7 +230,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* VE / VEYA Modu */}
           {selectedCategories.length > 1 && (
             <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
               <span className="text-gray-500">Eşleşme:</span>
@@ -270,7 +263,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Sonuç bilgisi */}
           {hasActiveFilters && !loading && (
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-xs text-gray-500">
@@ -288,14 +280,12 @@ export default function Home() {
             </div>
           )}
 
-          {/* Yükleniyor */}
           {loading && (
             <div className="text-center py-20 text-sm text-gray-500">
               Projeler yükleniyor...
             </div>
           )}
 
-          {/* Hata */}
           {loadError && !loading && (
             <div className="text-center py-20">
               <div className="text-5xl mb-3">⚠️</div>
@@ -310,7 +300,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Projeler */}
           {!loading && !loadError && (
             <>
               {projects.length > 0 ? (
@@ -365,7 +354,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Kategori Modal */}
       <CategoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

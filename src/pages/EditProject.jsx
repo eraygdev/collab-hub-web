@@ -9,6 +9,12 @@ import CategorySelector from '../components/CategorySelector';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+// ✅ Başlık: sadece harf, rakam, _ . ve boşluk
+const TITLE_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
+
+// ✅ Açıklamalar: harf, rakam, noktalama, boşluk (emoji/CJK yok)
+const TEXT_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;:'"()\[\]{}\-_/|@#$%&*+=~\s]*$/;
+
 function isValidUrl(str) {
   if (!str) return true;
   try {
@@ -17,6 +23,18 @@ function isValidUrl(str) {
   } catch {
     return false;
   }
+}
+
+function charCount(str) {
+  return str.length;
+}
+
+// ✅ Geçersiz karakteri bulur (uyarı mesajı için)
+function findInvalidChar(value, regex) {
+  for (const char of value) {
+    if (!regex.test(char)) return char;
+  }
+  return null;
 }
 
 export default function EditProject() {
@@ -34,7 +52,6 @@ export default function EditProject() {
   });
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [projectCategoryNames, setProjectCategoryNames] = useState([]);
   const [projectAuthorId, setProjectAuthorId] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -42,7 +59,9 @@ export default function EditProject() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Kategorileri çek
+  // ✅ Alan bazlı geçersiz karakter uyarıları
+  const [warnings, setWarnings] = useState({});
+
   useEffect(() => {
     fetch(`${API}/api/categories`)
       .then((res) => res.json())
@@ -50,7 +69,6 @@ export default function EditProject() {
       .catch(() => setCategories([]));
   }, []);
 
-  // Projeyi çek ve formu doldur
   useEffect(() => {
     const token = localStorage.getItem('token');
     fetch(`${API}/api/projects/${id}`, {
@@ -70,7 +88,7 @@ export default function EditProject() {
           imageUrl: data.imageUrl || '',
         });
 
-        setProjectCategoryNames(data.categories || []);
+        setSelectedCategories(Array.isArray(data.categoryIds) ? data.categoryIds : []);
         setProjectAuthorId(data.authorId ?? null);
         setLoading(false);
       })
@@ -80,16 +98,6 @@ export default function EditProject() {
       });
   }, [id]);
 
-  // categories state'i geldiğinde name → id dönüşümü yap
-  useEffect(() => {
-    if (categories.length === 0 || projectCategoryNames.length === 0) return;
-    const ids = categories
-      .filter((c) => projectCategoryNames.includes(c.name))
-      .map((c) => c.id);
-    setSelectedCategories(ids);
-  }, [categories, projectCategoryNames]);
-
-  // Yetki kontrolü: giriş yapmamışsa login'e, yazar değilse proje sayfasına
   useEffect(() => {
     if (authLoading || loading) return;
     if (!user) {
@@ -101,7 +109,52 @@ export default function EditProject() {
     }
   }, [user, authLoading, loading, projectAuthorId, id, navigate]);
 
-  const handleChange = (e) => {
+  // ✅ Uyarıyı göster ve 3 saniye sonra otomatik temizle
+  const showWarning = (field, char) => {
+    setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
+    setTimeout(() => {
+      setWarnings((prev) => ({ ...prev, [field]: '' }));
+    }, 3000);
+  };
+
+  // ✅ Başlık alanı
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    if (value === '') {
+      setForm({ ...form, title: '' });
+      setWarnings((prev) => ({ ...prev, title: '' }));
+      return;
+    }
+    if (!TITLE_REGEX.test(value)) {
+      const bad = findInvalidChar(value, TITLE_REGEX);
+      if (bad) showWarning('title', bad);
+      return;
+    }
+    if (value.length > PROJECT_LIMITS.title) return;
+    setForm({ ...form, title: value });
+    setWarnings((prev) => ({ ...prev, title: '' }));
+  };
+
+  // ✅ Açıklama alanları
+  const handleTextChange = (e) => {
+    const { name, value } = e.target;
+    if (value === '') {
+      setForm({ ...form, [name]: '' });
+      setWarnings((prev) => ({ ...prev, [name]: '' }));
+      return;
+    }
+    if (!TEXT_REGEX.test(value)) {
+      const bad = findInvalidChar(value, TEXT_REGEX);
+      if (bad) showWarning(name, bad);
+      return;
+    }
+    if (PROJECT_LIMITS[name] && value.length > PROJECT_LIMITS[name]) return;
+    setForm({ ...form, [name]: value });
+    setWarnings((prev) => ({ ...prev, [name]: '' }));
+  };
+
+  // ✅ URL alanları
+  const handleUrlChange = (e) => {
     const { name, value } = e.target;
     if (PROJECT_LIMITS[name] && value.length > PROJECT_LIMITS[name]) return;
     setForm({ ...form, [name]: value });
@@ -117,6 +170,13 @@ export default function EditProject() {
     if (!form.title.trim() || !form.description.trim()) {
       setError('Başlık ve kısa açıklama zorunlu.');
       return;
+    }
+
+    for (const [key, max] of Object.entries(PROJECT_LIMITS)) {
+      if (form[key] && form[key].length > max) {
+        setError(`${key} alanı en fazla ${max} karakter olabilir.`);
+        return;
+      }
     }
 
     if (!isValidUrl(form.githubUrl)) {
@@ -212,75 +272,83 @@ export default function EditProject() {
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm">
 
-          {/* Başlık */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="title" className="block text-xs font-medium text-gray-700">
                 Proje Başlığı <span className="text-red-500">*</span>
               </label>
-              <CharCounter current={form.title.length} max={PROJECT_LIMITS.title} id="title-counter" />
+              <CharCounter value={form.title} max={PROJECT_LIMITS.title} id="title-counter" />
             </div>
             <input
               id="title"
               name="title"
               type="text"
               value={form.title}
-              onChange={handleChange}
+              onChange={handleTitleChange}
               required
-              maxLength={PROJECT_LIMITS.title}
               disabled={submitting}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('title') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
+            {warnings.title && (
+              <p role="alert" className="mt-1 text-[11px] text-amber-600">
+                ⚠️ {warnings.title} — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.
+              </p>
+            )}
           </div>
 
-          {/* Kısa Açıklama */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="description" className="block text-xs font-medium text-gray-700">
                 Kısa Açıklama <span className="text-red-500">*</span>
               </label>
-              <CharCounter current={form.description.length} max={PROJECT_LIMITS.description} id="description-counter" />
+              <CharCounter value={form.description} max={PROJECT_LIMITS.description} id="description-counter" />
             </div>
             <textarea
               id="description"
               name="description"
               value={form.description}
-              onChange={handleChange}
+              onChange={handleTextChange}
               required
               rows={3}
-              maxLength={PROJECT_LIMITS.description}
               disabled={submitting}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y disabled:opacity-50 ${
                 overLimit('description') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
+            {warnings.description && (
+              <p role="alert" className="mt-1 text-[11px] text-amber-600">
+                ⚠️ {warnings.description} — emoji ve özel semboller kullanılamaz.
+              </p>
+            )}
           </div>
 
-          {/* Uzun Açıklama */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="longDescription" className="block text-xs font-medium text-gray-700">
                 Uzun Açıklama
               </label>
-              <CharCounter current={form.longDescription.length} max={PROJECT_LIMITS.longDescription} id="long-description-counter" />
+              <CharCounter value={form.longDescription} max={PROJECT_LIMITS.longDescription} id="long-description-counter" />
             </div>
             <textarea
               id="longDescription"
               name="longDescription"
               value={form.longDescription}
-              onChange={handleChange}
+              onChange={handleTextChange}
               rows={6}
-              maxLength={PROJECT_LIMITS.longDescription}
               disabled={submitting}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y disabled:opacity-50 ${
                 overLimit('longDescription') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
+            {warnings.longDescription && (
+              <p role="alert" className="mt-1 text-[11px] text-amber-600">
+                ⚠️ {warnings.longDescription} — emoji ve özel semboller kullanılamaz.
+              </p>
+            )}
           </div>
 
-          {/* Kategoriler */}
           <CategorySelector
             categories={categories}
             selected={selectedCategories}
@@ -288,21 +356,19 @@ export default function EditProject() {
             disabled={submitting}
           />
 
-          {/* GitHub URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="githubUrl" className="block text-xs font-medium text-gray-700">
                 GitHub URL
               </label>
-              <CharCounter current={form.githubUrl.length} max={PROJECT_LIMITS.githubUrl} id="github-url-counter" />
+              <CharCounter value={form.githubUrl} max={PROJECT_LIMITS.githubUrl} id="github-url-counter" />
             </div>
             <input
               id="githubUrl"
               name="githubUrl"
               type="url"
               value={form.githubUrl}
-              onChange={handleChange}
-              maxLength={PROJECT_LIMITS.githubUrl}
+              onChange={handleUrlChange}
               disabled={submitting}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('githubUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
@@ -310,21 +376,19 @@ export default function EditProject() {
             />
           </div>
 
-          {/* Demo URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="demoUrl" className="block text-xs font-medium text-gray-700">
                 Demo URL
               </label>
-              <CharCounter current={form.demoUrl.length} max={PROJECT_LIMITS.demoUrl} id="demo-url-counter" />
+              <CharCounter value={form.demoUrl} max={PROJECT_LIMITS.demoUrl} id="demo-url-counter" />
             </div>
             <input
               id="demoUrl"
               name="demoUrl"
               type="url"
               value={form.demoUrl}
-              onChange={handleChange}
-              maxLength={PROJECT_LIMITS.demoUrl}
+              onChange={handleUrlChange}
               disabled={submitting}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('demoUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
@@ -332,21 +396,19 @@ export default function EditProject() {
             />
           </div>
 
-          {/* Görsel URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="imageUrl" className="block text-xs font-medium text-gray-700">
                 Kapak Görseli URL
               </label>
-              <CharCounter current={form.imageUrl.length} max={PROJECT_LIMITS.imageUrl} id="image-url-counter" />
+              <CharCounter value={form.imageUrl} max={PROJECT_LIMITS.imageUrl} id="image-url-counter" />
             </div>
             <input
               id="imageUrl"
               name="imageUrl"
               type="url"
               value={form.imageUrl}
-              onChange={handleChange}
-              maxLength={PROJECT_LIMITS.imageUrl}
+              onChange={handleUrlChange}
               disabled={submitting}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('imageUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
@@ -355,21 +417,18 @@ export default function EditProject() {
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 
-          {/* Hata */}
           {error && (
             <div role="alert" className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5">
               {error}
             </div>
           )}
 
-          {/* Başarı */}
           {success && (
             <div role="status" className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-2.5">
               Güncellendi! Yönlendiriliyorsun...
             </div>
           )}
 
-          {/* Butonlar */}
           <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-2">
             <button
               type="button"

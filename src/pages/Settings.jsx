@@ -4,6 +4,24 @@ import { PROFILE_LIMITS } from '../constants/limits';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+// ✅ Kullanıcı adı: sadece harf, rakam, _ . ve boşluk
+const ALLOWED_USERNAME_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
+
+// ✅ Bio: harf, rakam, noktalama, boşluk, satır sonu (emoji/CJK yok)
+const ALLOWED_BIO_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;:'"()\[\]{}\-_/|@#$%&*+=~\s]*$/;
+
+function charCount(str) {
+  return str.length;
+}
+
+// ✅ Geçersiz karakteri bulur (uyarı mesajı için)
+function findInvalidChar(value, regex) {
+  for (const char of value) {
+    if (!regex.test(char)) return char;
+  }
+  return null;
+}
+
 export default function Settings() {
   const { user, loading, refreshUser } = useAuth();
 
@@ -14,7 +32,9 @@ export default function Settings() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // /api/auth/me'den taze profil verisini çek.
+  // ✅ Alan bazlı geçersiz karakter uyarıları
+  const [warnings, setWarnings] = useState({});
+
   useEffect(() => {
     if (!user) {
       setFetching(false);
@@ -34,6 +54,14 @@ export default function Settings() {
       .catch(() => setFetching(false));
   }, [user]);
 
+  // ✅ Uyarıyı göster ve 3 saniye sonra otomatik temizle
+  const showWarning = (field, char) => {
+    setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
+    setTimeout(() => {
+      setWarnings((prev) => ({ ...prev, [field]: '' }));
+    }, 3000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -41,6 +69,15 @@ export default function Settings() {
 
     if (!username.trim()) {
       setError('Kullanıcı adı boş olamaz.');
+      return;
+    }
+
+    if (charCount(username) > PROFILE_LIMITS.username) {
+      setError(`Kullanıcı adı en fazla ${PROFILE_LIMITS.username} karakter olabilir.`);
+      return;
+    }
+    if (charCount(bio) > PROFILE_LIMITS.bio) {
+      setError(`Hakkımda en fazla ${PROFILE_LIMITS.bio} karakter olabilir.`);
       return;
     }
 
@@ -73,7 +110,6 @@ export default function Settings() {
         return;
       }
 
-      // ✅ AuthContext'teki user bilgisini tazele → Navbar anında güncellenir
       await refreshUser();
 
       setSuccess('Profil başarıyla güncellendi.');
@@ -98,7 +134,6 @@ export default function Settings() {
     <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
       <div className="max-w-2xl mx-auto">
 
-        {/* Başlık */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-black">
             Ayarlar.
@@ -108,7 +143,6 @@ export default function Settings() {
           </p>
         </div>
 
-        {/* Profil Bilgileri */}
         <form
           onSubmit={handleSubmit}
           className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-5"
@@ -119,13 +153,16 @@ export default function Settings() {
             </h2>
           </div>
 
-          {/* Avatar (salt okunur) */}
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-gray-200 border border-gray-300 overflow-hidden shrink-0">
               {user.avatar_url ? (
                 <img
                   src={user.avatar_url}
                   alt={user.username}
+                  loading="lazy"
+                  decoding="async"
+                  width="64"
+                  height="64"
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -142,7 +179,6 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Kullanıcı Adı */}
           <div>
             <label htmlFor="username" className="block text-xs font-medium text-gray-700 mb-1.5">
               Kullanıcı Adı
@@ -151,17 +187,35 @@ export default function Settings() {
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              maxLength={PROFILE_LIMITS.username}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  setUsername('');
+                  setWarnings((prev) => ({ ...prev, username: '' }));
+                  return;
+                }
+                if (!ALLOWED_USERNAME_REGEX.test(value)) {
+                  const bad = findInvalidChar(value, ALLOWED_USERNAME_REGEX);
+                  if (bad) showWarning('username', bad);
+                  return;
+                }
+                if (value.length > PROFILE_LIMITS.username) return;
+                setUsername(value);
+                setWarnings((prev) => ({ ...prev, username: '' }));
+              }}
               disabled={submitting}
               className="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all disabled:opacity-50"
             />
             <p className="mt-1 text-[11px] text-gray-400">
               {username.length} / {PROFILE_LIMITS.username}
             </p>
+            {warnings.username && (
+              <p role="alert" className="mt-1 text-[11px] text-amber-600">
+                ⚠️ {warnings.username} — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.
+              </p>
+            )}
           </div>
 
-          {/* Email (salt okunur) */}
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1.5">
               E-posta
@@ -179,7 +233,6 @@ export default function Settings() {
             </p>
           </div>
 
-          {/* Bio */}
           <div>
             <label htmlFor="bio" className="block text-xs font-medium text-gray-700 mb-1.5">
               Hakkımda
@@ -187,19 +240,37 @@ export default function Settings() {
             <textarea
               id="bio"
               value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  setBio('');
+                  setWarnings((prev) => ({ ...prev, bio: '' }));
+                  return;
+                }
+                if (!ALLOWED_BIO_REGEX.test(value)) {
+                  const bad = findInvalidChar(value, ALLOWED_BIO_REGEX);
+                  if (bad) showWarning('bio', bad);
+                  return;
+                }
+                if (value.length > PROFILE_LIMITS.bio) return;
+                setBio(value);
+                setWarnings((prev) => ({ ...prev, bio: '' }));
+              }}
               placeholder="Kendinden kısaca bahset..."
               rows={4}
-              maxLength={PROFILE_LIMITS.bio}
               disabled={submitting}
               className="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all resize-y disabled:opacity-50"
             />
             <p className="mt-1 text-[11px] text-gray-400">
               {bio.length} / {PROFILE_LIMITS.bio}
             </p>
+            {warnings.bio && (
+              <p role="alert" className="mt-1 text-[11px] text-amber-600">
+                ⚠️ {warnings.bio} — emoji ve özel semboller kullanılamaz.
+              </p>
+            )}
           </div>
 
-          {/* Hata */}
           {error && (
             <div
               role="alert"
@@ -209,7 +280,6 @@ export default function Settings() {
             </div>
           )}
 
-          {/* Başarı */}
           {success && (
             <div
               role="status"
@@ -219,7 +289,6 @@ export default function Settings() {
             </div>
           )}
 
-          {/* Kaydet */}
           <div className="pt-2">
             <button
               type="submit"
@@ -231,7 +300,6 @@ export default function Settings() {
           </div>
         </form>
 
-        {/* Tehlikeli Bölge */}
         <div className="mt-6 bg-white border border-red-100 rounded-2xl p-6 sm:p-8">
           <h2 className="text-sm font-bold text-red-600 uppercase tracking-wider mb-2">
             Tehlikeli Bölge

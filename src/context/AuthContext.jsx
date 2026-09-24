@@ -5,13 +5,10 @@ const AuthContext = createContext(null);
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // Token'ı localStorage'dan okuyup decode eder.
-// base64url → base64 dönüşümü + UTF-8 güvenli decode.
 function decodeToken(token) {
   try {
     const payload = token.split('.')[1];
-    // base64url → base64
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    // UTF-8 güvenli decode
     const json = decodeURIComponent(
       atob(base64)
         .split('')
@@ -30,24 +27,46 @@ function isTokenValid(decoded) {
   return decoded.exp * 1000 > Date.now();
 }
 
-// Tüm uygulamaya kullanıcı bilgisini dağıtan sağlayıcı.
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // /api/auth/me'den taze veri çekip user'ı günceller.
+  // JWT'de avatar_url olmadığı için bu fonksiyon kritik.
+  const refreshUser = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const res = await fetch(`${API}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      // JWT'den gelen user_id'yi koru, DB'den gelen alanları merge et
+      setUser((prev) => ({ ...prev, ...data }));
+      return data;
+    } catch {
+      return null;
+    }
+  }, []);
+
   // Sayfa ilk açıldığında token var mı diye bakar.
+  // Token varsa: JWT'yi decode et + /api/auth/me'den taze veriyi çek.
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       const decoded = decodeToken(token);
       if (isTokenValid(decoded)) {
         setUser(decoded);
+        // JWT'de avatar_url yok → taze veriyi hemen çek
+        refreshUser().finally(() => setLoading(false));
+        return;
       } else {
         localStorage.removeItem('token');
       }
     }
     setLoading(false);
-  }, []);
+  }, [refreshUser]);
 
   // Her dakika token'ı kontrol et, expire olduysa otomatik logout.
   useEffect(() => {
@@ -58,12 +77,11 @@ export function AuthProvider({ children }) {
       if (!isTokenValid(decoded)) {
         localStorage.removeItem('token');
         setUser(null);
-        // Kullanıcıyı login'e yönlendir
         if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
           window.location.href = '/login';
         }
       }
-    }, 60 * 1000); // her dakika
+    }, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -73,24 +91,6 @@ export function AuthProvider({ children }) {
     const decoded = decodeToken(token);
     if (isTokenValid(decoded)) {
       setUser(decoded);
-    }
-  }, []);
-
-  // /api/auth/me'den taze veri çekip user'ı günceller (Settings için).
-  const refreshUser = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-    try {
-      const res = await fetch(`${API}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      // Mevcut decoded user'a taze alanları merge et
-      setUser((prev) => ({ ...prev, ...data, user_id: data.user_id }));
-      return data;
-    } catch {
-      return null;
     }
   }, []);
 
@@ -108,7 +108,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Herhangi bir bileşende kullanıcı bilgisine erişmek için hook.
 export function useAuth() {
   return useContext(AuthContext);
 }

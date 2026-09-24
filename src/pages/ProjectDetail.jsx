@@ -209,6 +209,10 @@ const isAuthor = user && project.authorId && user.user_id === project.authorId;
             <img
               src={project.imageUrl}
               alt={project.title}
+              loading="lazy"
+              decoding="async"
+              width="1200"
+              height="600"
               className="w-full h-full object-cover"
             />
           ) : (

@@ -99,7 +99,7 @@ export default function Dashboard() {
             {projects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {projects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
+                  <ProjectCard key={project.id} project={project} showAuthor={false} />
                 ))}
               </div>
             ) : (

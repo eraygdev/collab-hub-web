@@ -70,10 +70,14 @@ export default function Profile() {
             <div className="w-16 h-16 rounded-full bg-gray-200 border border-gray-300 overflow-hidden shrink-0">
               {user.avatar_url ? (
                 <img
-                  src={user.avatar_url}
-                  alt={user.username}
-                  className="w-full h-full object-cover"
-                />
+                src={user.avatar_url}
+                alt={user.username}
+                loading="lazy"
+                decoding="async"
+                width="64"
+                height="64"
+                className="w-full h-full object-cover"
+              />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
@@ -141,7 +145,7 @@ export default function Profile() {
             {projects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
+                  <ProjectCard key={project.id} project={project} showAuthor={false} />
                 ))}
               </div>
             ) : (

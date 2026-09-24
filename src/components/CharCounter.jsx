@@ -1,5 +1,7 @@
 // Kalan karakteri gösteren küçük yardımcı bileşen.
-export default function CharCounter({ current, max, id }) {
+// Özel karakter/emoji engellendiği için str.length güvenli.
+export default function CharCounter({ value = '', max, id }) {
+  const current = value.length;
   const remaining = max - current;
   const isNearLimit = remaining <= 20 && remaining >= 0;
   const isOverLimit = remaining < 0;

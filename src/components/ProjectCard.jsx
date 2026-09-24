@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const MAX_VISIBLE = 3;
 
-export default function ProjectCard({ project }) {
+function ProjectCard({ project, showAuthor = true }) {
   const categories = project.categories || [];
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
 
-  const visibleCategories = categories.slice(0, MAX_VISIBLE);
-  const hiddenCount = Math.max(0, categories.length - MAX_VISIBLE);
+  const visibleCategories = useMemo(
+    () => categories.slice(0, MAX_VISIBLE),
+    [categories]
+  );
+  const hiddenCount = useMemo(
+    () => Math.max(0, categories.length - MAX_VISIBLE),
+    [categories]
+  );
 
   const showImage = project.imageUrl && !imageError;
 
@@ -27,6 +33,10 @@ export default function ProjectCard({ project }) {
           <img
             src={project.imageUrl}
             alt={project.title}
+            loading="lazy"
+            decoding="async"
+            width="400"
+            height="300"
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
           />
@@ -36,7 +46,7 @@ export default function ProjectCard({ project }) {
           </svg>
         )}
 
-        {/* Yıldız badge — sağ üst */}
+        {/* Yıldız badge */}
         {project.stars !== undefined && (
           <div
             className={`absolute top-3 right-3 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm rounded-full ${
@@ -52,14 +62,17 @@ export default function ProjectCard({ project }) {
       </div>
 
       <div className="p-4 flex flex-col flex-1">
-        {/* Yazar satırı */}
-        {project.author && (
+        {showAuthor && project.author && (
           <div className="flex items-center gap-1.5 mb-2">
             <div className="w-4 h-4 rounded-full bg-gray-200 overflow-hidden shrink-0">
               {project.authorAvatar ? (
                 <img
                   src={project.authorAvatar}
                   alt={project.author}
+                  loading="lazy"
+                  decoding="async"
+                  width="16"
+                  height="16"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
@@ -105,3 +118,6 @@ export default function ProjectCard({ project }) {
     </div>
   );
 }
+
+// React.memo ile gereksiz render'ları önle
+export default React.memo(ProjectCard);
