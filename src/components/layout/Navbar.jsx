@@ -1,6 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import UserMenu from './UserMenu';
+import UserDropdown from './UserDropdown';
 
 export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
@@ -42,7 +42,7 @@ export default function Navbar({ onOpenSidebar }) {
               >
                 Merhaba, {user.username}
               </NavLink>
-              <UserMenu />
+              <UserDropdown />
             </>
           ) : (
             <>
@@ -58,7 +58,7 @@ export default function Navbar({ onOpenSidebar }) {
               >
                 Giriş Yap
               </NavLink>
-              <UserMenu />
+              <UserDropdown />
             </>
           )}
         </div>
