@@ -5,16 +5,16 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import Home from './pages/project/Home';
-import UserProfile from './pages/user/UserProfile';
+import UserProfile from './pages/user/Profile';
 import Settings from './pages/user/Settings';
 import Dashboard from './pages/user/Dashboard';
-import CreateProject from './pages/project/CreateProject';
-import EditProject from './pages/project/EditProject';
+import CreateProject from './pages/project/Create';
+import EditProject from './pages/project/Edit';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import ProjectDetail from './pages/project/ProjectDetail';
+import ProjectDetail from './pages/project/Details';
 import NotFound from './pages/NotFound';
-import AuthCallback from './pages/auth/AuthCallback';
+import AuthCallback from './pages/auth/Callback';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
