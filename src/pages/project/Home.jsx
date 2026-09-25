@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import ProjectCard from '../../components/ProjectCard';
-import CategoryModal from '../../components/CategoryModal';
+import ProjectCard from '../../components/project/ProjectCard';
+import CategoryModal from '../../components/project/CategoryPick';
 import { useDebounced } from '../../hooks/useDebounced';
 import { SEARCH_LIMITS } from '../../constants/limits';
 

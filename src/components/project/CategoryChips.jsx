@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import CategoryModal from './CategoryModal';
-import { PROJECT_LIMITS } from '../constants/limits';
+import CategoryModal from './CategoryPick';
+import { PROJECT_LIMITS } from '../../constants/limits';
 
 // Chip listesi + "Daha fazla" modal ile çoklu kategori seçimi.
 // categories: [{id, name, slug}]

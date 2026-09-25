@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
-import CharCounter from '../../components/CharCounter';
-import ImagePreview from '../../components/ImagePreview';
-import CategorySelector from '../../components/CategorySelector';
+import CharCounter from '../../components/ui/CharCounter';
+import ImagePreview from '../../components/project/ImagePreview';
+import CategorySelector from '../../components/project/CategoryChips';
 import {
   TITLE_REGEX,
   TEXT_REGEX,

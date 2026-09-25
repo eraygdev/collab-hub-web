@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import ProjectCard from '../../components/ProjectCard';
+import ProjectCard from '../../components/project/ProjectCard';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 

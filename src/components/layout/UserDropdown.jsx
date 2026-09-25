@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 // Avatar + dropdown menü. Hem giriş yapmış hem yapmamış kullanıcı için.
 export default function UserMenu() {
