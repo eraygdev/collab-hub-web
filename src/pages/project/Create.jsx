@@ -1,45 +1,25 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { PROJECT_LIMITS } from '../constants/limits';
-import { useDebounced } from '../hooks/useDebounced';
-import CharCounter from '../components/CharCounter';
-import ImagePreview from '../components/ImagePreview';
-import CategorySelector from '../components/CategorySelector';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { PROJECT_LIMITS } from '../../constants/limits';
+import { useDebounced } from '../../hooks/useDebounced';
+import CharCounter from '../../components/CharCounter';
+import ImagePreview from '../../components/ImagePreview';
+import CategorySelector from '../../components/CategorySelector';
+import {
+  TITLE_REGEX,
+  TEXT_REGEX,
+  charCount,
+  findInvalidChar,
+  isValidUrl,
+} from '../../utils/validators';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// ✅ Başlık: sadece harf, rakam, _ . ve boşluk
-const TITLE_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
+const DRAFT_KEY = 'createProjectDraft';
 
-// ✅ Açıklamalar: harf, rakam, noktalama, boşluk (emoji/CJK yok)
-const TEXT_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;:'"()\[\]{}\-_/|@#$%&*+=~\s]*$/;
-
-function isValidUrl(str) {
-  if (!str) return true;
-  try {
-    const u = new URL(str);
-    return u.protocol === 'http:' || u.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-function charCount(str) {
-  return str.length;
-}
-
-// ✅ Geçersiz karakteri bulur (uyarı mesajı için)
-function findInvalidChar(value, regex) {
-  for (const char of value) {
-    if (!regex.test(char)) return char;
-  }
-  return null;
-}
-
-export default function EditProject() {
-  const { id } = useParams();
-  const { user, loading: authLoading } = useAuth();
+export default function CreateProject() {
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -50,16 +30,13 @@ export default function EditProject() {
     demoUrl: '',
     imageUrl: '',
   });
+
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [projectAuthorId, setProjectAuthorId] = useState(null);
-
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // ✅ Alan bazlı geçersiz karakter uyarıları
   const [warnings, setWarnings] = useState({});
 
   useEffect(() => {
@@ -69,47 +46,46 @@ export default function EditProject() {
       .catch(() => setCategories([]));
   }, []);
 
+  const [draftLoaded, setDraftLoaded] = useState(false);
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    fetch(`${API}/api/projects/${id}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Proje bulunamadı');
-        return res.json();
-      })
-      .then((data) => {
-        setForm({
-          title: data.title || '',
-          description: data.description || '',
-          longDescription: data.longDescription || '',
-          githubUrl: data.githubUrl || '',
-          demoUrl: data.demoUrl || '',
-          imageUrl: data.imageUrl || '',
-        });
-
-        setSelectedCategories(Array.isArray(data.categoryIds) ? data.categoryIds : []);
-        setProjectAuthorId(data.authorId ?? null);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Proje bulunamadı');
-        setLoading(false);
-      });
-  }, [id]);
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const { _selectedCategories, ...formData } = parsed;
+        setForm((prev) => ({ ...prev, ...formData }));
+        if (Array.isArray(_selectedCategories)) {
+          setSelectedCategories(_selectedCategories);
+        }
+      }
+    } catch {}
+    setDraftLoaded(true);
+  }, []);
 
   useEffect(() => {
-    if (authLoading || loading) return;
-    if (!user) {
+    if (!draftLoaded) return;
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({
+            ...form,
+            _selectedCategories: selectedCategories,
+          })
+        );
+      } catch {}
+    }, 800);
+    return () => clearTimeout(t);
+  }, [form, selectedCategories, draftLoaded]);
+
+  const debouncedImageUrl = useDebounced(form.imageUrl, 400);
+
+  useEffect(() => {
+    if (!loading && !user) {
       navigate('/login');
-      return;
     }
-    if (projectAuthorId !== null && user.user_id !== projectAuthorId) {
-      navigate(`/project/${id}`);
-    }
-  }, [user, authLoading, loading, projectAuthorId, id, navigate]);
+  }, [user, loading, navigate]);
 
-  // ✅ Uyarıyı göster ve 3 saniye sonra otomatik temizle
   const showWarning = (field, char) => {
     setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
     setTimeout(() => {
@@ -117,7 +93,6 @@ export default function EditProject() {
     }, 3000);
   };
 
-  // ✅ Başlık alanı
   const handleTitleChange = (e) => {
     const value = e.target.value;
     if (value === '') {
@@ -130,12 +105,11 @@ export default function EditProject() {
       if (bad) showWarning('title', bad);
       return;
     }
-    if (value.length > PROJECT_LIMITS.title) return;
+    if (charCount(value) > PROJECT_LIMITS.title) return;
     setForm({ ...form, title: value });
     setWarnings((prev) => ({ ...prev, title: '' }));
   };
 
-  // ✅ Açıklama alanları
   const handleTextChange = (e) => {
     const { name, value } = e.target;
     if (value === '') {
@@ -148,19 +122,18 @@ export default function EditProject() {
       if (bad) showWarning(name, bad);
       return;
     }
-    if (PROJECT_LIMITS[name] && value.length > PROJECT_LIMITS[name]) return;
+    if (PROJECT_LIMITS[name] && charCount(value) > PROJECT_LIMITS[name]) return;
     setForm({ ...form, [name]: value });
     setWarnings((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // ✅ URL alanları
   const handleUrlChange = (e) => {
     const { name, value } = e.target;
-    if (PROJECT_LIMITS[name] && value.length > PROJECT_LIMITS[name]) return;
+    if (PROJECT_LIMITS[name] && charCount(value) > PROJECT_LIMITS[name]) return;
     setForm({ ...form, [name]: value });
   };
 
-  const overLimit = (key) => form[key].length > PROJECT_LIMITS[key];
+  const overLimit = (key) => charCount(form[key]) > PROJECT_LIMITS[key];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -173,22 +146,22 @@ export default function EditProject() {
     }
 
     for (const [key, max] of Object.entries(PROJECT_LIMITS)) {
-      if (form[key] && form[key].length > max) {
+      if (form[key] && charCount(form[key]) > max) {
         setError(`${key} alanı en fazla ${max} karakter olabilir.`);
         return;
       }
     }
 
     if (!isValidUrl(form.githubUrl)) {
-      setError('GitHub URL geçersiz.');
+      setError('GitHub URL geçersiz. http:// veya https:// ile başlamalı.');
       return;
     }
     if (!isValidUrl(form.demoUrl)) {
-      setError('Demo URL geçersiz.');
+      setError('Demo URL geçersiz. http:// veya https:// ile başlamalı.');
       return;
     }
     if (!isValidUrl(form.imageUrl)) {
-      setError('Görsel URL geçersiz.');
+      setError('Görsel URL geçersiz. http:// veya https:// ile başlamalı.');
       return;
     }
 
@@ -196,8 +169,8 @@ export default function EditProject() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/projects/${id}`, {
-        method: 'PUT',
+      const res = await fetch(`${API}/api/projects`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -224,9 +197,12 @@ export default function EditProject() {
         return;
       }
 
+      localStorage.removeItem(DRAFT_KEY);
+      setSelectedCategories([]);
       setSuccess(true);
+
       setTimeout(() => {
-        navigate(`/project/${id}`);
+        navigate(`/project/${data.id}`);
       }, 700);
     } catch {
       setError('Sunucuya bağlanılamadı');
@@ -234,9 +210,15 @@ export default function EditProject() {
     }
   };
 
-  const debouncedImageUrl = useDebounced(form.imageUrl, 400);
+  const handleCancel = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="w-full px-4 py-10 text-center text-sm text-gray-500">
         Yükleniyor...
@@ -246,27 +228,16 @@ export default function EditProject() {
 
   if (!user) return null;
 
-  if (error && !form.title) {
-    return (
-      <div className="w-full px-4 py-20 text-center">
-        <p className="text-sm text-gray-500">{error}</p>
-        <Link to="/" className="mt-4 inline-block text-sm underline">
-          Ana sayfaya dön
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
       <div className="max-w-2xl mx-auto">
 
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-black">
-            Projeyi düzenle.
+            Yeni proje oluştur.
           </h1>
           <p className="mt-2 text-sm text-gray-500">
-            Değişiklikleri kaydet veya iptal et.
+            Projeni topluluğa tanıt, katkıda bulunacak geliştiriciler bul.
           </p>
         </div>
 
@@ -285,8 +256,11 @@ export default function EditProject() {
               type="text"
               value={form.title}
               onChange={handleTitleChange}
+              placeholder="Örn: AI Destekli Kod Asistanı"
               required
               disabled={submitting}
+              aria-describedby="title-counter"
+              aria-invalid={overLimit('title')}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('title') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
@@ -310,9 +284,12 @@ export default function EditProject() {
               name="description"
               value={form.description}
               onChange={handleTextChange}
+              placeholder="Projeni 1-2 cümleyle özetle."
               required
               rows={3}
               disabled={submitting}
+              aria-describedby="description-counter"
+              aria-invalid={overLimit('description')}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y disabled:opacity-50 ${
                 overLimit('description') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
@@ -336,8 +313,11 @@ export default function EditProject() {
               name="longDescription"
               value={form.longDescription}
               onChange={handleTextChange}
+              placeholder="Projenin detayları, kullanılan teknolojiler, hedef kitlesi... (opsiyonel)"
               rows={6}
               disabled={submitting}
+              aria-describedby="long-description-counter"
+              aria-invalid={overLimit('longDescription')}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y disabled:opacity-50 ${
                 overLimit('longDescription') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
@@ -369,7 +349,10 @@ export default function EditProject() {
               type="url"
               value={form.githubUrl}
               onChange={handleUrlChange}
+              placeholder="https://github.com/kullanici/proje (opsiyonel)"
               disabled={submitting}
+              aria-describedby="github-url-counter"
+              aria-invalid={overLimit('githubUrl')}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('githubUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
@@ -389,7 +372,10 @@ export default function EditProject() {
               type="url"
               value={form.demoUrl}
               onChange={handleUrlChange}
+              placeholder="https://proje-demo.com (opsiyonel)"
               disabled={submitting}
+              aria-describedby="demo-url-counter"
+              aria-invalid={overLimit('demoUrl')}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('demoUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
@@ -409,32 +395,44 @@ export default function EditProject() {
               type="url"
               value={form.imageUrl}
               onChange={handleUrlChange}
+              placeholder="https://... (opsiyonel)"
               disabled={submitting}
+              aria-describedby="image-url-counter image-url-hint"
+              aria-invalid={overLimit('imageUrl')}
               className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
                 overLimit('imageUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
+            <p id="image-url-hint" className="mt-1 text-[11px] text-gray-400">
+              URL yapıştır, önizleme otomatik görünür.
+            </p>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 
           {error && (
-            <div role="alert" className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5">
+            <div
+              role="alert"
+              className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5"
+            >
               {error}
             </div>
           )}
 
           {success && (
-            <div role="status" className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-2.5">
-              Güncellendi! Yönlendiriliyorsun...
+            <div
+              role="status"
+              className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-2.5"
+            >
+              Proje oluşturuldu! Yönlendiriliyorsun...
             </div>
           )}
 
           <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-2">
             <button
               type="button"
-              onClick={() => navigate(`/project/${id}`)}
+              onClick={handleCancel}
               disabled={submitting}
-              className="flex-1 px-5 py-3 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+              className="flex-1 px-5 py-3 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               İptal
             </button>
@@ -443,7 +441,7 @@ export default function EditProject() {
               disabled={submitting}
               className="flex-1 px-5 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
+              {submitting ? 'Kaydediliyor...' : 'Projeyi Yayınla'}
             </button>
           </div>
 

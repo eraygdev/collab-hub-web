@@ -118,7 +118,7 @@ export default function UserMenu() {
                 Dashboard
               </Link>
               <Link
-                to="/profile"
+                to={`/profile/${user.username}`}
                 role="menuitem"
                 onClick={() => setOpen(false)}
                 className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

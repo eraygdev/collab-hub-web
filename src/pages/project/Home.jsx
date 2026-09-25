@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import ProjectCard from '../components/ProjectCard';
-import CategoryModal from '../components/CategoryModal';
-import { useDebounced } from '../hooks/useDebounced';
-import { SEARCH_LIMITS } from '../constants/limits';
+import ProjectCard from '../../components/ProjectCard';
+import CategoryModal from '../../components/CategoryModal';
+import { useDebounced } from '../../hooks/useDebounced';
+import { SEARCH_LIMITS } from '../../constants/limits';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 

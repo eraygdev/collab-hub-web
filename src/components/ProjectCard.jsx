@@ -86,7 +86,15 @@ function ProjectCard({ project, showAuthor = true }) {
                 </div>
               )}
             </div>
-            <span className="text-xs text-gray-500 truncate">{project.author}</span>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/profile/${project.author}`);
+              }}
+              className="text-xs text-gray-500 hover:text-black hover:underline truncate cursor-pointer"
+            >
+              {project.author}
+            </span>
           </div>
         )}
 

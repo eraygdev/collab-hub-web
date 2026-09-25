@@ -1,26 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { PROFILE_LIMITS } from '../constants/limits';
+import { useAuth } from '../../context/AuthContext';
+import { PROFILE_LIMITS } from '../../constants/limits';
+import {
+  USERNAME_REGEX,
+  BIO_REGEX,
+  charCount,
+  findInvalidChar,
+} from '../../utils/validators';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-
-// ✅ Kullanıcı adı: sadece harf, rakam, _ . ve boşluk
-const ALLOWED_USERNAME_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
-
-// ✅ Bio: harf, rakam, noktalama, boşluk, satır sonu (emoji/CJK yok)
-const ALLOWED_BIO_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;:'"()\[\]{}\-_/|@#$%&*+=~\s]*$/;
-
-function charCount(str) {
-  return str.length;
-}
-
-// ✅ Geçersiz karakteri bulur (uyarı mesajı için)
-function findInvalidChar(value, regex) {
-  for (const char of value) {
-    if (!regex.test(char)) return char;
-  }
-  return null;
-}
 
 export default function Settings() {
   const { user, loading, refreshUser } = useAuth();
@@ -32,7 +20,6 @@ export default function Settings() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // ✅ Alan bazlı geçersiz karakter uyarıları
   const [warnings, setWarnings] = useState({});
 
   useEffect(() => {
@@ -54,7 +41,6 @@ export default function Settings() {
       .catch(() => setFetching(false));
   }, [user]);
 
-  // ✅ Uyarıyı göster ve 3 saniye sonra otomatik temizle
   const showWarning = (field, char) => {
     setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
     setTimeout(() => {
@@ -194,12 +180,12 @@ export default function Settings() {
                   setWarnings((prev) => ({ ...prev, username: '' }));
                   return;
                 }
-                if (!ALLOWED_USERNAME_REGEX.test(value)) {
-                  const bad = findInvalidChar(value, ALLOWED_USERNAME_REGEX);
+                if (!USERNAME_REGEX.test(value)) {
+                  const bad = findInvalidChar(value, USERNAME_REGEX);
                   if (bad) showWarning('username', bad);
                   return;
                 }
-                if (value.length > PROFILE_LIMITS.username) return;
+                if (charCount(value) > PROFILE_LIMITS.username) return;
                 setUsername(value);
                 setWarnings((prev) => ({ ...prev, username: '' }));
               }}
@@ -207,7 +193,7 @@ export default function Settings() {
               className="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all disabled:opacity-50"
             />
             <p className="mt-1 text-[11px] text-gray-400">
-              {username.length} / {PROFILE_LIMITS.username}
+              {charCount(username)} / {PROFILE_LIMITS.username}
             </p>
             {warnings.username && (
               <p role="alert" className="mt-1 text-[11px] text-amber-600">
@@ -247,12 +233,12 @@ export default function Settings() {
                   setWarnings((prev) => ({ ...prev, bio: '' }));
                   return;
                 }
-                if (!ALLOWED_BIO_REGEX.test(value)) {
-                  const bad = findInvalidChar(value, ALLOWED_BIO_REGEX);
+                if (!BIO_REGEX.test(value)) {
+                  const bad = findInvalidChar(value, BIO_REGEX);
                   if (bad) showWarning('bio', bad);
                   return;
                 }
-                if (value.length > PROFILE_LIMITS.bio) return;
+                if (charCount(value) > PROFILE_LIMITS.bio) return;
                 setBio(value);
                 setWarnings((prev) => ({ ...prev, bio: '' }));
               }}
@@ -262,7 +248,7 @@ export default function Settings() {
               className="w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all resize-y disabled:opacity-50"
             />
             <p className="mt-1 text-[11px] text-gray-400">
-              {bio.length} / {PROFILE_LIMITS.bio}
+              {charCount(bio)} / {PROFILE_LIMITS.bio}
             </p>
             {warnings.bio && (
               <p role="alert" className="mt-1 text-[11px] text-amber-600">

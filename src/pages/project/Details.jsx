@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -289,6 +289,48 @@ const isAuthor = user && project.authorId && user.user_id === project.authorId;
           {/* Sağ Sütun - Sidebar */}
           <aside className="lg:col-span-1">
             <div className="lg:sticky lg:top-24 space-y-4">
+
+              {/* Yazar Kartı */}
+              {project.author && (
+                <Link
+                  to={`/profile/${project.author}`}
+                  className="block bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-gray-300 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden shrink-0 border border-gray-200">
+                      {project.authorAvatar ? (
+                        <img
+                          src={project.authorAvatar}
+                          alt={project.author}
+                          loading="lazy"
+                          decoding="async"
+                          width="48"
+                          height="48"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-400 mb-0.5">Yazar</p>
+                      <p className="text-sm font-semibold text-black truncate group-hover:text-gray-700 transition-colors">
+                        {project.author}
+                      </p>
+                    </div>
+                    <span className="text-gray-400 group-hover:text-black group-hover:translate-x-0.5 transition-all">
+                      →
+                    </span>
+                  </div>
+                </Link>
+              )}
 
               {/* CTA Kartı */}
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">

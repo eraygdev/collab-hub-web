@@ -4,17 +4,17 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Dashboard from './pages/Dashboard';
-import CreateProject from './pages/CreateProject';
-import EditProject from './pages/EditProject';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ProjectDetail from './pages/ProjectDetail';
+import Home from './pages/project/Home';
+import UserProfile from './pages/user/UserProfile';
+import Settings from './pages/user/Settings';
+import Dashboard from './pages/user/Dashboard';
+import CreateProject from './pages/project/CreateProject';
+import EditProject from './pages/project/EditProject';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import ProjectDetail from './pages/project/ProjectDetail';
 import NotFound from './pages/NotFound';
-import AuthCallback from './pages/AuthCallback';
+import AuthCallback from './pages/auth/AuthCallback';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -49,7 +49,7 @@ function AppContent() {
     <Layout hideFooter={hideFooter}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:username" element={<UserProfile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-project" element={<CreateProject />} />
