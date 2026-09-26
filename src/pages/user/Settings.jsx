@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { PROFILE_LIMITS } from '../../constants/limits';
+import CharWarning from '../../components/ui/CharWarning';
 import {
   USERNAME_REGEX,
   BIO_REGEX,
@@ -22,27 +23,40 @@ export default function Settings() {
 
   const [warnings, setWarnings] = useState({});
 
+  // ✅ Stabil dependency
+  const userId = user?.user_id;
+
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setFetching(false);
       return;
     }
 
     const token = localStorage.getItem('token');
+    let cancelled = false;
+
     fetch(`${API}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
+        if (cancelled) return;
         setUsername(data.username || '');
         setBio(data.bio || '');
         setFetching(false);
       })
-      .catch(() => setFetching(false));
-  }, [user]);
+      .catch(() => {
+        if (cancelled) return;
+        setFetching(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const showWarning = (field, char) => {
-    setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
+    setWarnings((prev) => ({ ...prev, [field]: char }));
     setTimeout(() => {
       setWarnings((prev) => ({ ...prev, [field]: '' }));
     }, 3000);
@@ -195,11 +209,7 @@ export default function Settings() {
             <p className="mt-1 text-[11px] text-gray-400">
               {charCount(username)} / {PROFILE_LIMITS.username}
             </p>
-            {warnings.username && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.username} — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.
-              </p>
-            )}
+            <CharWarning char={warnings.username} />
           </div>
 
           <div>
@@ -250,11 +260,7 @@ export default function Settings() {
             <p className="mt-1 text-[11px] text-gray-400">
               {charCount(bio)} / {PROFILE_LIMITS.bio}
             </p>
-            {warnings.bio && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.bio} — emoji ve özel semboller kullanılamaz.
-              </p>
-            )}
+            <CharWarning char={warnings.bio} />
           </div>
 
           {error && (

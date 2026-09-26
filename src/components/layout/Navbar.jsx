@@ -1,13 +1,14 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import UserDropdown from './UserDropdown';
+import UserSearch from './UserSearch';
 
 export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 shadow-xs">
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <button
             onClick={onOpenSidebar}
@@ -26,6 +27,9 @@ export default function Navbar({ onOpenSidebar }) {
             Collab-Hub.
           </Link>
         </div>
+
+        {/* ✅ Kullanıcı Arama */}
+        <UserSearch />
 
         <div className="flex items-center gap-2 sm:gap-4">
           {user ? (

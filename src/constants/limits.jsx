@@ -20,5 +20,13 @@ export const PROFILE_LIMITS = {
 
 // Arama limitleri
 export const SEARCH_LIMITS = {
-  maxLength: 80,
+  maxLength: 100,
+  userSearchMaxLength: 30,
+};
+
+
+// Sayfalama limitleri
+export const PAGINATION_LIMITS = {
+  projectsPerPage: 20, 
+  usersPerSearch: 5, 
 };

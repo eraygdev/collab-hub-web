@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
 import CharCounter from '../../components/ui/CharCounter';
+import CharWarning from '../../components/ui/CharWarning';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import {
@@ -48,6 +49,7 @@ export default function EditProject() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     const token = localStorage.getItem('token');
     fetch(`${API}/api/projects/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -57,6 +59,7 @@ export default function EditProject() {
         return res.json();
       })
       .then((data) => {
+        if (cancelled) return;
         setForm({
           title: data.title || '',
           description: data.description || '',
@@ -71,10 +74,18 @@ export default function EditProject() {
         setLoading(false);
       })
       .catch(() => {
+        if (cancelled) return;
         setError('Proje bulunamadı');
         setLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
+
+  // ✅ Stabil dependency: userId
+  const userId = user?.user_id;
 
   useEffect(() => {
     if (authLoading || loading) return;
@@ -82,13 +93,13 @@ export default function EditProject() {
       navigate('/login');
       return;
     }
-    if (projectAuthorId !== null && user.user_id !== projectAuthorId) {
+    if (projectAuthorId !== null && userId !== projectAuthorId) {
       navigate(`/project/${id}`);
     }
-  }, [user, authLoading, loading, projectAuthorId, id, navigate]);
+  }, [userId, user, authLoading, loading, projectAuthorId, id, navigate]);
 
   const showWarning = (field, char) => {
-    setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
+    setWarnings((prev) => ({ ...prev, [field]: char }));
     setTimeout(() => {
       setWarnings((prev) => ({ ...prev, [field]: '' }));
     }, 3000);
@@ -265,11 +276,7 @@ export default function EditProject() {
                 overLimit('title') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
-            {warnings.title && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.title} — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.
-              </p>
-            )}
+            <CharWarning char={warnings.title} />
           </div>
 
           <div>
@@ -291,11 +298,7 @@ export default function EditProject() {
                 overLimit('description') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
-            {warnings.description && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.description} — emoji ve özel semboller kullanılamaz.
-              </p>
-            )}
+            <CharWarning char={warnings.description} />
           </div>
 
           <div>
@@ -316,11 +319,7 @@ export default function EditProject() {
                 overLimit('longDescription') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
-            {warnings.longDescription && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.longDescription} — emoji ve özel semboller kullanılamaz.
-              </p>
-            )}
+            <CharWarning char={warnings.longDescription} />
           </div>
 
           <CategorySelector

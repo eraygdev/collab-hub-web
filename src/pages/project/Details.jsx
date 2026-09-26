@@ -15,8 +15,9 @@ export default function ProjectDetail() {
   const [starLoading, setStarLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Projeyi API'den çek.
+  // ✅ Cleanup ile fetch
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError('');
     const token = localStorage.getItem('token');
@@ -29,16 +30,21 @@ export default function ProjectDetail() {
         return res.json();
       })
       .then((data) => {
+        if (cancelled) return;
         setProject(data);
         setLoading(false);
       })
       .catch((err) => {
+        if (cancelled) return;
         setError(err.message);
         setLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  // Yıldızla / yıldızı geri al.
   const handleToggleStar = async () => {
     if (!user) {
       navigate('/login');
@@ -73,7 +79,6 @@ export default function ProjectDetail() {
     }
   };
 
-  // Projeyi sil.
   const handleDelete = async () => {
     if (!confirm('Bu projeyi silmek istediğine emin misin? Bu işlem geri alınamaz.')) {
       return;
@@ -144,8 +149,8 @@ export default function ProjectDetail() {
     );
   }
 
-  // Kullanıcı bu projenin yazarı mı?
-const isAuthor = user && project.authorId && user.user_id === project.authorId;
+  // ✅ Stabil karşılaştırma
+  const isAuthor = user && project.authorId && user.user_id === project.authorId;
 
   return (
     <div className="w-full bg-white">
@@ -340,12 +345,10 @@ const isAuthor = user && project.authorId && user.user_id === project.authorId;
                 </p>
                 <div className="space-y-2">
                 {isAuthor ? (
-                  // Yazar: yıldızla butonu yerine bilgilendirme
                   <div className="w-full px-4 py-2.5 bg-gray-50 text-gray-500 text-sm font-medium rounded-lg text-center border border-gray-200">
                     ⭐ Bu proje senin · {project.stars} yıldız
                   </div>
                 ) : (
-                  // Yazar değil: yıldızla butonu
                   <button
                     onClick={handleToggleStar}
                     disabled={starLoading}

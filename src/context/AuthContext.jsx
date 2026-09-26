@@ -1,10 +1,8 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 
 const AuthContext = createContext(null);
-
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// Token'ı localStorage'dan okuyup decode eder.
 function decodeToken(token) {
   try {
     const payload = token.split('.')[1];
@@ -21,7 +19,6 @@ function decodeToken(token) {
   }
 }
 
-// Token geçerli mi? (exp kontrolü)
 function isTokenValid(decoded) {
   if (!decoded || !decoded.exp) return false;
   return decoded.exp * 1000 > Date.now();
@@ -30,45 +27,63 @@ function isTokenValid(decoded) {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const initializedRef = useRef(false);
+  const abortRef = useRef(null);
 
-  // /api/auth/me'den taze veri çekip user'ı günceller.
-  // JWT'de avatar_url olmadığı için bu fonksiyon kritik.
   const refreshUser = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) return null;
+
+    // ✅ Önceki isteği iptal et
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    // ✅ Timeout ekle (5 saniye)
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
       const res = await fetch(`${API}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       if (!res.ok) return null;
       const data = await res.json();
-      // JWT'den gelen user_id'yi koru, DB'den gelen alanları merge et
       setUser((prev) => ({ ...prev, ...data }));
       return data;
-    } catch {
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') return null;
+      console.log('AuthContext refreshUser hata:', err.message);
       return null;
     }
   }, []);
 
-  // Sayfa ilk açıldığında token var mı diye bakar.
-  // Token varsa: JWT'yi decode et + /api/auth/me'den taze veriyi çek.
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decoded = decodeToken(token);
-      if (isTokenValid(decoded)) {
-        setUser(decoded);
-        // JWT'de avatar_url yok → taze veriyi hemen çek
-        refreshUser().finally(() => setLoading(false));
-        return;
-      } else {
-        localStorage.removeItem('token');
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const decoded = decodeToken(token);
+        if (isTokenValid(decoded)) {
+          setUser(decoded);
+          await refreshUser();
+        } else {
+          localStorage.removeItem('token');
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false); // ✅ HER DURUMDA çağrılır
+    };
+
+    initAuth();
   }, [refreshUser]);
 
-  // Her dakika token'ı kontrol et, expire olduysa otomatik logout.
   useEffect(() => {
     const interval = setInterval(() => {
       const token = localStorage.getItem('token');
@@ -85,7 +100,6 @@ export function AuthProvider({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  // AuthCallback gibi yerlerden token set etmek için.
   const login = useCallback((token) => {
     localStorage.setItem('token', token);
     const decoded = decodeToken(token);
@@ -94,7 +108,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Çıkış yapar: token'ı sil, kullanıcıyı sıfırla.
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     setUser(null);

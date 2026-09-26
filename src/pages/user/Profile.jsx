@@ -20,8 +20,9 @@ export default function UserProfile() {
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState('');
 
-  // Profil + ilk sayfa projeleri çek
+  // ✅ username ve sort değişince çalışır
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError('');
     setProjects([]);
@@ -38,15 +39,21 @@ export default function UserProfile() {
         return res.json();
       })
       .then((data) => {
+        if (cancelled) return;
         setProfile(data);
         setProjects(Array.isArray(data.projects) ? data.projects : []);
         setHasMore(!!data.hasMore);
         setLoading(false);
       })
       .catch((err) => {
+        if (cancelled) return;
         setError(err.message);
         setLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [username, sort]);
 
   // Daha fazla yükle
@@ -113,7 +120,8 @@ export default function UserProfile() {
     );
   }
 
-  const isSelf = user && user.user_id === profile.user_id;
+  // ✅ user?.user_id ile stabil karşılaştırma
+  const isSelf = user?.user_id === profile.user_id;
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-10">

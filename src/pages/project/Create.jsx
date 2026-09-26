@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
 import CharCounter from '../../components/ui/CharCounter';
+import CharWarning from '../../components/ui/CharWarning';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import {
@@ -39,6 +40,13 @@ export default function CreateProject() {
 
   const [warnings, setWarnings] = useState({});
 
+  // ✅ Auth yönlendirmesi — sadece user değişince
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
+
   useEffect(() => {
     fetch(`${API}/api/categories`)
       .then((res) => res.json())
@@ -62,6 +70,7 @@ export default function CreateProject() {
     setDraftLoaded(true);
   }, []);
 
+  // ✅ Draft kaydetme — debounce ile
   useEffect(() => {
     if (!draftLoaded) return;
     const t = setTimeout(() => {
@@ -80,14 +89,8 @@ export default function CreateProject() {
 
   const debouncedImageUrl = useDebounced(form.imageUrl, 400);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/login');
-    }
-  }, [user, loading, navigate]);
-
   const showWarning = (field, char) => {
-    setWarnings((prev) => ({ ...prev, [field]: `Geçersiz karakter: "${char}"` }));
+    setWarnings((prev) => ({ ...prev, [field]: char }));
     setTimeout(() => {
       setWarnings((prev) => ({ ...prev, [field]: '' }));
     }, 3000);
@@ -265,11 +268,7 @@ export default function CreateProject() {
                 overLimit('title') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
-            {warnings.title && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.title} — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.
-              </p>
-            )}
+            <CharWarning char={warnings.title} />
           </div>
 
           <div>
@@ -294,11 +293,7 @@ export default function CreateProject() {
                 overLimit('description') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
-            {warnings.description && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.description} — emoji ve özel semboller kullanılamaz.
-              </p>
-            )}
+            <CharWarning char={warnings.description} />
           </div>
 
           <div>
@@ -322,11 +317,7 @@ export default function CreateProject() {
                 overLimit('longDescription') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
               }`}
             />
-            {warnings.longDescription && (
-              <p role="alert" className="mt-1 text-[11px] text-amber-600">
-                ⚠️ {warnings.longDescription} — emoji ve özel semboller kullanılamaz.
-              </p>
-            )}
+            <CharWarning char={warnings.longDescription} />
           </div>
 
           <CategorySelector

@@ -12,6 +12,9 @@ export default function Dashboard() {
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // ✅ Stabil dependency: user?.user_id
+  const userId = user?.user_id;
+
   // Token yoksa login'e yönlendir.
   useEffect(() => {
     if (!loading && !user) {
@@ -19,10 +22,13 @@ export default function Dashboard() {
     }
   }, [user, loading, navigate]);
 
-  // Kullanıcının kendi projelerini çek.
+  // ✅ Kullanıcının kendi projelerini çek — sadece userId değişince
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     const token = localStorage.getItem('token');
+    let cancelled = false;
+
+    setProjectsLoading(true);
     fetch(`${API}/api/me/projects`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -31,14 +37,20 @@ export default function Dashboard() {
         return res.json();
       })
       .then((data) => {
+        if (cancelled) return;
         setProjects(Array.isArray(data) ? data : []);
         setProjectsLoading(false);
       })
       .catch((err) => {
+        if (cancelled) return;
         setError(err.message);
         setProjectsLoading(false);
       });
-  }, [user]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   if (loading) {
     return (
