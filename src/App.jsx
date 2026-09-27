@@ -15,6 +15,10 @@ import Register from './pages/auth/Register';
 import ProjectDetail from './pages/project/Details';
 import NotFound from './pages/NotFound';
 import AuthCallback from './pages/auth/Callback';
+import About from './pages/legal/About';
+import Privacy from './pages/legal/Privacy';
+import Terms from './pages/legal/Terms';
+import Cookies from './pages/legal/Cookies';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -58,6 +62,12 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/project/:id" element={<ProjectDetail />} />
+
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/cookies" element={<Cookies />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

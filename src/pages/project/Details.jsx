@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-export default function ProjectDetail() {
+export default function ProjectDetails() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();

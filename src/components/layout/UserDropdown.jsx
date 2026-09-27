@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 // Avatar + dropdown menü. Hem giriş yapmış hem yapmamış kullanıcı için.
-export default function UserMenu() {
+export default function UserDropdown() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -28,7 +28,6 @@ export default function UserMenu() {
     };
     const handleEsc = (e) => {
       if (e.key === 'Escape') {
-        // Onay ekranı açıksa önce onu iptal et, menüyü açık bırak.
         if (confirmLogout) {
           setConfirmLogout(false);
         } else {
@@ -60,7 +59,6 @@ export default function UserMenu() {
     );
   }
 
-  // Avatar görseli var mı ve yüklenebiliyor mu?
   const showImage = user.avatar_url && !avatarError;
 
   return (
@@ -75,15 +73,15 @@ export default function UserMenu() {
       >
         {showImage ? (
           <img
-          src={user.avatar_url}
-          alt={user.username}
-          loading="lazy"
-          decoding="async"
-          width="36"
-          height="36"
-          className="w-full h-full object-cover"
-          onError={() => setAvatarError(true)}
-        />
+            src={user.avatar_url}
+            alt={user.username}
+            loading="lazy"
+            decoding="async"
+            width="36"
+            height="36"
+            className="w-full h-full object-cover"
+            onError={() => setAvatarError(true)}
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <svg className="w-5 h-5 text-gray-500 mt-1" fill="currentColor" viewBox="0 0 24 24">

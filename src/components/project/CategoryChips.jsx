@@ -5,7 +5,7 @@ import { PROJECT_LIMITS } from '../../constants/limits';
 // Chip listesi + "Daha fazla" modal ile çoklu kategori seçimi.
 // categories: [{id, name, slug}]
 // selected: [id, id, ...]
-export default function CategorySelector({ categories, selected, onChange, disabled }) {
+export default function CategoryChips({ categories, selected, onChange, disabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const MAX_SELECTION = PROJECT_LIMITS.maxCategories;

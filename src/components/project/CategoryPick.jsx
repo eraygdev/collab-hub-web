@@ -5,7 +5,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 // Basit in-memory cache — aynı oturumda tekrar fetch etmesin
 let categoriesCache = null;
 
-export default function CategoryModal({
+export default function CategoryPick({
   isOpen,
   onClose,
   onConfirm,
