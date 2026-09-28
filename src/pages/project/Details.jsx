@@ -1,10 +1,12 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import JoinRequestModal from '../../components/project/JoinRequestModal';
+import ContributorCard from '../../components/project/ContributorCard';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-export default function ProjectDetails() {
+export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -14,6 +16,12 @@ export default function ProjectDetails() {
   const [error, setError] = useState('');
   const [starLoading, setStarLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Başvuru durumu
+  const [joinStatus, setJoinStatus] = useState('none'); // 'none' | 'pending' | 'approved'
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [joinSubmitting, setJoinSubmitting] = useState(false);
+  const [joinError, setJoinError] = useState('');
 
   // ✅ Cleanup ile fetch
   useEffect(() => {
@@ -45,27 +53,51 @@ export default function ProjectDetails() {
     };
   }, [id]);
 
+  // ✅ Başvuru durumunu çek
+  useEffect(() => {
+    if (!user) {
+      setJoinStatus('none');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    let cancelled = false;
+
+    fetch(`${API}/api/projects/${id}/my-join-status`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setJoinStatus(data.status || 'none');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setJoinStatus('none');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, user]);
+
   const handleToggleStar = async () => {
     if (!user) {
       navigate('/login');
       return;
     }
-
     if (starLoading) return;
 
     const token = localStorage.getItem('token');
     const method = project.starred ? 'DELETE' : 'POST';
 
     setStarLoading(true);
-
     try {
       const res = await fetch(`${API}/api/projects/${id}/star`, {
         method,
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!res.ok) throw new Error('İşlem başarısız');
-
       const data = await res.json();
       setProject((prev) => ({
         ...prev,
@@ -73,7 +105,7 @@ export default function ProjectDetails() {
         starred: data.starred,
       }));
     } catch {
-      // Sessizce başarısız
+      // sessizce
     } finally {
       setStarLoading(false);
     }
@@ -83,7 +115,6 @@ export default function ProjectDetails() {
     if (!confirm('Bu projeyi silmek istediğine emin misin? Bu işlem geri alınamaz.')) {
       return;
     }
-
     setDeleting(true);
     const token = localStorage.getItem('token');
 
@@ -92,7 +123,6 @@ export default function ProjectDetails() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!res.ok) {
         const text = await res.text();
         let data = {};
@@ -101,11 +131,47 @@ export default function ProjectDetails() {
         setDeleting(false);
         return;
       }
-
       navigate('/');
     } catch {
       alert('Sunucuya bağlanılamadı');
       setDeleting(false);
+    }
+  };
+
+  // ✅ Başvuru gönder
+  const handleJoinSubmit = async (message) => {
+    setJoinError('');
+    setJoinSubmitting(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(`${API}/api/projects/${id}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      const text = await res.text();
+      let data = {};
+      if (text) {
+        try { data = JSON.parse(text); } catch {}
+      }
+
+      if (!res.ok) {
+        setJoinError(data.error || 'Başvuru gönderilemedi');
+        setJoinSubmitting(false);
+        return;
+      }
+
+      setJoinStatus('pending');
+      setIsJoinModalOpen(false);
+      setJoinSubmitting(false);
+    } catch {
+      setJoinError('Sunucuya bağlanılamadı');
+      setJoinSubmitting(false);
     }
   };
 
@@ -149,8 +215,33 @@ export default function ProjectDetails() {
     );
   }
 
-  // ✅ Stabil karşılaştırma
   const isAuthor = user && project.authorId && user.user_id === project.authorId;
+
+  // "Ekibe Katıl" butonu durumu
+  let joinButtonLabel = '👥 Ekibe Katıl';
+  let joinButtonDisabled = false;
+
+  if (!user) {
+    joinButtonLabel = '👥 Ekibe Katıl';
+  } else if (isAuthor) {
+    joinButtonLabel = '👑 Bu projenin sahibisin';
+    joinButtonDisabled = true;
+  } else if (joinStatus === 'pending') {
+    joinButtonLabel = '⏳ Başvurun onay bekliyor';
+    joinButtonDisabled = true;
+  } else if (joinStatus === 'approved') {
+    joinButtonLabel = '✅ Katkıcısın';
+    joinButtonDisabled = true;
+  }
+
+  const handleJoinClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (joinButtonDisabled) return;
+    setIsJoinModalOpen(true);
+  };
 
   return (
     <div className="w-full bg-white">
@@ -280,6 +371,22 @@ export default function ProjectDetails() {
                 </div>
               </div>
             )}
+            {/* ✅ Katkıcılar */}
+            {project.contributorsList && project.contributorsList.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+                  Katkıcılar ({project.contributorsList.length})
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {project.contributorsList.map((contributor) => (
+                    <ContributorCard
+                      key={contributor.user_id}
+                      contributor={contributor}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div>
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
@@ -344,31 +451,36 @@ export default function ProjectDetails() {
                   Katkıda bulunmak için ekibe katıl veya projeyi yıldızla.
                 </p>
                 <div className="space-y-2">
-                {isAuthor ? (
-                  <div className="w-full px-4 py-2.5 bg-gray-50 text-gray-500 text-sm font-medium rounded-lg text-center border border-gray-200">
-                    ⭐ Bu proje senin · {project.stars} yıldız
-                  </div>
-                ) : (
+                  {isAuthor ? (
+                    <div className="w-full px-4 py-2.5 bg-gray-50 text-gray-500 text-sm font-medium rounded-lg text-center border border-gray-200">
+                      ⭐ Bu proje senin · {project.stars} yıldız
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleToggleStar}
+                      disabled={starLoading}
+                      className={`w-full px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                        project.starred
+                          ? 'bg-amber-400 text-black border border-amber-500 hover:bg-amber-500'
+                          : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      {starLoading
+                        ? '...'
+                        : project.starred
+                        ? `★ Yıldızlandı (${project.stars})`
+                        : `☆ Yıldızla (${project.stars})`}
+                    </button>
+                  )}
+
                   <button
-                    onClick={handleToggleStar}
-                    disabled={starLoading}
-                    className={`w-full px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-                      project.starred
-                        ? 'bg-amber-400 text-black border border-amber-500 hover:bg-amber-500'
-                        : 'bg-black text-white hover:bg-gray-800'
-                    }`}
+                    onClick={handleJoinClick}
+                    disabled={joinButtonDisabled}
+                    className="w-full px-4 py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-white"
                   >
-                    {starLoading
-                      ? '...'
-                      : project.starred
-                      ? `★ Yıldızlandı (${project.stars})`
-                      : `☆ Yıldızla (${project.stars})`}
+                    {joinButtonLabel}
                   </button>
-                )}
-                <button className="w-full px-4 py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer">
-                  👥 Ekibe Katıl
-                </button>
-              </div>
+                </div>
               </div>
 
               {/* Bilgi Kartı */}
@@ -384,9 +496,9 @@ export default function ProjectDetails() {
                     <dd className="font-medium text-gray-900">⭐ {project.stars}</dd>
                   </div>
                   <div className="flex items-center justify-between">
-                    <dt className="text-gray-500">Katkıcı</dt>
-                    <dd className="font-medium text-gray-900">👥 {project.contributors}</dd>
-                  </div>
+                <dt className="text-gray-500">Katkıcı</dt>
+                <dd className="font-medium text-gray-900">👥 {project.contributorsList?.length || 0}</dd>
+                  </div>auto
                   <div className="flex items-center justify-between">
                     <dt className="text-gray-500">Durum</dt>
                     <dd className="font-medium text-emerald-600">{project.status}</dd>
@@ -427,6 +539,16 @@ export default function ProjectDetails() {
         </div>
 
       </div>
+
+      {/* ✅ Başvuru Modalı */}
+      <JoinRequestModal
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onConfirm={handleJoinSubmit}
+        projectTitle={project.title}
+        isPremium={user?.is_premium === true}
+        submitting={joinSubmitting}
+      />
     </div>
   );
 }
