@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDebounced } from '../../hooks/useDebounced';
+import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
 import { SEARCH_LIMITS, PAGINATION_LIMITS } from '../../constants/limits';
 import CharWarning from '../ui/CharWarning';
@@ -12,23 +13,32 @@ export default function UserSearch() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const [warning, setWarning] = useState('');
 
   const debouncedQuery = useDebounced(query, 300);
   const containerRef = useRef(null);
   const abortRef = useRef(null);
 
+  // ✅ Arama geçmişi hook'u (query'yi geçiriyoruz)
+  const {
+    filteredHistory,
+    hasHistory,
+    isDropdownOpen,
+    openDropdown,
+    hideDropdown,
+    add: addHistory,
+    remove: removeHistory,
+    clear: clearHistory,
+  } = useSearchHistory('user', query);
+
   // Arama isteği
   useEffect(() => {
-    // ✅ Önceki isteği iptal et
     if (abortRef.current) {
       abortRef.current.abort();
     }
 
     if (!debouncedQuery.trim()) {
       setResults([]);
-      setIsOpen(false);
       return;
     }
 
@@ -47,7 +57,7 @@ export default function UserSearch() {
 
         const data = await res.json();
         setResults(Array.isArray(data) ? data : []);
-        setIsOpen(true);
+        openDropdown();
       } catch (err) {
         if (err.name !== 'AbortError') {
           setResults([]);
@@ -62,21 +72,21 @@ export default function UserSearch() {
     return () => {
       controller.abort();
     };
-  }, [debouncedQuery]);
+  }, [debouncedQuery, openDropdown]);
 
-  // Dışarı tıklayınca kapat
+  // Dışına tıklayınca / ESC ile kapat
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isDropdownOpen) return;
 
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setIsOpen(false);
+        hideDropdown();
       }
     };
 
     const handleEsc = (e) => {
       if (e.key === 'Escape') {
-        setIsOpen(false);
+        hideDropdown();
       }
     };
 
@@ -87,7 +97,7 @@ export default function UserSearch() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEsc);
     };
-  }, [isOpen]);
+  }, [isDropdownOpen, hideDropdown]);
 
   const showWarning = (char) => {
     setWarning(char);
@@ -116,9 +126,18 @@ export default function UserSearch() {
   };
 
   const handleSelect = (username) => {
+    addHistory(username);
     setQuery('');
     setResults([]);
-    setIsOpen(false);
+    hideDropdown();
+    setWarning('');
+    navigate(`/profile/${encodeURIComponent(username)}`);
+  };
+
+  const handleSelectHistory = (username) => {
+    setQuery('');
+    setResults([]);
+    hideDropdown();
     setWarning('');
     navigate(`/profile/${encodeURIComponent(username)}`);
   };
@@ -126,9 +145,24 @@ export default function UserSearch() {
   const handleClear = () => {
     setQuery('');
     setResults([]);
-    setIsOpen(false);
+    hideDropdown();
     setWarning('');
   };
+
+  const handleFocus = () => {
+    if (results.length > 0 || (query.trim() === '' && hasHistory)) {
+      openDropdown();
+    }
+  };
+
+  // Gösterme koşulları
+  const showResults = query.trim() !== '' && results.length > 0;
+  const showHistory = !showResults && hasHistory;
+  const showEmpty =
+    query.trim() !== '' &&
+    !loading &&
+    results.length === 0 &&
+    !hasHistory;
 
   return (
     <div ref={containerRef} className="relative hidden md:block">
@@ -143,9 +177,7 @@ export default function UserSearch() {
           type="text"
           value={query}
           onChange={handleChange}
-          onFocus={() => {
-            if (results.length > 0) setIsOpen(true);
-          }}
+          onFocus={handleFocus}
           placeholder="Kullanıcı ara..."
           maxLength={SEARCH_LIMITS.userSearchMaxLength}
           className={`w-56 pl-9 pr-8 py-2 text-sm bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white transition-all ${
@@ -171,21 +203,10 @@ export default function UserSearch() {
       />
 
       {/* Dropdown */}
-      {isOpen && !warning && (
+      {isDropdownOpen && !warning && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
-          {loading && (
-            <div className="px-4 py-3 text-xs text-gray-500 text-center">
-              Aranıyor...
-            </div>
-          )}
-
-          {!loading && results.length === 0 && (
-            <div className="px-4 py-3 text-xs text-gray-500 text-center">
-              Sonuç bulunamadı
-            </div>
-          )}
-
-          {!loading && results.length > 0 && (
+          {/* Kullanıcı arama sonuçları */}
+          {showResults && (
             <ul className="max-h-80 overflow-y-auto">
               {results.map((user) => (
                 <li key={user.user_id}>
@@ -229,6 +250,59 @@ export default function UserSearch() {
                 </li>
               ))}
             </ul>
+          )}
+
+          {/* Filtrelenmiş geçmiş aramalar */}
+          {showHistory && (
+            <>
+              <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Son Aramalar
+                </span>
+                <button
+                  type="button"
+                  onClick={clearHistory}
+                  className="text-[10px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                >
+                  Tümünü temizle
+                </button>
+              </div>
+              <ul className="max-h-72 overflow-y-auto">
+                {filteredHistory.map((username) => (
+                  <li key={username}>
+                    <div className="flex items-center group">
+                      <button
+                        type="button"
+                        onClick={() => handleSelectHistory(username)}
+                        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+                      >
+                        <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="truncate">{username}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeHistory(username)}
+                        className="p-2 mr-1 text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                        aria-label={`${username} aramasını sil`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* Boş sonuç */}
+          {showEmpty && (
+            <div className="px-4 py-3 text-xs text-gray-500 text-center">
+              Sonuç bulunamadı
+            </div>
           )}
         </div>
       )}

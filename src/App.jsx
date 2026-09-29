@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
+import ScrollToTopButton from './components/ui/ScrollToTopButton';
 import Home from './pages/project/Home';
 import UserProfile from './pages/user/Profile';
 import Settings from './pages/user/Settings';
@@ -39,6 +40,7 @@ function Layout({ children, hideFooter }) {
         {children}
       </main>
       {!hideFooter && <Footer />}
+      <ScrollToTopButton />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import CategoryModal from '../../components/project/CategoryPick';
 import CharWarning from '../../components/ui/CharWarning';
 import { SEARCH_LIMITS } from '../../constants/limits';
 import { TEXT_REGEX, findInvalidChar } from '../../utils/validators';
+import { useSearchHistory } from '../../hooks/useSearchHistory';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const LIMIT = 20;
@@ -27,12 +28,26 @@ export default function Home() {
 
   const [allCategories, setAllCategories] = useState([]);
 
+  const searchContainerRef = useRef(null);
+
+  // ✅ Arama geçmişi hook'u (query'yi geçiriyoruz)
+  const {
+    filteredHistory,
+    hasHistory,
+    isDropdownOpen,
+    openDropdown,
+    closeDropdown,
+    hideDropdown,
+    add: addHistory,
+    remove: removeHistory,
+    clear: clearHistory,
+  } = useSearchHistory('project', searchInput);
+
   const categoryKey = useMemo(
     () => [...selectedCategories].sort().join(','),
     [selectedCategories]
   );
 
-  // ✅ Kategoriler için de abort
   useEffect(() => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -54,6 +69,20 @@ export default function Home() {
       controller.abort();
     };
   }, []);
+
+  // ✅ Dışına tıklayınca dropdown'ı kapat
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        hideDropdown();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen, hideDropdown]);
 
   const fetchProjects = useCallback(
     async (searchValue, categoryIds, mode, offsetValue, signal) => {
@@ -83,10 +112,9 @@ export default function Home() {
     []
   );
 
-  // ✅ Ana fetch effect — abort + timeout
   useEffect(() => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10sn timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     const load = async () => {
       setLoading(true);
@@ -106,11 +134,7 @@ export default function Home() {
         setLoading(false);
       } catch (err) {
         clearTimeout(timeoutId);
-        // ✅ AbortError'ı sessizce geç
-        if (err.name === 'AbortError') {
-          return;
-        }
-        // ✅ Sadece gerçek hatayı göster
+        if (err.name === 'AbortError') return;
         setLoadError(err.message);
         setLoading(false);
       }
@@ -124,7 +148,6 @@ export default function Home() {
     };
   }, [activeSearch, categoryKey, matchMode, fetchProjects]);
 
-  // ... geri kalan handler'lar aynı
   const handleLoadMore = async () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
@@ -138,7 +161,7 @@ export default function Home() {
       setProjects((prev) => [...prev, ...data]);
       setHasMore(data.length === LIMIT);
     } catch {
-      // sessizce geç
+      // sessizce
     } finally {
       setLoadingMore(false);
     }
@@ -166,17 +189,30 @@ export default function Home() {
     setSearchWarning('');
   };
 
-  const handleSearch = () => setActiveSearch(searchInput.trim());
+  const handleSearch = () => {
+    const q = searchInput.trim();
+    setActiveSearch(q);
+    if (q) addHistory(q);
+    closeDropdown();
+  };
+
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSearch();
     }
   };
+
   const handleClearSearch = () => {
     setSearchInput('');
     setActiveSearch('');
     setSearchWarning('');
+  };
+
+  const handleSelectHistory = (q) => {
+    setSearchInput(q);
+    setActiveSearch(q);
+    hideDropdown();
   };
 
   const toggleCategory = (id) => {
@@ -195,6 +231,8 @@ export default function Home() {
 
   const hasActiveFilters =
     activeSearch.trim() !== '' || selectedCategories.length > 0;
+
+  const showHistoryDropdown = isDropdownOpen && hasHistory && !searchWarning;
 
   return (
     <div className="w-full">
@@ -231,7 +269,7 @@ export default function Home() {
 
             <div className="w-full lg:w-auto">
               <div className="flex items-center gap-2">
-                <div className="relative flex-1 lg:w-64">
+                <div ref={searchContainerRef} className="relative flex-1 lg:w-64">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
@@ -242,6 +280,7 @@ export default function Home() {
                     value={searchInput}
                     onChange={handleSearchInputChange}
                     onKeyDown={handleSearchKeyDown}
+                    onFocus={openDropdown}
                     placeholder="Proje ara..."
                     maxLength={SEARCH_LIMITS.maxLength}
                     className={`w-full pl-10 pr-9 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all ${
@@ -259,6 +298,51 @@ export default function Home() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
+                  )}
+
+                  {showHistoryDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                          Son Aramalar
+                        </span>
+                        <button
+                          type="button"
+                          onClick={clearHistory}
+                          className="text-[10px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                        >
+                          Tümünü temizle
+                        </button>
+                      </div>
+                      <ul className="max-h-72 overflow-y-auto">
+                        {filteredHistory.map((q) => (
+                          <li key={q}>
+                            <div className="flex items-center group">
+                              <button
+                                type="button"
+                                onClick={() => handleSelectHistory(q)}
+                                className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+                              >
+                                <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="truncate">{q}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeHistory(q)}
+                                className="p-2 mr-1 text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                                aria-label={`${q} aramasını sil`}
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </div>
                 <button
