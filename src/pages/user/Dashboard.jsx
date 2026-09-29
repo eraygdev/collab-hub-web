@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProjectCard from '../../components/project/ProjectCard';
+import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { isCompact, view, setView } = useProjectView();
 
-  const [tab, setTab] = useState('projects'); // 'projects' | 'requests'
+  const [tab, setTab] = useState('projects');
 
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
@@ -17,18 +19,16 @@ export default function Dashboard() {
 
   const [requests, setRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
-  const [requestActionId, setRequestActionId] = useState(null); // hangi başvuru işleniyor
+  const [requestActionId, setRequestActionId] = useState(null);
 
   const userId = user?.user_id;
 
-  // Auth yönlendirme
   useEffect(() => {
     if (!loading && !user) {
       navigate('/login');
     }
   }, [user, loading, navigate]);
 
-  // Projeleri çek
   useEffect(() => {
     if (!userId) return;
     const token = localStorage.getItem('token');
@@ -58,7 +58,6 @@ export default function Dashboard() {
     };
   }, [userId]);
 
-  // Başvuruları çek
   useEffect(() => {
     if (!userId) return;
     const token = localStorage.getItem('token');
@@ -89,7 +88,6 @@ export default function Dashboard() {
   }, [userId]);
 
   const handleRequestAction = async (requestId, action) => {
-    // action: 'approve' | 'reject'
     if (requestActionId) return;
     setRequestActionId(requestId);
     const token = localStorage.getItem('token');
@@ -105,7 +103,6 @@ export default function Dashboard() {
 
       if (!res.ok) throw new Error('İşlem başarısız');
 
-      // Listeden kaldır
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
     } catch {
       alert('İşlem başarısız oldu');
@@ -126,11 +123,14 @@ export default function Dashboard() {
 
   const pendingCount = requests.length;
 
+  const gridClass = isCompact
+    ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
+    : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6';
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
       <div className="max-w-7xl mx-auto">
 
-        {/* Başlık */}
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-black mb-2">
@@ -151,38 +151,70 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Sekmeler */}
         <div className="mb-6 border-b border-gray-200">
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => setTab('projects')}
-              className={`pb-3 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px ${
-                tab === 'projects'
-                  ? 'text-black border-black'
-                  : 'text-gray-500 border-transparent hover:text-black'
-              }`}
-            >
-              Projelerim
-            </button>
-            <button
-              onClick={() => setTab('requests')}
-              className={`pb-3 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px flex items-center gap-2 ${
-                tab === 'requests'
-                  ? 'text-black border-black'
-                  : 'text-gray-500 border-transparent hover:text-black'
-              }`}
-            >
-              Gelen Başvurular
-              {pendingCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-red-500 rounded-full">
-                  {pendingCount}
-                </span>
-              )}
-            </button>
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => setTab('projects')}
+                className={`pb-3 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px ${
+                  tab === 'projects'
+                    ? 'text-black border-black'
+                    : 'text-gray-500 border-transparent hover:text-black'
+                }`}
+              >
+                Projelerim
+              </button>
+              <button
+                onClick={() => setTab('requests')}
+                className={`pb-3 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px flex items-center gap-2 ${
+                  tab === 'requests'
+                    ? 'text-black border-black'
+                    : 'text-gray-500 border-transparent hover:text-black'
+                }`}
+              >
+                Gelen Başvurular
+                {pendingCount > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-red-500 rounded-full">
+                    {pendingCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Görünüm toggle — sadece Projelerim sekmesinde */}
+            {tab === 'projects' && (
+              <div className="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50 mb-3">
+                <button
+                  onClick={() => setView('normal')}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                    view === 'normal'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-gray-500 hover:text-black'
+                  }`}
+                  aria-label="Normal görünüm"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setView('compact')}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                    view === 'compact'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-gray-500 hover:text-black'
+                  }`}
+                  aria-label="Küçük görünüm"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Tab: Projelerim */}
         {tab === 'projects' && (
           <>
             {projectsLoading && (
@@ -202,9 +234,14 @@ export default function Dashboard() {
             {!projectsLoading && !error && (
               <>
                 {projects.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  <div className={gridClass}>
                     {projects.map((project) => (
-                      <ProjectCard key={project.id} project={project} showAuthor={false} />
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        showAuthor={false}
+                        compact={isCompact}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -229,7 +266,6 @@ export default function Dashboard() {
           </>
         )}
 
-        {/* Tab: Gelen Başvurular */}
         {tab === 'requests' && (
           <>
             {requestsLoading && (
@@ -259,7 +295,6 @@ export default function Dashboard() {
                       key={req.id}
                       className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
                     >
-                      {/* Avatar */}
                       <Link
                         to={`/profile/${req.username}`}
                         className="w-12 h-12 rounded-full bg-gray-200 border border-gray-200 overflow-hidden shrink-0"
@@ -286,7 +321,6 @@ export default function Dashboard() {
                         )}
                       </Link>
 
-                      {/* Bilgi */}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                           <Link
@@ -319,7 +353,6 @@ export default function Dashboard() {
                         </p>
                       </div>
 
-                      {/* Aksiyonlar */}
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           onClick={() => handleRequestAction(req.id, 'reject')}

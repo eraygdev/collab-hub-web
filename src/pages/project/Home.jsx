@@ -6,6 +6,7 @@ import CharWarning from '../../components/ui/CharWarning';
 import { SEARCH_LIMITS } from '../../constants/limits';
 import { TEXT_REGEX, findInvalidChar } from '../../utils/validators';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
+import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const LIMIT = 20;
@@ -30,7 +31,8 @@ export default function Home() {
 
   const searchContainerRef = useRef(null);
 
-  // ✅ Arama geçmişi hook'u (query'yi geçiriyoruz)
+  const { isCompact, view, setView } = useProjectView();
+
   const {
     filteredHistory,
     hasHistory,
@@ -70,7 +72,6 @@ export default function Home() {
     };
   }, []);
 
-  // ✅ Dışına tıklayınca dropdown'ı kapat
   useEffect(() => {
     if (!isDropdownOpen) return;
 
@@ -233,6 +234,10 @@ export default function Home() {
     activeSearch.trim() !== '' || selectedCategories.length > 0;
 
   const showHistoryDropdown = isDropdownOpen && hasHistory && !searchWarning;
+
+  const gridClass = isCompact
+    ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
+    : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6';
 
   return (
     <div className="w-full">
@@ -397,34 +402,73 @@ export default function Home() {
             </div>
           )}
 
-          {selectedCategories.length > 1 && (
-            <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-gray-500">Eşleşme:</span>
+          {/* ✅ Sol: Eşleşme | Sağ: Görünüm toggle + Yeni proje */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              {selectedCategories.length > 1 && (
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-gray-500">Eşleşme:</span>
+                  <div className="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+                    <button
+                      onClick={() => setMatchMode('or')}
+                      className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                        matchMode === 'or' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'
+                      }`}
+                    >
+                      Herhangi biri
+                    </button>
+                    <button
+                      onClick={() => setMatchMode('and')}
+                      className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                        matchMode === 'and' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'
+                      }`}
+                    >
+                      Hepsi
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Görünüm toggle — sadece ikon */}
               <div className="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
                 <button
-                  onClick={() => setMatchMode('or')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                    matchMode === 'or' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'
+                  onClick={() => setView('normal')}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                    view === 'normal'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-gray-500 hover:text-black'
                   }`}
+                  aria-label="Normal görünüm"
                 >
-                  Herhangi biri
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
                 </button>
                 <button
-                  onClick={() => setMatchMode('and')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                    matchMode === 'and' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-black'
+                  onClick={() => setView('compact')}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                    view === 'compact'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-gray-500 hover:text-black'
                   }`}
+                  aria-label="Küçük görünüm"
                 >
-                  Hepsi
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
                 </button>
               </div>
-              <span className="text-gray-400">
-                {matchMode === 'and'
-                  ? '· seçili kategorilerin tümü olmalı'
-                  : '· seçili kategorilerden en az biri olmalı'}
-              </span>
+
+              <Link
+                to="/create-project"
+                className="text-xs font-medium text-gray-500 hover:text-black transition-colors"
+              >
+                + Yeni proje
+              </Link>
             </div>
-          )}
+          </div>
 
           {hasActiveFilters && !loading && (
             <div className="mb-4 flex items-center justify-between gap-3">
@@ -465,9 +509,9 @@ export default function Home() {
             <>
               {projects.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  <div className={gridClass}>
                     {projects.map((project) => (
-                      <ProjectCard key={project.id} project={project} />
+                      <ProjectCard key={project.id} project={project} compact={isCompact} />
                     ))}
                   </div>
                   {hasMore && (

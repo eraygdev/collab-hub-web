@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import JoinRequestModal from '../../components/project/JoinRequestModal';
 import ContributorCard from '../../components/project/ContributorCard';
+import LeaveConfirmModal from '../../components/project/LeaveConfirmModal';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -18,12 +19,15 @@ export default function ProjectDetail() {
   const [deleting, setDeleting] = useState(false);
 
   // Başvuru durumu
-  const [joinStatus, setJoinStatus] = useState('none'); // 'none' | 'pending' | 'approved'
+  const [joinStatus, setJoinStatus] = useState('none');
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [joinSubmitting, setJoinSubmitting] = useState(false);
-  const [joinError, setJoinError] = useState('');
 
-  // ✅ Cleanup ile fetch
+  // Ayrılma
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [leaveSubmitting, setLeaveSubmitting] = useState(false);
+
+  // Proje fetch
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -53,7 +57,7 @@ export default function ProjectDetail() {
     };
   }, [id]);
 
-  // ✅ Başvuru durumunu çek
+  // Başvuru durumu
   useEffect(() => {
     if (!user) {
       setJoinStatus('none');
@@ -138,9 +142,7 @@ export default function ProjectDetail() {
     }
   };
 
-  // ✅ Başvuru gönder
   const handleJoinSubmit = async (message) => {
-    setJoinError('');
     setJoinSubmitting(true);
     const token = localStorage.getItem('token');
 
@@ -161,7 +163,7 @@ export default function ProjectDetail() {
       }
 
       if (!res.ok) {
-        setJoinError(data.error || 'Başvuru gönderilemedi');
+        alert(data.error || 'Başvuru gönderilemedi');
         setJoinSubmitting(false);
         return;
       }
@@ -170,8 +172,46 @@ export default function ProjectDetail() {
       setIsJoinModalOpen(false);
       setJoinSubmitting(false);
     } catch {
-      setJoinError('Sunucuya bağlanılamadı');
+      alert('Sunucuya bağlanılamadı');
       setJoinSubmitting(false);
+    }
+  };
+
+  // ✅ Ayrılma
+  const handleLeaveConfirm = async () => {
+    setLeaveSubmitting(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(`${API}/api/projects/${id}/leave`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        let data = {};
+        try { data = JSON.parse(text); } catch {}
+        alert(data.error || 'Ayrılma başarısız');
+        setLeaveSubmitting(false);
+        setIsLeaveModalOpen(false);
+        return;
+      }
+
+      // ✅ Başarılı: status 'none' olur + katkıcı listesinden çıkar
+      setJoinStatus('none');
+      setProject((prev) => ({
+        ...prev,
+        contributorsList: (prev.contributorsList || []).filter(
+          (c) => c.user_id !== user.user_id
+        ),
+      }));
+      setIsLeaveModalOpen(false);
+      setLeaveSubmitting(false);
+    } catch {
+      alert('Sunucuya bağlanılamadı');
+      setLeaveSubmitting(false);
+      setIsLeaveModalOpen(false);
     }
   };
 
@@ -217,9 +257,10 @@ export default function ProjectDetail() {
 
   const isAuthor = user && project.authorId && user.user_id === project.authorId;
 
-  // "Ekibe Katıl" butonu durumu
+  // Buton durumu
   let joinButtonLabel = '👥 Ekibe Katıl';
   let joinButtonDisabled = false;
+  let joinButtonIsLeave = false;
 
   if (!user) {
     joinButtonLabel = '👥 Ekibe Katıl';
@@ -230,8 +271,8 @@ export default function ProjectDetail() {
     joinButtonLabel = '⏳ Başvurun onay bekliyor';
     joinButtonDisabled = true;
   } else if (joinStatus === 'approved') {
-    joinButtonLabel = '✅ Katkıcısın';
-    joinButtonDisabled = true;
+    joinButtonLabel = '🚪 Projeden Ayrıl';
+    joinButtonIsLeave = true;
   }
 
   const handleJoinClick = () => {
@@ -241,6 +282,10 @@ export default function ProjectDetail() {
     }
     if (joinButtonDisabled) return;
     setIsJoinModalOpen(true);
+  };
+
+  const handleLeaveClick = () => {
+    setIsLeaveModalOpen(true);
   };
 
   return (
@@ -371,6 +416,7 @@ export default function ProjectDetail() {
                 </div>
               </div>
             )}
+
             {/* ✅ Katkıcılar */}
             {project.contributorsList && project.contributorsList.length > 0 && (
               <div className="mb-10">
@@ -398,7 +444,7 @@ export default function ProjectDetail() {
             </div>
           </div>
 
-          {/* Sağ Sütun - Sidebar */}
+          {/* Sağ Sütun */}
           <aside className="lg:col-span-1">
             <div className="lg:sticky lg:top-24 space-y-4">
 
@@ -473,13 +519,23 @@ export default function ProjectDetail() {
                     </button>
                   )}
 
-                  <button
-                    onClick={handleJoinClick}
-                    disabled={joinButtonDisabled}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-white"
-                  >
-                    {joinButtonLabel}
-                  </button>
+                  {/* ✅ Ayrıl / Katıl butonu */}
+                  {joinButtonIsLeave ? (
+                    <button
+                      onClick={handleLeaveClick}
+                      className="w-full px-4 py-2.5 bg-white text-red-600 text-sm font-semibold rounded-lg border border-red-200 hover:bg-red-50 transition-colors cursor-pointer"
+                    >
+                      {joinButtonLabel}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleJoinClick}
+                      disabled={joinButtonDisabled}
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    >
+                      {joinButtonLabel}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -496,9 +552,9 @@ export default function ProjectDetail() {
                     <dd className="font-medium text-gray-900">⭐ {project.stars}</dd>
                   </div>
                   <div className="flex items-center justify-between">
-                <dt className="text-gray-500">Katkıcı</dt>
-                <dd className="font-medium text-gray-900">👥 {project.contributorsList?.length || 0}</dd>
-                  </div>auto
+                    <dt className="text-gray-500">Katkıcı</dt>
+                    <dd className="font-medium text-gray-900">👥 {project.contributorsList?.length || 0}</dd>
+                  </div>
                   <div className="flex items-center justify-between">
                     <dt className="text-gray-500">Durum</dt>
                     <dd className="font-medium text-emerald-600">{project.status}</dd>
@@ -548,6 +604,15 @@ export default function ProjectDetail() {
         projectTitle={project.title}
         isPremium={user?.is_premium === true}
         submitting={joinSubmitting}
+      />
+
+      {/* ✅ Ayrılma Modalı (3 saniyelik geri sayım) */}
+      <LeaveConfirmModal
+        isOpen={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        onConfirm={handleLeaveConfirm}
+        projectTitle={project.title}
+        submitting={leaveSubmitting}
       />
     </div>
   );
