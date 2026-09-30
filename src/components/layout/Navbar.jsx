@@ -10,6 +10,11 @@ export default function Navbar({ onOpenSidebar }) {
     <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 shadow-xs">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
+          
+            <span className="text-[26px] font-extrabold text-gray-900/70 hover:text-gray-900 transition-colors font-dm">
+              Collab-Hub.
+            </span>
+
           <button
             onClick={onOpenSidebar}
             className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition-colors focus:outline-hidden cursor-pointer"
@@ -20,12 +25,6 @@ export default function Navbar({ onOpenSidebar }) {
             </svg>
           </button>
 
-          <Link
-            to="/"
-            className="text-[26px] font-extrabold text-gray-900/70 hover:text-gray-900 transition-colors cursor-pointer font-dm"
-          >
-            Collab-Hub.
-          </Link>
         </div>
 
         {/* ✅ Kullanıcı Arama */}
