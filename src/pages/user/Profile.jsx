@@ -3,6 +3,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
+import * as Icon from '../../components/ui/Icons';
 import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -157,7 +158,7 @@ export default function UserProfile() {
             ]}
           />
           <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-            <div className="text-5xl mb-3">🔍</div>
+            <Icon.Search className="w-12 h-12 text-text-muted mx-auto mb-3" />
             <h2 className="text-lg font-bold text-text mb-1 font-mono">
               kullanıcı bulunamadı
             </h2>
@@ -192,81 +193,142 @@ export default function UserProfile() {
           ]}
         />
 
-        {/* ───── Profil Kartı ───── */}
-        <div className="bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-bg border border-accent/15 overflow-hidden shrink-0">
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.username}
-                  loading="lazy"
-                  decoding="async"
-                  width="80"
-                  height="80"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <svg className="w-10 h-10 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                </div>
+        {/* ═══════════════════════════════════════════
+            PROFİL KARTI — Cover + Overlap
+        ═══════════════════════════════════════════ */}
+        <div className="bg-surface border border-accent/10 rounded-2xl mb-6">
+
+          {/* COVER BANNER — daha kısa */}
+          <div className="relative h-20 sm:h-24 overflow-hidden rounded-t-2xl">
+            {/* Gradient zemin */}
+            <div className="absolute inset-0 bg-gradient-to-br from-surface via-bg to-surface" />
+
+            {/* Glow blob — üst yarıda */}
+            <div className="absolute top-[-60px] left-1/4 w-[400px] h-[200px] bg-accent opacity-[0.1] blur-[100px] rounded-full pointer-events-none" />
+
+            {/* Noktalı pattern — SADECE SAĞ ÜST KÖŞE (stats arkası) */}
+            <div
+              className="absolute top-0 right-0 w-72 h-full opacity-[0.25] pointer-events-none"
+              style={{
+                backgroundImage: 'radial-gradient(circle, var(--color-text-muted) 1px, transparent 1px)',
+                backgroundSize: '18px 18px',
+                maskImage: 'radial-gradient(ellipse at top right, black 0%, transparent 70%)',
+                WebkitMaskImage: 'radial-gradient(ellipse at top right, black 0%, transparent 70%)',
+              }}
+            />
+
+            {/* İstatistikler — sağ üst, desktop */}
+            <div className="hidden sm:flex absolute top-3 right-4 items-center gap-4 text-xs font-mono z-10">
+              <div className="text-right">
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">proje</p>
+                <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-sm">
+                  <Icon.Folder className="w-3.5 h-3.5 text-text-muted" />
+                  {profile.stats.totalProjects}
+                </p>
+              </div>
+              <div className="w-px h-5 bg-accent/20" />
+              <div className="text-right">
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">yıldız</p>
+                <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-sm">
+                  <Icon.Star className="w-3.5 h-3.5 text-text-muted" />
+                  {profile.stats.totalStars}
+                </p>
+              </div>
+              <div className="w-px h-5 bg-accent/20" />
+              <div className="text-right">
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">katkıcı</p>
+                <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-sm">
+                  <Icon.Users className="w-3.5 h-3.5 text-text-muted" />
+                  {profile.stats.totalContributors}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* AVATAR + BİLGİLER */}
+          <div className="px-6 sm:px-8 pb-6">
+
+            {/* Avatar — overlap artırıldı (üst boşluk azalsın) */}
+            <div className="relative z-10 -mt-12 sm:-mt-14 mb-4 flex items-end justify-between gap-4 flex-wrap">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-bg border-4 border-surface overflow-hidden shrink-0 shadow-lg">
+                {profile.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.username}
+                    loading="lazy"
+                    decoding="async"
+                    width="96"
+                    height="96"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Icon.User className="w-10 h-10 text-text-muted" />
+                  </div>
+                )}
+              </div>
+
+              {isSelf && (
+                <Link
+                  to="/settings"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-text-muted bg-surface border border-accent/20 rounded-lg hover:border-accent hover:text-text transition-all font-mono"
+                >
+                  <Icon.Settings className="w-4 h-4" />
+                  ayarlar
+                </Link>
               )}
             </div>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-text mb-1">
+
+            {/* Username + bio */}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-text tracking-tight mb-1">
                 {isSelf ? 'Profilim' : profile.username}
               </h1>
-              <p className="text-sm text-text-muted font-mono mb-1">
+              <p className="text-sm text-text-muted font-mono mb-3">
                 @{profile.username}
               </p>
-              {profile.bio && (
-                <p className="text-sm text-text-muted leading-relaxed">
+              {profile.bio ? (
+                <p className="text-sm text-text-muted leading-relaxed max-w-2xl">
                   {profile.bio}
+                </p>
+              ) : (
+                <p className="text-sm text-text-muted/60 italic font-mono">
+                  henüz bir bio eklenmemiş.
                 </p>
               )}
             </div>
-            {isSelf && (
-              <Link
-                to="/settings"
-                className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:border-accent hover:bg-bg transition-all shrink-0 text-center font-mono"
-              >
-                ayarlar
-              </Link>
-            )}
+
+            {/* İstatistikler — mobil */}
+            <div className="sm:hidden mt-5 flex items-center gap-4 text-xs font-mono">
+              <div>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">proje</p>
+                <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-base">
+                  <Icon.Folder className="w-3.5 h-3.5 text-text-muted" />
+                  {profile.stats.totalProjects}
+                </p>
+              </div>
+              <div className="w-px h-8 bg-accent/20" />
+              <div>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">yıldız</p>
+                <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-base">
+                  <Icon.Star className="w-3.5 h-3.5 text-text-muted" />
+                  {profile.stats.totalStars}
+                </p>
+              </div>
+              <div className="w-px h-8 bg-accent/20" />
+              <div>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">katkıcı</p>
+                <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-base">
+                  <Icon.Users className="w-3.5 h-3.5 text-text-muted" />
+                  {profile.stats.totalContributors}
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        {/* ───── İstatistikler ───── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-surface border border-accent/10 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-wider text-text-muted mb-1 font-mono">
-              /proje
-            </p>
-            <p className="text-2xl font-bold text-text font-mono tabular-nums">
-              {profile.stats.totalProjects}
-            </p>
-          </div>
-          <div className="bg-surface border border-accent/10 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-wider text-text-muted mb-1 font-mono">
-              /toplam yıldız
-            </p>
-            <p className="text-2xl font-bold text-text font-mono tabular-nums">
-              ⭐ {profile.stats.totalStars}
-            </p>
-          </div>
-          <div className="bg-surface border border-accent/10 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-wider text-text-muted mb-1 font-mono">
-              /toplam katkıcı
-            </p>
-            <p className="text-2xl font-bold text-text font-mono tabular-nums">
-              👥 {profile.stats.totalContributors}
-            </p>
-          </div>
-        </div>
-
-        {/* ───── Tab'lar (sadece kendi profilinde) ───── */}
+        {/* TAB'LAR */}
         {isSelf && (
           <div className="mb-6 border-b border-accent/10">
             <div className="flex items-center gap-6">
@@ -294,7 +356,7 @@ export default function UserProfile() {
           </div>
         )}
 
-        {/* ───── Başlık + Toggle + Sıralama ───── */}
+        {/* BAŞLIK + SIRALAMA + GÖRÜNÜM */}
         <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
           <h2 className="text-sm font-bold text-text uppercase tracking-wider font-mono">
             {!isSelf
@@ -305,7 +367,6 @@ export default function UserProfile() {
           </h2>
 
           <div className="flex items-center gap-3">
-            {/* Görünüm toggle */}
             <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60">
               <button
                 onClick={() => setView('normal')}
@@ -317,9 +378,7 @@ export default function UserProfile() {
                 aria-label="Büyük kartlar"
                 title="Büyük kartlar"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <Icon.List className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setView('compact')}
@@ -331,18 +390,17 @@ export default function UserProfile() {
                 aria-label="Küçük kartlar"
                 title="Küçük kartlar"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                </svg>
+                <Icon.LayoutGrid className="w-3.5 h-3.5" />
               </button>
             </div>
 
             {isSelf && tab === 'projects' && (
               <Link
                 to="/create-project"
-                className="text-xs font-medium text-text-muted hover:text-text transition-colors font-mono"
+                className="inline-flex items-center gap-1 text-xs font-medium text-text-muted hover:text-text transition-colors font-mono"
               >
-                + yeni proje
+                <Icon.Plus className="w-3.5 h-3.5" />
+                yeni proje
               </Link>
             )}
 
@@ -373,7 +431,7 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* ───── İçerik ───── */}
+        {/* PROJELER */}
         {tab === 'projects' && (
           <>
             {projects.length > 0 ? (
@@ -399,7 +457,10 @@ export default function UserProfile() {
                       {loadingMore ? (
                         <>yükleniyor<span className="animate-pulse">...</span></>
                       ) : (
-                        <>↓ daha fazla yükle</>
+                        <>
+                          <Icon.ChevronDown className="w-4 h-4" />
+                          daha fazla yükle
+                        </>
                       )}
                     </button>
                   </div>
@@ -407,7 +468,7 @@ export default function UserProfile() {
               </>
             ) : (
               <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-                <div className="text-5xl mb-3">📦</div>
+                <Icon.Package className="w-12 h-12 text-text-muted mx-auto mb-3" />
                 <h3 className="text-base font-bold text-text mb-1 font-mono">
                   {isSelf ? 'henüz projen yok' : 'henüz proje yok'}
                 </h3>
@@ -429,6 +490,7 @@ export default function UserProfile() {
           </>
         )}
 
+        {/* KATKILAR */}
         {isSelf && tab === 'contributions' && (
           <>
             {contributions.length > 0 ? (
@@ -444,7 +506,7 @@ export default function UserProfile() {
               </div>
             ) : (
               <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-                <div className="text-5xl mb-3">🤝</div>
+                <Icon.Users className="w-12 h-12 text-text-muted mx-auto mb-3" />
                 <h3 className="text-base font-bold text-text mb-1 font-mono">
                   henüz bir projeye katkıda bulunmadın
                 </h3>

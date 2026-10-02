@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ProjectCard from '../../components/project/ProjectCard';
 import CategoryModal from '../../components/project/CategoryPick';
+import * as Icon from '../../components/ui/Icons';
 import { SEARCH_LIMITS } from '../../constants/limits';
 import { TEXT_REGEX, findInvalidChar } from '../../utils/validators';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
@@ -257,19 +258,14 @@ export default function Home() {
   return (
     <div className="w-full bg-bg min-h-screen">
 
-      {/* ═══════════════════════════════════════════
-          HERO
-      ═══════════════════════════════════════════ */}
+      {/* HERO */}
       <section className="relative z-20 border-b border-accent/10">
-
-        {/* Glow blob */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-accent opacity-[0.08] blur-[120px] rounded-full" />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
 
-          {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-accent/15 bg-surface/60">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
             <span className="text-[11px] font-mono tracking-wider text-text-muted uppercase">
@@ -277,7 +273,6 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-text leading-[1.05] mb-6">
             Fikirlerini paylaş,
             <br />
@@ -289,7 +284,7 @@ export default function Home() {
             Tüm geliştiriciler tek bir yerde.
           </p>
 
-          {/* COMMAND PALETTE + ARA */}
+          {/* COMMAND PALETTE */}
           <div ref={searchContainerRef} className="relative max-w-2xl mx-auto">
             <div className="flex items-stretch gap-2">
 
@@ -301,9 +296,7 @@ export default function Home() {
                 }`}
               >
                 <span className="absolute left-4 text-text-muted pointer-events-none">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-                  </svg>
+                  <Icon.Search className="w-5 h-5" />
                 </span>
 
                 <input
@@ -329,9 +322,7 @@ export default function Home() {
                     className="absolute right-14 p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-bg/60 transition-colors cursor-pointer"
                     aria-label="Aramayı temizle"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <Icon.Close className="w-4 h-4" />
                   </button>
                 )}
 
@@ -350,6 +341,7 @@ export default function Home() {
               </button>
             </div>
 
+            {/* History dropdown */}
             {showHistoryDropdown && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden z-[100]">
                 <div className="flex items-center justify-between px-4 py-2.5 border-b border-accent/10">
@@ -373,9 +365,7 @@ export default function Home() {
                           onClick={() => handleSelectHistory(q)}
                           className="flex-1 flex items-center gap-3 px-4 py-3 text-sm text-text/80 hover:bg-bg/50 hover:text-text transition-colors cursor-pointer text-left font-mono"
                         >
-                          <svg className="w-3.5 h-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                          <Icon.Clock className="w-3.5 h-3.5 text-text-muted shrink-0" />
                           <span className="truncate">{q}</span>
                         </button>
                         <button
@@ -384,9 +374,7 @@ export default function Home() {
                           className="p-2.5 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                           aria-label={`${q} aramasını sil`}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <Icon.Close className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </li>
@@ -397,35 +385,32 @@ export default function Home() {
           </div>
 
           {searchWarning && (
-            <p className="mt-3 text-[11px] text-text font-mono">
-              ⚠ Geçersiz karakter: "{searchWarning}"
+            <p className="mt-3 text-[11px] text-text font-mono inline-flex items-center gap-1.5">
+              <Icon.Warning className="w-3 h-3" />
+              Geçersiz karakter: "{searchWarning}"
             </p>
           )}
 
-          {/* Quick actions */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/create-project"
               className="group inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg text-sm font-bold rounded-xl border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
+              <Icon.Plus className="w-4 h-4" />
               Proje Oluştur
             </Link>
             <Link
               to="/dashboard"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-transparent text-text text-sm font-bold rounded-xl border border-accent/30 hover:border-accent hover:bg-surface/60 transition-all cursor-pointer"
             >
+              <Icon.LayoutGrid className="w-4 h-4" />
               Dashboard
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════
-          KEŞFET
-      ═══════════════════════════════════════════ */}
+      {/* KEŞFET */}
       <div className="relative z-0 w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-7xl mx-auto">
 
@@ -439,10 +424,8 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Görünüm toggle */}
             <div className="flex items-center gap-3">
               <div className="inline-flex rounded-xl border border-accent/20 p-0.5 bg-surface/60">
-                {/* Büyük kartlar — 3 çizgi */}
                 <button
                   onClick={() => setView('normal')}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
@@ -453,11 +436,8 @@ export default function Home() {
                   aria-label="Büyük kartlar"
                   title="Büyük kartlar"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
+                  <Icon.List className="w-3.5 h-3.5" />
                 </button>
-                {/* Küçük kartlar — grid */}
                 <button
                   onClick={() => setView('compact')}
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
@@ -468,9 +448,7 @@ export default function Home() {
                   aria-label="Küçük kartlar"
                   title="Küçük kartlar"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                  </svg>
+                  <Icon.LayoutGrid className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -507,9 +485,10 @@ export default function Home() {
               {allCategories.length > VISIBLE_LIMIT && (
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
                 >
-                  +{allCategories.length - VISIBLE_LIMIT} daha
+                  <Icon.Plus className="w-3 h-3" />
+                  {allCategories.length - VISIBLE_LIMIT} daha
                 </button>
               )}
             </div>
@@ -571,7 +550,7 @@ export default function Home() {
 
           {loadError && !loading && (
             <div className="text-center py-20 rounded-2xl bg-surface/30 border border-accent/15">
-              <div className="text-5xl mb-3">⚠️</div>
+              <Icon.Warning className="w-12 h-12 text-text-muted mx-auto mb-3" />
               <h3 className="text-lg font-bold text-text mb-1 font-mono">projeler yüklenemedi</h3>
               <p className="text-sm text-text-muted mb-4">{loadError}</p>
               <button
@@ -606,7 +585,10 @@ export default function Home() {
                         {loadingMore ? (
                           <>yükleniyor<span className="animate-pulse">...</span></>
                         ) : (
-                          <>↓ daha fazla yükle</>
+                          <>
+                            <Icon.ChevronDown className="w-4 h-4" />
+                            daha fazla yükle
+                          </>
                         )}
                       </button>
                     </div>
@@ -614,13 +596,13 @@ export default function Home() {
                 </>
               ) : (
                 <div className="text-center py-20 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-                  <div className="text-5xl mb-3">🔍</div>
+                  <Icon.Search className="w-12 h-12 text-text-muted mx-auto mb-3" />
                   <h3 className="text-lg font-bold text-text mb-1 font-mono">
                     {hasActiveFilters ? 'sonuç bulunamadı' : 'henüz proje yok'}
                   </h3>
                   <p className="text-sm text-text-muted mb-5">
                     {hasActiveFilters
-                      ? 'Arama veya filtre kriterlerine uyan proje yok.'
+                      ? 'Arama veya filtre kriterlerine uygun proje yok.'
                       : 'İlk projeyi sen oluştur!'}
                   </p>
                   {hasActiveFilters ? (

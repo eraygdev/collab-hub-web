@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
+import * as Icon from '../../components/ui/Icons';
 import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState({ projects: 0, stars: 0, contributors: 0 });
 
   const [requests, setRequests] = useState([]);
   const [requestsLoading, setRequestsLoading] = useState(true);
@@ -45,7 +47,18 @@ export default function Dashboard() {
       })
       .then((data) => {
         if (cancelled) return;
-        setProjects(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.projects)
+          ? data.projects
+          : [];
+        setProjects(list);
+        setStats((prev) => ({
+          ...prev,
+          projects: list.length,
+          stars: data?.totalStars ?? prev.stars,
+          contributors: data?.totalContributors ?? prev.contributors,
+        }));
         setProjectsLoading(false);
       })
       .catch((err) => {
@@ -141,95 +154,216 @@ export default function Dashboard() {
         />
 
         {/* ═══════════════════════════════════════════
-            HEADER
+            HEADER — Linear tarzı minimal
         ═══════════════════════════════════════════ */}
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-1 tracking-tight">
-              Merhaba, <span className="font-mono">{user.username}</span> 👋
-            </h1>
-            <p className="text-sm text-text-muted">
-              Buradan projelerini yönetebilir, yeni proje oluşturabilirsin.
-            </p>
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-2 tracking-tight">
+                Merhaba, <span className="font-mono text-accent">{user.username}</span>
+              </h1>
+              <p className="text-sm text-text-muted max-w-lg">
+                Projelerini yönet, başvuruları değerlendir, yeni fikirler yayınla.
+              </p>
+            </div>
           </div>
 
           <Link
             to="/create-project"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent text-bg text-sm font-bold rounded-xl border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer shrink-0"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-xl border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.5)] cursor-pointer shrink-0 self-start sm:self-end"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <Icon.Plus className="w-4 h-4" />
             Yeni Proje
           </Link>
         </div>
 
         {/* ═══════════════════════════════════════════
-            SEKMELER
+            STATS — SVG ikonlu mini kartlar
+        ═══════════════════════════════════════════ */}
+        <div className="mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+
+            {/* Proje */}
+            <div className="group relative bg-surface border border-accent/10 rounded-xl p-4 hover:border-accent/30 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon.Folder className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
+                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
+                  proje
+                </span>
+              </div>
+              <p className="text-2xl font-extrabold text-text font-mono tabular-nums leading-none">
+                {stats.projects}
+              </p>
+            </div>
+
+            {/* Yıldız */}
+            <div className="group relative bg-surface border border-accent/10 rounded-xl p-4 hover:border-accent/30 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon.Star className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
+                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
+                  yıldız
+                </span>
+              </div>
+              <p className="text-2xl font-extrabold text-text font-mono tabular-nums leading-none">
+                {stats.stars}
+              </p>
+            </div>
+
+            {/* Katkıcı */}
+            <div className="group relative bg-surface border border-accent/10 rounded-xl p-4 hover:border-accent/30 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon.Users className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
+                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
+                  katkıcı
+                </span>
+              </div>
+              <p className="text-2xl font-extrabold text-text font-mono tabular-nums leading-none">
+                {stats.contributors}
+              </p>
+            </div>
+
+            {/* Bekleyen */}
+            <div
+              className={`group relative bg-surface border rounded-xl p-4 transition-all overflow-hidden ${
+                pendingCount > 0
+                  ? 'border-accent/40 shadow-[0_0_20px_-8px_rgba(239,228,206,0.3)]'
+                  : 'border-accent/10 hover:border-accent/30'
+              }`}
+            >
+              {pendingCount > 0 && (
+                <div className="absolute top-[-30px] right-[-30px] w-[100px] h-[100px] bg-accent opacity-[0.1] blur-[40px] rounded-full pointer-events-none" />
+              )}
+
+              <div className="relative flex items-center gap-2 mb-2">
+                <Icon.Mail
+                  className={`w-4 h-4 transition-colors ${
+                    pendingCount > 0
+                      ? 'text-accent animate-pulse'
+                      : 'text-text-muted group-hover:text-accent'
+                  }`}
+                />
+                <span
+                  className={`text-[10px] font-mono uppercase tracking-wider ${
+                    pendingCount > 0 ? 'text-accent' : 'text-text-muted'
+                  }`}
+                >
+                  bekleyen
+                </span>
+              </div>
+              <p
+                className={`relative text-2xl font-extrabold font-mono tabular-nums leading-none ${
+                  pendingCount > 0 ? 'text-accent' : 'text-text'
+                }`}
+              >
+                {pendingCount}
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════
+            TAB'LAR — üstte underline
         ═══════════════════════════════════════════ */}
         <div className="mb-6 border-b border-accent/10">
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex items-center gap-6">
-              <button
-                onClick={() => setTab('projects')}
-                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 -mb-px font-mono ${
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => setTab('projects')}
+              className={`inline-flex items-center gap-2 pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 -mb-px font-mono ${
+                tab === 'projects'
+                  ? 'text-text border-accent'
+                  : 'text-text-muted border-transparent hover:text-text'
+              }`}
+            >
+              /projelerim
+              <span
+                className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full font-mono ${
                   tab === 'projects'
-                    ? 'text-text border-accent'
-                    : 'text-text-muted border-transparent hover:text-text'
+                    ? 'bg-accent text-bg'
+                    : 'bg-accent/10 text-accent'
                 }`}
               >
-                /projelerim
+                {stats.projects}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setTab('requests')}
+              className={`inline-flex items-center gap-2 pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 -mb-px font-mono ${
+                tab === 'requests'
+                  ? 'text-text border-accent'
+                  : 'text-text-muted border-transparent hover:text-text'
+              }`}
+            >
+              /gelen başvurular
+              {pendingCount > 0 && (
+                <span className="inline-flex items-center gap-1 min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full font-mono bg-accent text-bg">
+                  {tab !== 'requests' && (
+                    <span className="w-1 h-1 rounded-full bg-bg animate-pulse" />
+                  )}
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════
+            ALT BAŞLIK + TOGGLE — tab'ların altında
+            min-h sabit → tab değişince hiza kaymaz
+        ═══════════════════════════════════════════ */}
+        <div className="mb-4 flex items-center justify-between gap-3 flex-wrap min-h-[32px]">
+          <h2 className="text-sm font-bold text-text uppercase tracking-wider font-mono">
+            {tab === 'projects' ? '/projelerim' : '/gelen başvurular'}
+          </h2>
+
+          <div className="flex items-center gap-3 min-h-[26px]">
+            {/* Görünüm toggle — sadece Projelerim */}
+            <div
+              className={`inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60 transition-opacity ${
+                tab === 'projects' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+              aria-hidden={tab !== 'projects'}
+            >
+              <button
+                onClick={() => setView('normal')}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                  view === 'normal'
+                    ? 'bg-accent text-bg shadow-sm'
+                    : 'text-text-muted hover:text-text'
+                }`}
+                aria-label="Büyük kartlar"
+                title="Büyük kartlar"
+                tabIndex={tab === 'projects' ? 0 : -1}
+              >
+                <Icon.List className="w-3.5 h-3.5" />
               </button>
               <button
-                onClick={() => setTab('requests')}
-                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 -mb-px flex items-center gap-2 font-mono ${
-                  tab === 'requests'
-                    ? 'text-text border-accent'
-                    : 'text-text-muted border-transparent hover:text-text'
+                onClick={() => setView('compact')}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                  view === 'compact'
+                    ? 'bg-accent text-bg shadow-sm'
+                    : 'text-text-muted hover:text-text'
                 }`}
+                aria-label="Küçük kartlar"
+                title="Küçük kartlar"
+                tabIndex={tab === 'projects' ? 0 : -1}
               >
-                /gelen başvurular
-                {pendingCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-bg bg-red-400 rounded-full">
-                    {pendingCount}
-                  </span>
-                )}
+                <Icon.LayoutGrid className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* Görünüm toggle — sadece Projelerim sekmesinde */}
-            {tab === 'projects' && (
-              <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60 mb-3">
-                <button
-                  onClick={() => setView('normal')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
-                    view === 'normal'
-                      ? 'bg-accent text-bg shadow-sm'
-                      : 'text-text-muted hover:text-text'
-                  }`}
-                  aria-label="Büyük kartlar"
-                  title="Büyük kartlar"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setView('compact')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
-                    view === 'compact'
-                      ? 'bg-accent text-bg shadow-sm'
-                      : 'text-text-muted hover:text-text'
-                  }`}
-                  aria-label="Küçük kartlar"
-                  title="Küçük kartlar"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                  </svg>
-                </button>
-              </div>
-            )}
+            {/* "+ yeni proje" — sadece Projelerim */}
+            <Link
+              to="/create-project"
+              className={`text-xs font-medium text-text-muted hover:text-text transition-all font-mono ${
+                tab === 'projects' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+              aria-hidden={tab !== 'projects'}
+              tabIndex={tab === 'projects' ? 0 : -1}
+            >
+              + yeni proje
+            </Link>
           </div>
         </div>
 
@@ -253,7 +387,7 @@ export default function Dashboard() {
 
             {error && !projectsLoading && (
               <div className="text-center py-20 rounded-2xl bg-surface/30 border border-accent/15">
-                <div className="text-5xl mb-3">⚠️</div>
+                <Icon.Warning className="w-12 h-12 text-text-muted mx-auto mb-3" />
                 <h3 className="text-lg font-bold text-text mb-1 font-mono">projeler yüklenemedi</h3>
                 <p className="text-sm text-text-muted">{error}</p>
               </div>
@@ -274,7 +408,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-20 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-                    <div className="text-5xl mb-3">📦</div>
+                    <Icon.Package className="w-12 h-12 text-text-muted mx-auto mb-3" />
                     <h3 className="text-lg font-bold text-text mb-1 font-mono">
                       henüz projen yok
                     </h3>
@@ -312,7 +446,7 @@ export default function Dashboard() {
 
             {!requestsLoading && requests.length === 0 && (
               <div className="text-center py-20 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-                <div className="text-5xl mb-3">📭</div>
+                <Icon.Inbox className="w-12 h-12 text-text-muted mx-auto mb-3" />
                 <h3 className="text-lg font-bold text-text mb-1 font-mono">
                   bekleyen başvuru yok
                 </h3>
@@ -350,9 +484,7 @@ export default function Dashboard() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <svg className="w-6 h-6 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                            </svg>
+                            <Icon.User className="w-6 h-6 text-text-muted" />
                           </div>
                         )}
                       </Link>

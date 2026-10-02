@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import UserDropdown from './UserDropdown';
 import UserSearch from './UserSearch';
+import * as Icon from '../ui/Icons';
 import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
@@ -14,7 +15,6 @@ export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Mobil arama dropdown state
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileQuery, setMobileQuery] = useState('');
   const [mobileResults, setMobileResults] = useState([]);
@@ -28,15 +28,11 @@ export default function Navbar({ onOpenSidebar }) {
   const {
     filteredHistory: mobileHistory,
     hasHistory: mobileHasHistory,
-    isDropdownOpen: mobileHistoryOpen,
-    openDropdown: mobileOpenHistory,
-    hideDropdown: mobileHideHistory,
     add: mobileAddHistory,
     remove: mobileRemoveHistory,
     clear: mobileClearHistory,
   } = useSearchHistory('user', mobileQuery);
 
-  // Mobil arama isteği
   useEffect(() => {
     if (!mobileSearchOpen) return;
 
@@ -78,7 +74,6 @@ export default function Navbar({ onOpenSidebar }) {
     };
   }, [mobileDebouncedQuery, mobileSearchOpen]);
 
-  // Mobil arama dışına tıklayınca kapat
   useEffect(() => {
     if (!mobileSearchOpen) return;
 
@@ -117,7 +112,6 @@ export default function Navbar({ onOpenSidebar }) {
     if (value.length > SEARCH_LIMITS.userSearchMaxLength) return;
     setMobileQuery(value);
     setMobileWarning('');
-    mobileOpenHistory();
   };
 
   const handleMobileSelect = (username) => {
@@ -125,7 +119,6 @@ export default function Navbar({ onOpenSidebar }) {
     setMobileQuery('');
     setMobileResults([]);
     setMobileSearchOpen(false);
-    mobileHideHistory();
     navigate(`/profile/${encodeURIComponent(username)}`);
   };
 
@@ -134,19 +127,16 @@ export default function Navbar({ onOpenSidebar }) {
       <header className="sticky top-0 z-50 w-full bg-bg/80 backdrop-blur-md border-b border-accent/10">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3 sm:gap-6 lg:gap-10">
 
-          {/* ───────── SOL: Sidebar toggle + Logo ───────── */}
+          {/* SOL: Sidebar toggle + Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onOpenSidebar}
               className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
               aria-label="Menüyü Aç"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Icon.Menu className="w-5 h-5" />
             </button>
 
-            {/* Logo — sadece Collab-Hub */}
             <Link
               to="/"
               className="font-display text-[20px] leading-none text-text hover:text-accent transition-colors shrink-0"
@@ -156,30 +146,25 @@ export default function Navbar({ onOpenSidebar }) {
             </Link>
           </div>
 
-          {/* ───────── ORTA: Kullanıcı arama (desktop) ───────── */}
+          {/* ORTA: Desktop arama */}
           <div className="hidden md:flex flex-1 justify-center min-w-0">
             <UserSearch />
           </div>
 
-          {/* ───────── SAĞ: Mobil arama + Auth ───────── */}
+          {/* SAĞ: Mobil arama + Auth */}
           <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
 
-            {/* Mobil arama butonu */}
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
               className="md:hidden p-2 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
               aria-label="Kullanıcı ara"
             >
-              <svg style={{ width: 18, height: 18 }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-              </svg>
+              <Icon.Search className="w-4 h-4" />
             </button>
 
             {user ? (
-              // Giriş yapmış: sadece avatar dropdown
               <UserDropdown />
             ) : (
-              // Giriş yapmamış: Giriş Yap + Kayıt Ol
               <>
                 <NavLink
                   to="/login"
@@ -204,7 +189,7 @@ export default function Navbar({ onOpenSidebar }) {
           </div>
         </div>
 
-        {/* ───────── MOBİL ARAMA DROPDOWN ───────── */}
+        {/* MOBİL ARAMA DROPDOWN */}
         {mobileSearchOpen && (
           <div
             ref={mobileSearchRef}
@@ -213,9 +198,7 @@ export default function Navbar({ onOpenSidebar }) {
             <div className="px-4 py-3">
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-                  </svg>
+                  <Icon.Search className="w-4 h-4" />
                 </span>
                 <input
                   type="text"
@@ -237,16 +220,15 @@ export default function Navbar({ onOpenSidebar }) {
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
                     aria-label="Temizle"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <Icon.Close className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
 
               {mobileWarning && (
-                <p className="mt-1.5 text-[11px] text-amber-400 font-mono">
-                  ⚠ Geçersiz karakter: "{mobileWarning}"
+                <p className="mt-1.5 text-[11px] text-amber-400 font-mono inline-flex items-center gap-1">
+                  <Icon.Warning className="w-3 h-3" />
+                  Geçersiz karakter: "{mobileWarning}"
                 </p>
               )}
 
@@ -274,9 +256,7 @@ export default function Navbar({ onOpenSidebar }) {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                              </svg>
+                              <Icon.User className="w-4 h-4 text-text-muted" />
                             </div>
                           )}
                         </div>
@@ -315,9 +295,7 @@ export default function Navbar({ onOpenSidebar }) {
                             onClick={() => handleMobileSelect(username)}
                             className="flex-1 flex items-center gap-2.5 px-2 py-2 text-sm text-text/80 hover:bg-bg/60 hover:text-text rounded-lg transition-colors cursor-pointer text-left font-mono"
                           >
-                            <svg className="w-3.5 h-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                            <Icon.Clock className="w-3.5 h-3.5 text-text-muted shrink-0" />
                             <span className="truncate">{username}</span>
                           </button>
                           <button
@@ -325,9 +303,7 @@ export default function Navbar({ onOpenSidebar }) {
                             className="p-2 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                             aria-label={`${username} aramasını sil`}
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <Icon.Close className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </li>

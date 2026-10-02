@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import CategoryModal from './CategoryPick';
+import * as Icon from '../ui/Icons';
 import { PROJECT_LIMITS } from '../../constants/limits';
 
-// Chip listesi + "Daha fazla" modal ile çoklu kategori seçimi.
-// categories: [{id, name, slug}]
-// selected: [id, id, ...]
 export default function CategoryChips({ categories, selected, onChange, disabled }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -25,7 +23,6 @@ export default function CategoryChips({ categories, selected, onChange, disabled
 
   return (
     <div>
-      {/* Başlık + sayaç */}
       <div className="flex items-center justify-between mb-1.5">
         <label className="block text-xs font-medium text-text">
           Kategoriler
@@ -65,9 +62,10 @@ export default function CategoryChips({ categories, selected, onChange, disabled
               type="button"
               onClick={() => setIsModalOpen(true)}
               disabled={disabled}
-              className="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
             >
-              +{categories.length - VISIBLE_LIMIT} daha
+              <Icon.Plus className="w-3 h-3" />
+              {categories.length - VISIBLE_LIMIT} daha
             </button>
           )}
         </div>

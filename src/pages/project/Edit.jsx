@@ -8,6 +8,7 @@ import CharCounter from '../../components/ui/CharCounter';
 import CharWarning from '../../components/ui/CharWarning';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
+import * as Icon from '../../components/ui/Icons';
 import {
   TITLE_REGEX,
   TEXT_REGEX,
@@ -243,7 +244,7 @@ export default function EditProject() {
             ]}
           />
           <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-            <div className="text-5xl mb-3">⚠️</div>
+            <Icon.Warning className="w-12 h-12 text-text-muted mx-auto mb-3" />
             <h2 className="text-lg font-bold text-text mb-1 font-mono">proje bulunamadı</h2>
             <p className="text-sm text-text-muted mb-5">{error}</p>
             <Link
@@ -262,7 +263,6 @@ export default function EditProject() {
     <div className="w-full bg-bg min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Breadcrumb */}
         <PageBreadcrumb
           items={[
             { label: 'ana sayfa', to: '/' },
@@ -271,7 +271,6 @@ export default function EditProject() {
           ]}
         />
 
-        {/* Başlık */}
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
             Projeyi düzenle.
@@ -353,7 +352,6 @@ export default function EditProject() {
             <CharWarning char={warnings.longDescription} />
           </div>
 
-          {/* Kategoriler */}
           <CategorySelector
             categories={categories}
             selected={selectedCategories}
@@ -425,27 +423,26 @@ export default function EditProject() {
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 
-          {/* Error */}
           {error && (
             <div
               role="alert"
-              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono"
+              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
-              ⚠ {error}
+              <Icon.Warning className="w-4 h-4 shrink-0" />
+              {error}
             </div>
           )}
 
-          {/* Success */}
           {success && (
             <div
               role="status"
-              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono"
+              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
-              ✓ Güncellendi! Yönlendiriliyorsun...
+              <Icon.Check className="w-4 h-4 shrink-0" />
+              Güncellendi! Yönlendiriliyorsun...
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-2">
             <button
               type="button"

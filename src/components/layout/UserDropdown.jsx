@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import * as Icon from '../ui/Icons';
 
 export default function UserDropdown() {
   const { user, logout } = useAuth();
@@ -48,9 +49,7 @@ export default function UserDropdown() {
         className="w-8 h-8 rounded-full bg-surface border border-accent/15 overflow-hidden flex items-center justify-center cursor-pointer hover:border-accent/40 transition-all"
         aria-label="Giriş Yap"
       >
-        <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-        </svg>
+        <Icon.User className="w-4 h-4 text-text-muted" />
       </button>
     );
   }
@@ -59,7 +58,6 @@ export default function UserDropdown() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Avatar */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-8 h-8 rounded-full bg-surface border border-accent/15 overflow-hidden cursor-pointer hover:border-accent/40 hover:ring-2 hover:ring-accent/10 transition-all"
@@ -80,20 +78,16 @@ export default function UserDropdown() {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
+            <Icon.User className="w-4 h-4 text-text-muted" />
           </div>
         )}
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div
           role="menu"
           className="absolute right-0 mt-2 w-56 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]"
         >
-          {/* Kullanıcı başlığı */}
           <div className="px-4 py-3 border-b border-accent/10">
             <p className="text-sm font-semibold text-text truncate font-mono">
               {user.username}
@@ -103,37 +97,40 @@ export default function UserDropdown() {
 
           {!confirmLogout ? (
             <>
-              {/* ✅ Sıralama: Profilim en üstte */}
               <Link
                 to={`/profile/${user.username}`}
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
+                <Icon.User className="w-4 h-4" />
                 Profilim
               </Link>
               <Link
                 to="/dashboard"
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
+                <Icon.LayoutGrid className="w-4 h-4" />
                 Dashboard
               </Link>
               <Link
                 to="/create-project"
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
+                <Icon.Plus className="w-4 h-4" />
                 Yeni Proje Oluştur
               </Link>
               <Link
                 to="/settings"
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
+                <Icon.Settings className="w-4 h-4" />
                 Ayarlar
               </Link>
 
@@ -142,8 +139,9 @@ export default function UserDropdown() {
               <button
                 role="menuitem"
                 onClick={() => setConfirmLogout(true)}
-                className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
               >
+                <Icon.Logout className="w-4 h-4" />
                 Çıkış Yap
               </button>
             </>

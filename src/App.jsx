@@ -5,6 +5,7 @@ import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
 import ScrollToTopButton from './components/ui/ScrollToTopButton';
+import PageTransition from './components/ui/PageTransition';
 import Home from './pages/project/Home';
 import UserProfile from './pages/user/Profile';
 import Settings from './pages/user/Settings';
@@ -53,25 +54,27 @@ function AppContent() {
 
   return (
     <Layout hideFooter={hideFooter}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/profile/:username" element={<UserProfile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/create-project" element={<CreateProject />} />
-        <Route path="/project/:id/edit" element={<EditProject />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/project/:id" element={<ProjectDetail />} />
+      <PageTransition>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile/:username" element={<UserProfile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create-project" element={<CreateProject />} />
+          <Route path="/project/:id/edit" element={<EditProject />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/project/:id" element={<ProjectDetail />} />
 
-        <Route path="/about" element={<About />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/cookies" element={<Cookies />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/cookies" element={<Cookies />} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </PageTransition>
     </Layout>
   );
 }

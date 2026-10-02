@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import * as Icon from '../ui/Icons';
 
 export default function LeaveConfirmModal({
   isOpen,
@@ -73,16 +74,14 @@ export default function LeaveConfirmModal({
             className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
             aria-label="Kapat"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon.Close className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
         <div className="px-6 py-5">
           <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg mb-4">
-            <span className="text-base shrink-0">⚠️</span>
+            <Icon.Warning className="w-4 h-4 text-red-300 shrink-0 mt-0.5" />
             <div className="text-xs text-red-200/90 leading-relaxed">
               <p className="font-semibold mb-1 text-red-200">Bu projeden ayrılıyorsun.</p>
               <p>

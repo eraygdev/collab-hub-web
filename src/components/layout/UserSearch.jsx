@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as Icon from '../ui/Icons';
 import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
@@ -162,12 +163,9 @@ export default function UserSearch() {
 
   return (
     <div ref={containerRef} className="relative hidden md:block flex-1 max-w-md">
-      {/* Arama kutusu */}
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-          </svg>
+          <Icon.Search className="w-4 h-4" />
         </span>
         <input
           type="text"
@@ -186,9 +184,7 @@ export default function UserSearch() {
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
             aria-label="Temizle"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon.Close className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
@@ -198,10 +194,8 @@ export default function UserSearch() {
         className="absolute top-full left-0 right-0 mt-1"
       />
 
-      {/* Dropdown */}
       {isDropdownOpen && !warning && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]">
-          {/* Kullanıcı sonuçları */}
           {showResults && (
             <ul className="max-h-80 overflow-y-auto">
               {results.map((user) => (
@@ -226,9 +220,7 @@ export default function UserSearch() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
+                          <Icon.User className="w-4 h-4 text-text-muted" />
                         </div>
                       )}
                     </div>
@@ -248,7 +240,6 @@ export default function UserSearch() {
             </ul>
           )}
 
-          {/* Geçmiş */}
           {showHistory && (
             <>
               <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
@@ -272,9 +263,7 @@ export default function UserSearch() {
                         onClick={() => handleSelectHistory(username)}
                         className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-sm text-text/80 hover:bg-bg/60 hover:text-text transition-colors cursor-pointer text-left font-mono"
                       >
-                        <svg className="w-3.5 h-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        <Icon.Clock className="w-3.5 h-3.5 text-text-muted shrink-0" />
                         <span className="truncate">{username}</span>
                       </button>
                       <button
@@ -283,9 +272,7 @@ export default function UserSearch() {
                         className="p-2 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                         aria-label={`${username} aramasını sil`}
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <Icon.Close className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </li>
@@ -294,7 +281,6 @@ export default function UserSearch() {
             </>
           )}
 
-          {/* Boş */}
           {showEmpty && (
             <div className="px-4 py-3 text-xs text-text-muted text-center font-mono">
               Sonuç bulunamadı

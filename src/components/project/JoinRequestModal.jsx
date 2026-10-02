@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import * as Icon from '../ui/Icons';
 
 export default function JoinRequestModal({
   isOpen,
@@ -54,9 +55,7 @@ export default function JoinRequestModal({
             className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
             aria-label="Kapat"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon.Close className="w-5 h-5" />
           </button>
         </div>
 
@@ -100,7 +99,7 @@ export default function JoinRequestModal({
             </div>
           ) : (
             <div className="flex items-start gap-2.5 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-              <span className="text-base shrink-0">💡</span>
+              <Icon.Sparkles className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
               <p className="text-xs text-amber-200/90 leading-relaxed">
                 <strong className="text-amber-200">Premium</strong> üyelik ile başvuruna kişisel bir mesaj
                 ekleyebilirsin. Standart üyeler direkt başvuru gönderir.

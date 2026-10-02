@@ -5,6 +5,7 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import JoinRequestModal from '../../components/project/JoinRequestModal';
 import ContributorCard from '../../components/project/ContributorCard';
 import LeaveConfirmModal from '../../components/project/LeaveConfirmModal';
+import * as Icon from '../../components/ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -241,7 +242,7 @@ export default function ProjectDetail() {
             ]}
           />
           <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
-            <div className="text-5xl mb-3">🔍</div>
+            <Icon.Search className="w-12 h-12 text-text-muted mx-auto mb-3" />
             <h2 className="text-lg font-bold text-text mb-1 font-mono">proje bulunamadı</h2>
             <p className="text-sm text-text-muted mb-5">
               Aradığın proje silinmiş veya taşınmış olabilir.
@@ -260,20 +261,20 @@ export default function ProjectDetail() {
 
   const isAuthor = user && project.authorId && user.user_id === project.authorId;
 
-  let joinButtonLabel = '👥 ekibe katıl';
+  let joinButtonLabel = 'ekibe katıl';
   let joinButtonDisabled = false;
   let joinButtonIsLeave = false;
 
   if (!user) {
-    joinButtonLabel = '👥 ekibe katıl';
+    joinButtonLabel = 'ekibe katıl';
   } else if (isAuthor) {
-    joinButtonLabel = '👑 bu projenin sahibisin';
+    joinButtonLabel = 'bu projenin sahibisin';
     joinButtonDisabled = true;
   } else if (joinStatus === 'pending') {
-    joinButtonLabel = '⏳ başvurun onay bekliyor';
+    joinButtonLabel = 'başvurun onay bekliyor';
     joinButtonDisabled = true;
   } else if (joinStatus === 'approved') {
-    joinButtonLabel = '🚪 projeden ayrıl';
+    joinButtonLabel = 'projeden ayrıl';
     joinButtonIsLeave = true;
   }
 
@@ -294,7 +295,6 @@ export default function ProjectDetail() {
     <div className="w-full bg-bg min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Breadcrumb */}
         <PageBreadcrumb
           items={[
             { label: 'ana sayfa', to: '/' },
@@ -309,9 +309,7 @@ export default function ProjectDetail() {
               to={`/project/${project.id}/edit`}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-muted bg-transparent border border-accent/20 rounded-lg hover:border-accent hover:text-text transition-all font-mono"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
+              <Icon.Edit className="w-3.5 h-3.5" />
               düzenle
             </Link>
             <button
@@ -320,9 +318,7 @@ export default function ProjectDetail() {
               disabled={deleting}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-400 bg-transparent border border-red-400/30 rounded-lg hover:bg-red-400/10 hover:border-red-400/60 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <Icon.Trash className="w-3.5 h-3.5" />
               {deleting ? 'siliniyor...' : 'sil'}
             </button>
           </div>
@@ -335,8 +331,9 @@ export default function ProjectDetail() {
               <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
               {project.status}
             </span>
-            <span className="text-xs text-text-muted font-mono">
-              📅 {formatDate(project.createdAt)}
+            <span className="inline-flex items-center gap-1.5 text-xs text-text-muted font-mono">
+              <Icon.Calendar className="w-3.5 h-3.5" />
+              {formatDate(project.createdAt)}
             </span>
           </div>
 
@@ -362,9 +359,7 @@ export default function ProjectDetail() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <svg className="w-16 h-16 text-text-muted" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
+            <Icon.Image className="w-16 h-16 text-text-muted" />
           )}
         </div>
 
@@ -405,7 +400,8 @@ export default function ProjectDetail() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-text-muted bg-surface border border-accent/15 rounded-full hover:border-accent hover:text-text transition-all font-mono"
                     >
-                      🐙 github
+                      <Icon.Github className="w-4 h-4" />
+                      github
                     </a>
                   )}
                   {project.demoUrl && (
@@ -415,7 +411,8 @@ export default function ProjectDetail() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-text-muted bg-surface border border-accent/15 rounded-full hover:border-accent hover:text-text transition-all font-mono"
                     >
-                      🔗 demo
+                      <Icon.ExternalLink className="w-4 h-4" />
+                      demo
                     </a>
                   )}
                 </div>
@@ -475,9 +472,7 @@ export default function ProjectDetail() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <svg className="w-6 h-6 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                          </svg>
+                          <Icon.User className="w-6 h-6 text-text-muted" />
                         </div>
                       )}
                     </div>
@@ -487,9 +482,7 @@ export default function ProjectDetail() {
                         {project.author}
                       </p>
                     </div>
-                    <span className="text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all">
-                      →
-                    </span>
+                    <Icon.ArrowRight className="w-4 h-4 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </Link>
               )}
@@ -504,40 +497,57 @@ export default function ProjectDetail() {
                 </p>
                 <div className="space-y-2">
                   {isAuthor ? (
-                    <div className="w-full px-4 py-2.5 bg-bg/60 text-text-muted text-sm font-medium rounded-lg text-center border border-accent/10 font-mono">
-                      ⭐ bu proje senin · {project.stars} yıldız
+                    <div className="w-full px-4 py-2.5 bg-bg/60 text-text-muted text-sm font-medium rounded-lg text-center border border-accent/10 font-mono inline-flex items-center justify-center gap-2">
+                      <Icon.StarFilled className="w-4 h-4" />
+                      bu proje senin · {project.stars} yıldız
                     </div>
                   ) : (
                     <button
                       onClick={handleToggleStar}
                       disabled={starLoading}
-                      className={`w-full px-4 py-2.5 text-sm font-bold rounded-lg border transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono ${
+                      className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-lg border transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono ${
                         project.starred
                           ? 'bg-accent/10 text-accent border-accent/50 hover:bg-accent/15 hover:shadow-[0_0_20px_-5px_rgba(239,228,206,0.3)]'
                           : 'bg-transparent text-text border-accent/30 hover:border-accent hover:bg-surface'
                       }`}
                     >
-                      {starLoading
-                        ? '...'
-                        : project.starred
-                        ? `★ yıldızlandı (${project.stars})`
-                        : `☆ yıldızla (${project.stars})`}
+                      {starLoading ? (
+                        '...'
+                      ) : project.starred ? (
+                        <>
+                          <Icon.StarFilled className="w-4 h-4" />
+                          yıldızlandı ({project.stars})
+                        </>
+                      ) : (
+                        <>
+                          <Icon.Star className="w-4 h-4" />
+                          yıldızla ({project.stars})
+                        </>
+                      )}
                     </button>
                   )}
 
                   {joinButtonIsLeave ? (
                     <button
                       onClick={handleLeaveClick}
-                      className="w-full px-4 py-2.5 text-sm font-semibold text-red-400 bg-transparent border border-red-400/30 rounded-lg hover:bg-red-400/10 hover:border-red-400/60 transition-all cursor-pointer font-mono"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-400 bg-transparent border border-red-400/30 rounded-lg hover:bg-red-400/10 hover:border-red-400/60 transition-all cursor-pointer font-mono"
                     >
+                      <Icon.Logout className="w-4 h-4" />
                       {joinButtonLabel}
                     </button>
                   ) : (
                     <button
                       onClick={handleJoinClick}
                       disabled={joinButtonDisabled}
-                      className="w-full px-4 py-2.5 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-accent disabled:hover:shadow-none font-mono"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-accent disabled:hover:shadow-none font-mono"
                     >
+                      {joinStatus === 'pending' ? (
+                        <Icon.Clock className="w-4 h-4" />
+                      ) : joinButtonDisabled ? (
+                        <Icon.Star className="w-4 h-4" />
+                      ) : (
+                        <Icon.Plus className="w-4 h-4" />
+                      )}
                       {joinButtonLabel}
                     </button>
                   )}
@@ -556,11 +566,17 @@ export default function ProjectDetail() {
                   </div>
                   <div className="flex items-center justify-between">
                     <dt className="text-text-muted font-mono">yıldız</dt>
-                    <dd className="font-medium text-text font-mono tabular-nums">⭐ {project.stars}</dd>
+                    <dd className="font-medium text-text font-mono tabular-nums inline-flex items-center gap-1">
+                      <Icon.StarFilled className="w-3.5 h-3.5 text-accent" />
+                      {project.stars}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between">
                     <dt className="text-text-muted font-mono">katkıcı</dt>
-                    <dd className="font-medium text-text font-mono tabular-nums">👥 {project.contributorsList?.length || 0}</dd>
+                    <dd className="font-medium text-text font-mono tabular-nums inline-flex items-center gap-1">
+                      <Icon.Users className="w-3.5 h-3.5" />
+                      {project.contributorsList?.length || 0}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between">
                     <dt className="text-text-muted font-mono">durum</dt>
@@ -584,17 +600,19 @@ export default function ProjectDetail() {
                       navigator.clipboard.writeText(window.location.href);
                       alert('Link kopyalandı!');
                     }}
-                    className="flex-1 px-3 py-2 text-xs font-medium text-text-muted bg-bg/60 border border-accent/15 rounded-lg hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-text-muted bg-bg/60 border border-accent/15 rounded-lg hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
                   >
-                    🔗 link
+                    <Icon.Link className="w-3.5 h-3.5" />
+                    link
                   </button>
                   <a
                     href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(project.title)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 px-3 py-2 text-xs font-medium text-text-muted bg-bg/60 border border-accent/15 rounded-lg hover:border-accent hover:text-text transition-all cursor-pointer text-center font-mono"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-text-muted bg-bg/60 border border-accent/15 rounded-lg hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
                   >
-                    🐦 twitter
+                    <Icon.Twitter className="w-3.5 h-3.5" />
+                    twitter
                   </a>
                 </div>
               </div>
@@ -605,7 +623,6 @@ export default function ProjectDetail() {
 
       </div>
 
-      {/* Modallar */}
       <JoinRequestModal
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}

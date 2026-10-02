@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharWarning from '../../components/ui/CharWarning';
+import * as Icon from '../../components/ui/Icons';
 import { PROFILE_LIMITS } from '../../constants/limits';
 import {
   USERNAME_REGEX,
@@ -134,16 +135,14 @@ export default function Settings() {
     <div className="w-full bg-bg min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Breadcrumb */}
         <PageBreadcrumb
           items={[
             { label: 'ana sayfa', to: '/' },
-            { label: 'dashboard', to: '/dashboard' },
+            { label: 'profilim', to: `/profile/${user.username}` },
             { label: 'ayarlar' },
           ]}
         />
 
-        {/* Başlık */}
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
             Ayarlar.
@@ -153,7 +152,6 @@ export default function Settings() {
           </p>
         </div>
 
-        {/* ───── Profil Formu ───── */}
         <form
           onSubmit={handleSubmit}
           className="bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8 space-y-5"
@@ -179,9 +177,7 @@ export default function Settings() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
+                  <Icon.User className="w-8 h-8 text-text-muted" />
                 </div>
               )}
             </div>
@@ -225,7 +221,7 @@ export default function Settings() {
             <CharWarning char={warnings.username} />
           </div>
 
-          {/* Email (readonly) */}
+          {/* Email */}
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-text mb-1.5">
               E-posta
@@ -278,27 +274,26 @@ export default function Settings() {
             <CharWarning char={warnings.bio} />
           </div>
 
-          {/* Error */}
           {error && (
             <div
               role="alert"
-              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono"
+              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
-              ⚠ {error}
+              <Icon.Warning className="w-4 h-4 shrink-0" />
+              {error}
             </div>
           )}
 
-          {/* Success */}
           {success && (
             <div
               role="status"
-              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono"
+              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
-              ✓ {success}
+              <Icon.Check className="w-4 h-4 shrink-0" />
+              {success}
             </div>
           )}
 
-          {/* Submit */}
           <div className="pt-2">
             <button
               type="submit"
@@ -310,7 +305,7 @@ export default function Settings() {
           </div>
         </form>
 
-        {/* ───── Tehlikeli Bölge ───── */}
+        {/* Tehlikeli Bölge */}
         <div className="mt-6 bg-surface border border-red-400/20 rounded-2xl p-6 sm:p-8">
           <h2 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 font-mono">
             /tehlikeli bölge

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import * as Icon from '../ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// Basit in-memory cache — aynı oturumda tekrar fetch etmesin
 let categoriesCache = null;
 
 export default function CategoryPick({
@@ -21,14 +21,12 @@ export default function CategoryPick({
   const [error, setError] = useState('');
   const abortRef = useRef(null);
 
-  // Modal açıldığında seçimi senkronize et
   useEffect(() => {
     if (isOpen) {
       setTempSelection(selectedCategories);
     }
   }, [isOpen, selectedCategories]);
 
-  // Kategorileri sadece GEREKTİĞİNDE fetch et
   useEffect(() => {
     if (!isOpen) return;
 
@@ -145,9 +143,7 @@ export default function CategoryPick({
             className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
             aria-label="Kapat"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon.Close className="w-5 h-5" />
           </button>
         </div>
 
@@ -161,7 +157,7 @@ export default function CategoryPick({
 
           {error && !loading && (
             <div className="text-center py-10">
-              <div className="text-4xl mb-2">⚠️</div>
+              <Icon.Warning className="w-10 h-10 text-text-muted mx-auto mb-2" />
               <p className="text-sm text-red-400 mb-1">{error}</p>
               <p className="text-xs text-text-muted">
                 Backend'in çalıştığından emin ol.

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import * as Icon from '../ui/Icons';
 
-// URL geçerli mi? (sadece http/https)
 function isValidUrl(str) {
   if (!str) return true;
   try {
@@ -11,7 +11,6 @@ function isValidUrl(str) {
   }
 }
 
-// image_url için canlı görsel önizleme.
 export default function ImagePreview({ url, debouncedUrl }) {
   const [status, setStatus] = useState('idle');
 
@@ -47,8 +46,9 @@ export default function ImagePreview({ url, debouncedUrl }) {
 
   if (status === 'error') {
     return (
-      <p className="mt-2 text-xs text-red-400 font-mono">
-        ⚠ Görsel yüklenemedi. URL'yi kontrol et.
+      <p className="mt-2 text-xs text-red-400 font-mono inline-flex items-center gap-1.5">
+        <Icon.Warning className="w-3 h-3" />
+        Görsel yüklenemedi. URL'yi kontrol et.
       </p>
     );
   }
