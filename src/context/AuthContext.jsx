@@ -34,7 +34,6 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token');
     if (!token) return null;
 
-    // ✅ Önceki isteği iptal et
     if (abortRef.current) {
       abortRef.current.abort();
     }
@@ -42,7 +41,6 @@ export function AuthProvider({ children }) {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ✅ Timeout ekle (5 saniye)
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     try {
@@ -58,7 +56,10 @@ export function AuthProvider({ children }) {
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === 'AbortError') return null;
-      console.log('AuthContext refreshUser hata:', err.message);
+      // Sadece development'ta logla — production'da sessiz
+      if (import.meta.env.DEV) {
+        console.warn('[AuthContext] refreshUser failed:', err.message);
+      }
       return null;
     }
   }, []);
@@ -78,7 +79,7 @@ export function AuthProvider({ children }) {
           localStorage.removeItem('token');
         }
       }
-      setLoading(false); // ✅ HER DURUMDA çağrılır
+      setLoading(false);
     };
 
     initAuth();
@@ -92,7 +93,10 @@ export function AuthProvider({ children }) {
       if (!isTokenValid(decoded)) {
         localStorage.removeItem('token');
         setUser(null);
-        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        if (
+          window.location.pathname !== '/login' &&
+          window.location.pathname !== '/register'
+        ) {
           window.location.href = '/login';
         }
       }

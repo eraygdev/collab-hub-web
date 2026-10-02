@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 const SidebarLink = ({ to, label, onClose, children }) => (
@@ -16,6 +17,7 @@ const SidebarLink = ({ to, label, onClose, children }) => (
 
 export default function Sidebar({ isOpen, onClose }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -43,17 +45,17 @@ export default function Sidebar({ isOpen, onClose }) {
         className={`fixed top-0 left-0 bottom-0 w-72 bg-surface z-50 shadow-2xl border-r border-accent/10 transform transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        aria-label="Ana menü"
+        aria-label={t('sidebar.aria.menu')}
       >
         {/* Header — navbar ile aynı yükseklik */}
         <div className="h-14 px-5 flex items-center justify-between border-b border-accent/10 shrink-0">
           <span className="font-sans text-sm font-semibold text-text tracking-tight">
-            Menü
+            {t('sidebar.title')}
           </span>
           <button
             onClick={onClose}
             className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
-            aria-label="Menüyü Kapat"
+            aria-label={t('sidebar.aria.close')}
           >
             <Icon.Close className="w-5 h-5" />
           </button>
@@ -61,35 +63,35 @@ export default function Sidebar({ isOpen, onClose }) {
 
         <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
 
-          <SidebarLink to="/" label="Home" onClose={onClose}>
+          <SidebarLink to="/" label={t('sidebar.home')} onClose={onClose}>
             <Icon.Folder className="w-5 h-5" />
           </SidebarLink>
 
           {user ? (
             <>
-              <SidebarLink to="/dashboard" label="Dashboard" onClose={onClose}>
+              <SidebarLink to="/dashboard" label={t('sidebar.dashboard')} onClose={onClose}>
                 <Icon.LayoutGrid className="w-5 h-5" />
               </SidebarLink>
 
-              <SidebarLink to="/create-project" label="Yeni Proje" onClose={onClose}>
+              <SidebarLink to="/create-project" label={t('sidebar.new_project')} onClose={onClose}>
                 <Icon.Plus className="w-5 h-5" />
               </SidebarLink>
 
-              <SidebarLink to={`/profile/${user.username}`} label="Profilim" onClose={onClose}>
+              <SidebarLink to={`/profile/${user.username}`} label={t('sidebar.profile')} onClose={onClose}>
                 <Icon.User className="w-5 h-5" />
               </SidebarLink>
 
-              <SidebarLink to="/settings" label="Ayarlar" onClose={onClose}>
+              <SidebarLink to="/settings" label={t('sidebar.settings')} onClose={onClose}>
                 <Icon.Settings className="w-5 h-5" />
               </SidebarLink>
             </>
           ) : (
             <div className="pt-4 mt-4 border-t border-accent/10 space-y-1">
-              <SidebarLink to="/login" label="Giriş Yap" onClose={onClose}>
+              <SidebarLink to="/login" label={t('sidebar.login')} onClose={onClose}>
                 <Icon.Login className="w-5 h-5" />
               </SidebarLink>
 
-              <SidebarLink to="/register" label="Kayıt Ol" onClose={onClose}>
+              <SidebarLink to="/register" label={t('sidebar.register')} onClose={onClose}>
                 <Icon.User className="w-5 h-5" />
               </SidebarLink>
             </div>
@@ -99,7 +101,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Alt bant */}
         <div className="px-5 py-4 border-t border-accent/10 shrink-0">
           <p className="text-[10px] text-text-muted font-mono uppercase tracking-wider">
-            Collab-Hub · by Reta
+            {t('sidebar.brand')}
           </p>
         </div>
       </aside>

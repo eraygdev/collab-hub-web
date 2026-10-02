@@ -1,124 +1,117 @@
 import Legal from '../../components/layout/Legal';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export default function Terms() {
+  const { t } = useLanguage();
+
   const sections = [
     {
-      id: 'kabul',
-      title: 'Şartların Kabulü',
+      id: 'acceptance',
+      title: 'Acceptance of Terms',
       content: (
-        <>
-          <p>
-            Collab-Hub'a erişerek ve kullanarak bu kullanım şartlarını kabul
-            etmiş sayılırsınız. Şartları kabul etmiyorsanız platformu
-            kullanmayınız.
-          </p>
-        </>
+        <p>
+          By accessing and using Collab-Hub, you are deemed to have accepted these terms of use.
+          If you do not accept the terms, please do not use the platform.
+        </p>
       ),
     },
     {
-      id: 'hesap',
-      title: 'Hesap Sorumluluğu',
+      id: 'account',
+      title: 'Account Responsibility',
       content: (
         <>
-          <p>Hesabınızla ilgili sorumluluklar:</p>
+          <p>Responsibilities regarding your account:</p>
           <ul>
-            <li>Hesap bilgilerinizin doğruluğundan siz sorumlusunuz.</li>
-            <li>
-              Hesabınız üzerinden yapılan tüm işlemlerden siz sorumlusunuz.
-            </li>
-            <li>
-              Hesabınızın yetkisiz kullanımını fark ederseniz derhal bize
-              bildirmelisiniz.
-            </li>
+            <li>You are responsible for the accuracy of your account information.</li>
+            <li>You are responsible for all transactions made through your account.</li>
+            <li>If you notice unauthorized use of your account, you must notify us immediately.</li>
           </ul>
         </>
       ),
     },
     {
-      id: 'icerik-kurallari',
-      title: 'İçerik Kuralları',
+      id: 'content-rules',
+      title: 'Content Rules',
       content: (
         <>
-          <p>Platformda paylaştığınız içeriklerde şunlar yasaktır:</p>
+          <p>The following are prohibited in content you share on the platform:</p>
           <ul>
-            <li>Yasa dışı içerik</li>
-            <li>Nefret söylemi, hakaret, tehdit</li>
-            <li>Telif hakkı ihlali</li>
-            <li>Spam, reklam, yanıltıcı içerik</li>
-            <li>Kötü amaçlı yazılım veya zararlı kod</li>
-            <li>Kişisel verilerin izinsiz paylaşımı</li>
+            <li>Illegal content</li>
+            <li>Hate speech, insults, threats</li>
+            <li>Copyright infringement</li>
+            <li>Spam, ads, misleading content</li>
+            <li>Malware or harmful code</li>
+            <li>Unauthorized sharing of personal data</li>
           </ul>
           <p>
-            Bu kurallara uymayan içerikler önceden bildirilmeksizin
-            kaldırılabilir ve hesabınız askıya alınabilir.
+            Content that violates these rules may be removed without prior notice, and
+            your account may be suspended.
           </p>
         </>
       ),
     },
     {
-      id: 'fikri-mulkiyet',
-      title: 'Fikri Mülkiyet',
+      id: 'ip',
+      title: 'Intellectual Property',
       content: (
         <>
           <p>
-            Yayınladığınız projelerin fikri mülkiyet hakları size aittir.
-            Ancak platforma yükleyerek, içeriğinizi diğer kullanıcılara
-            göstermek için bize sınırlı bir lisans vermiş olursunuz.
+            The intellectual property rights of the projects you publish belong to you.
+            However, by uploading to the platform, you grant us a limited license
+            to display your content to other users.
           </p>
           <p>
-            Collab-Hub adı, logosu ve tasarımı bize aittir; izinsiz
-            kullanılamaz.
+            The Collab-Hub name, logo, and design belong to us; they cannot be used
+            without permission.
           </p>
         </>
       ),
     },
     {
-      id: 'sorumluluk-reddi',
-      title: 'Sorumluluk Reddi',
+      id: 'disclaimer',
+      title: 'Disclaimer',
       content: (
         <>
           <p>
-            Collab-Hub "olduğu gibi" sunulur. Kesintisiz veya hatasız çalışma
-            garantisi verilmez.
+            Collab-Hub is provided "as is". No guarantee of uninterrupted or error-free
+            operation is given.
           </p>
           <p>
-            Platformda paylaşılan projelerin doğruluğu, güvenliği veya
-            yasallığı konusunda sorumluluk kabul edilmez. Kullanıcılar
-            arasındaki etkileşimlerden doğacak sorunlardan Collab-Hub sorumlu
-            tutulamaz.
+            No responsibility is accepted for the accuracy, security, or legality of
+            projects shared on the platform. Collab-Hub cannot be held responsible for
+            issues arising from interactions between users.
           </p>
         </>
       ),
     },
     {
-      id: 'hesap-silme',
-      title: 'Hesap Askıya Alma ve Silme',
+      id: 'account-deletion',
+      title: 'Account Suspension and Deletion',
       content: (
         <p>
-          Kullanım şartlarını ihlal eden hesaplar önceden bildirilmeksizin
-          askıya alınabilir veya silinebilir. Hesabınızı dilediğiniz zaman
-          kendiniz de silebilirsiniz.
+          Accounts that violate the terms of use may be suspended or deleted without
+          prior notice. You can also delete your account yourself at any time.
         </p>
       ),
     },
     {
-      id: 'degisiklikler',
-      title: 'Şartlarda Değişiklik',
+      id: 'changes',
+      title: 'Changes to Terms',
       content: (
         <p>
-          Bu şartlar zaman zaman güncellenebilir. Değişiklikler bu sayfada
-          yayınlandığı anda yürürlüğe girer. Platformu kullanmaya devam
-          etmeniz, güncel şartları kabul ettiğiniz anlamına gelir.
+          These terms may be updated from time to time. Changes take effect as soon as
+          they are published on this page. Continuing to use the platform means you
+          accept the current terms.
         </p>
       ),
     },
     {
-      id: 'uygulanacak-hukuk',
-      title: 'Uygulanacak Hukuk',
+      id: 'law',
+      title: 'Governing Law',
       content: (
         <p>
-          Bu şartlar Türkiye Cumhuriyeti hukukuna tabidir. Anlaşmazlıklar
-          durumunda Türkiye mahkemeleri yetkilidir.
+          These terms are subject to the laws of the Republic of Türkiye. In case of
+          disputes, Turkish courts have jurisdiction.
         </p>
       ),
     },
@@ -126,8 +119,8 @@ export default function Terms() {
 
   return (
     <Legal
-      title="Kullanım Şartları"
-      updatedAt="27 Eylül 2026"
+      title={t('terms.title')}
+      updatedAt="September 27, 2026"
       sections={sections}
     />
   );

@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../../components/ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Login() {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function Login() {
   if (loading || user) {
     return (
       <div className="w-full flex-1 flex items-center justify-center bg-bg">
-        <p className="text-sm text-text-muted font-mono">yükleniyor...</p>
+        <p className="text-sm text-text-muted font-mono">{t('auth.loading')}</p>
       </div>
     );
   }
@@ -37,15 +39,15 @@ export default function Login() {
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-accent/15 bg-bg/50">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
             <span className="text-[10px] font-mono tracking-wider text-text-muted uppercase">
-              giriş
+              {t('login.eyebrow')}
             </span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text mb-2">
-            Tekrar hoş geldin.
+            {t('login.title')}
           </h1>
           <p className="text-sm text-text-muted leading-relaxed mb-8">
-            Hesabına giriş yap ve kaldığın yerden devam et.
+            {t('login.subtitle')}
           </p>
 
           <button
@@ -53,21 +55,23 @@ export default function Login() {
             className="w-full flex items-center justify-center gap-3 px-5 py-3.5 bg-accent text-bg text-sm font-bold rounded-xl border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer"
           >
             <Icon.Github className="w-5 h-5" />
-            GitHub ile Devam Et
+            {t('login.github_button')}
           </button>
 
           <div className="mt-6 pt-6 border-t border-accent/10">
             <p className="text-xs text-text-muted/70 text-center font-mono leading-relaxed">
-              Collab-Hub, kimlik doğrulama için <span className="text-text-muted">GitHub OAuth</span> kullanır.
-              Şifre saklanmaz.
+              {t('auth.github_oauth_note')}
             </p>
           </div>
         </div>
 
         <p className="text-center text-sm text-text-muted mt-6">
-          Hesabın yok mu?{' '}
-          <Link to="/register" className="text-text font-semibold hover:text-accent transition-colors underline underline-offset-2">
-            Kayıt ol
+          {t('login.no_account')}{' '}
+          <Link
+            to="/register"
+            className="text-text font-semibold hover:text-accent transition-colors underline underline-offset-2"
+          >
+            {t('login.register_link')}
           </Link>
         </p>
       </div>

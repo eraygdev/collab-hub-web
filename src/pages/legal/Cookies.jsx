@@ -1,35 +1,35 @@
 import Legal from '../../components/layout/Legal';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export default function Cookies() {
+  const { t } = useLanguage();
+
   const sections = [
     {
-      id: 'nedir',
-      title: 'Çerez Nedir?',
+      id: 'what-are',
+      title: 'What Are Cookies?',
       content: (
-        <>
-          <p>
-            Çerezler (cookies), ziyaret ettiğiniz web siteleri tarafından
-            tarayıcınıza kaydedilen küçük metin dosyalarıdır. Oturumunuzu
-            hatırlamak, tercihlerinizi saklamak ve deneyiminizi iyileştirmek
-            için kullanılır.
-          </p>
-        </>
+        <p>
+          Cookies are small text files stored in your browser by the websites you visit.
+          They are used to remember your session, save your preferences, and improve
+          your experience.
+        </p>
       ),
     },
     {
-      id: 'kullandigimiz',
-      title: 'Kullandığımız Çerezler',
+      id: 'used',
+      title: 'Cookies We Use',
       content: (
         <>
-          <p>Collab-Hub şu çerezleri kullanır:</p>
+          <p>Collab-Hub uses the following cookies:</p>
           <ul>
             <li>
-              <strong>Zorunlu çerezler:</strong> Oturum yönetimi ve güvenlik
-              için gereklidir. Devre dışı bırakılamaz.
+              <strong>Essential cookies:</strong> Required for session management and
+              security. Cannot be disabled.
             </li>
             <li>
-              <strong>Yerel depolama (localStorage):</strong> Giriş token'ınız
-              ve form taslaklarınız tarayıcınızda saklanır.
+              <strong>Local storage:</strong> Your login token and form drafts are stored
+              in your browser.
             </li>
           </ul>
         </>
@@ -37,75 +37,67 @@ export default function Cookies() {
     },
     {
       id: 'localstorage',
-      title: 'LocalStorage Kullanımı',
+      title: 'LocalStorage Usage',
       content: (
         <>
           <p>
-            Collab-Hub, çerezlerin yanı sıra tarayıcınızın{' '}
-            <strong>localStorage</strong> özelliğini de kullanır:
+            In addition to cookies, Collab-Hub uses your browser's{' '}
+            <strong>localStorage</strong> feature:
           </p>
           <ul>
             <li>
-              <strong>token:</strong> Giriş yaptığınızda oluşturulan JWT
-              token'ı. 7 gün geçerlidir.
+              <strong>token:</strong> The JWT token created when you log in. Valid for 7 days.
             </li>
             <li>
-              <strong>createProjectDraft:</strong> Yeni proje oluştururken
-              girdiğiniz veriler. Siz kaydedene kadar tarayıcınızda kalır.
+              <strong>createProjectDraft:</strong> The data you enter while creating a new
+              project. Stays in your browser until you save.
             </li>
           </ul>
           <p>
-            LocalStorage verileri sunucuya gönderilmez, sadece tarayıcınızda
-            saklanır.
+            LocalStorage data is not sent to the server, only stored in your browser.
           </p>
         </>
       ),
     },
     {
-      id: 'ucuncu-taraf',
-      title: 'Üçüncü Taraf Çerezleri',
+      id: 'third-party',
+      title: 'Third-Party Cookies',
       content: (
         <p>
-          Şu an Collab-Hub üçüncü taraf reklam veya analitik çerezi
-          kullanmamaktadır. Gelecekte eklenirse bu sayfa güncellenecektir.
+          Collab-Hub currently does not use third-party advertising or analytics cookies.
+          If they are added in the future, this page will be updated.
         </p>
       ),
     },
     {
-      id: 'kontrol',
-      title: 'Çerezleri Nasıl Kontrol Ederim?',
+      id: 'control',
+      title: 'How Do I Control Cookies?',
       content: (
         <>
           <p>
-            Tarayıcı ayarlarınızdan çerezleri ve localStorage verilerini
-            silebilir veya engelleyebilirsiniz. Ancak:
+            You can delete or block cookies and localStorage data from your browser settings.
+            However:
           </p>
           <ul>
-            <li>
-              Çerezleri tamamen engellerseniz oturum açamazsınız.
-            </li>
-            <li>
-              localStorage'ı temizlerseniz oturumunuz kapanır.
-            </li>
+            <li>If you block cookies completely, you cannot log in.</li>
+            <li>If you clear localStorage, your session will be terminated.</li>
           </ul>
-          <p>
-            Popüler tarayıcılar için ayarlar:
-          </p>
+          <p>Settings for popular browsers:</p>
           <ul>
-            <li>Chrome: Ayarlar → Gizlilik ve güvenlik → Çerezler</li>
-            <li>Firefox: Ayarlar → Gizlilik ve Güvenlik → Çerezler</li>
-            <li>Safari: Tercihler → Gizlilik → Çerezleri yönet</li>
+            <li>Chrome: Settings → Privacy and security → Cookies</li>
+            <li>Firefox: Settings → Privacy & Security → Cookies</li>
+            <li>Safari: Preferences → Privacy → Manage Cookies</li>
           </ul>
         </>
       ),
     },
     {
-      id: 'degisiklikler',
-      title: 'Değişiklikler',
+      id: 'changes',
+      title: 'Changes',
       content: (
         <p>
-          Bu çerez politikası zaman zaman güncellenebilir. Güncel sürüm her
-          zaman bu sayfada yayınlanır.
+          This cookie policy may be updated from time to time. The current version is
+          always published on this page.
         </p>
       ),
     },
@@ -113,8 +105,8 @@ export default function Cookies() {
 
   return (
     <Legal
-      title="Çerez Politikası"
-      updatedAt="27 Eylül 2026"
+      title={t('cookies.title')}
+      updatedAt="September 27, 2026"
       sections={sections}
     />
   );

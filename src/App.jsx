@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './i18n/LanguageContext';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
@@ -37,7 +38,12 @@ function Layout({ children, hideFooter }) {
     <div className="min-h-screen bg-bg flex flex-col font-sans text-text selection:bg-accent selection:text-bg">
       <Navbar onOpenSidebar={() => setIsSidebarOpen(true)} />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className={`flex-1 flex flex-col w-full bg-bg ${hideFooter ? 'overflow-hidden' : ''}`}>
+      {/* main: flex-1 flex flex-col + overflow-x-hidden — içerik taşmasın */}
+      <main
+        className={`flex-1 flex flex-col w-full bg-bg min-h-0 overflow-x-hidden ${
+          hideFooter ? 'overflow-y-hidden' : ''
+        }`}
+      >
         {children}
       </main>
       {!hideFooter && <Footer />}
@@ -82,10 +88,12 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <ScrollToTop />
-        <AppContent />
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <ScrollToTop />
+          <AppContent />
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -8,6 +9,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 export default function Footer() {
   const year = new Date().getFullYear();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <footer className="w-full relative">
@@ -27,12 +29,12 @@ export default function Footer() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-6">
             <h2 className="text-lg sm:text-xl font-extrabold tracking-tight mb-1 text-text">
-              {user ? `Hoş geldin, ${user.username}` : 'Projeni Paylaş, Ekibe Katıl'}
+              {user
+                ? t('footer.cta.welcome_user', { username: user.username })
+                : t('footer.cta.title')}
             </h2>
             <p className="text-xs sm:text-sm text-text-muted font-mono">
-              {user
-                ? 'Yeni bir proje oluştur veya paneline göz at.'
-                : 'Hesap oluştur, projeni yayınla ve topluluğa katıl.'}
+              {user ? t('footer.cta.desc_user') : t('footer.cta.desc_guest')}
             </p>
           </div>
 
@@ -43,14 +45,14 @@ export default function Footer() {
                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 text-sm font-bold text-bg bg-accent hover:bg-accent/90 rounded-lg transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer"
               >
                 <Icon.Plus className="w-4 h-4" />
-                Proje Oluştur
+                {t('footer.cta.create')}
               </Link>
               <Link
                 to="/dashboard"
                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 text-sm font-bold text-text bg-transparent hover:bg-surface border border-accent/30 hover:border-accent rounded-lg transition-all cursor-pointer"
               >
                 <Icon.LayoutGrid className="w-4 h-4" />
-                Dashboard
+                {t('footer.cta.dashboard')}
               </Link>
             </div>
           ) : (
@@ -60,7 +62,7 @@ export default function Footer() {
                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 text-sm font-bold text-text bg-transparent hover:bg-surface border border-accent/30 hover:border-accent rounded-lg transition-all cursor-pointer"
               >
                 <Icon.Github className="w-4 h-4" />
-                GitHub ile Başla
+                {t('footer.cta.github_start')}
               </button>
             </div>
           )}
@@ -90,21 +92,21 @@ export default function Footer() {
                 Collab-Hub
               </Link>
               <p className="text-sm text-text-muted leading-relaxed mb-4">
-                Geliştiricilerin projelerini paylaştığı, keşfettiği ve ekibe katıldığı açık kaynak platform.
+                {t('footer.brand.tagline')}
               </p>
               <div className="flex items-center gap-2.5">
                 <a
                   href="https://github.com/eraygdev"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="GitHub Profili"
+                  aria-label={t('footer.aria.github')}
                   className="w-9 h-9 rounded-lg bg-surface border border-accent/15 flex items-center justify-center text-text-muted hover:text-bg hover:bg-accent hover:border-accent transition-all"
                 >
                   <Icon.Github className="w-4 h-4" />
                 </a>
                 <a
                   href="mailto:retadeveloper@gmail.com"
-                  aria-label="E-posta"
+                  aria-label={t('footer.aria.email')}
                   className="w-9 h-9 rounded-lg bg-surface border border-accent/15 flex items-center justify-center text-text-muted hover:text-bg hover:bg-accent hover:border-accent transition-all"
                 >
                   <Icon.Mail className="w-4 h-4" />
@@ -113,7 +115,7 @@ export default function Footer() {
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Twitter"
+                  aria-label={t('footer.aria.twitter')}
                   className="w-9 h-9 rounded-lg bg-surface border border-accent/15 flex items-center justify-center text-text-muted hover:text-bg hover:bg-accent hover:border-accent transition-all"
                 >
                   <Icon.Twitter className="w-4 h-4" />
@@ -124,22 +126,22 @@ export default function Footer() {
             {/* Ürün */}
             <div>
               <h3 className="text-xs font-bold text-text uppercase tracking-wider mb-4 font-mono">
-                /ürün
+                {t('footer.section.product')}
               </h3>
               <ul className="space-y-2.5 text-sm">
                 <li>
                   <Link to="/" className="text-text-muted hover:text-text transition-colors">
-                    Keşfet
+                    {t('footer.link.explore')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/create-project" className="text-text-muted hover:text-text transition-colors">
-                    Proje Oluştur
+                    {t('footer.link.create')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/dashboard" className="text-text-muted hover:text-text transition-colors">
-                    Dashboard
+                    {t('footer.link.dashboard')}
                   </Link>
                 </li>
               </ul>
@@ -148,7 +150,7 @@ export default function Footer() {
             {/* Kaynaklar */}
             <div>
               <h3 className="text-xs font-bold text-text uppercase tracking-wider mb-4 font-mono">
-                /kaynaklar
+                {t('footer.section.resources')}
               </h3>
               <ul className="space-y-2.5 text-sm">
                 <li>
@@ -158,7 +160,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-text-muted hover:text-text transition-colors"
                   >
-                    Geliştirici
+                    {t('footer.link.developer')}
                   </a>
                 </li>
                 <li>
@@ -166,7 +168,7 @@ export default function Footer() {
                     href="mailto:retadeveloper@gmail.com"
                     className="text-text-muted hover:text-text transition-colors"
                   >
-                    İletişim
+                    {t('footer.link.contact')}
                   </a>
                 </li>
                 <li>
@@ -176,7 +178,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-text-muted hover:text-text transition-colors"
                   >
-                    Twitter
+                    {t('footer.link.twitter')}
                   </a>
                 </li>
               </ul>
@@ -185,22 +187,22 @@ export default function Footer() {
             {/* Şirket */}
             <div>
               <h3 className="text-xs font-bold text-text uppercase tracking-wider mb-4 font-mono">
-                /şirket
+                {t('footer.section.company')}
               </h3>
               <ul className="space-y-2.5 text-sm">
                 <li>
                   <Link to="/about" className="text-text-muted hover:text-text transition-colors">
-                    Hakkımızda
+                    {t('footer.link.about')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/privacy" className="text-text-muted hover:text-text transition-colors">
-                    Gizlilik
+                    {t('footer.link.privacy')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/terms" className="text-text-muted hover:text-text transition-colors">
-                    Kullanım Şartları
+                    {t('footer.link.terms')}
                   </Link>
                 </li>
               </ul>
@@ -211,19 +213,19 @@ export default function Footer() {
           {/* Copyright */}
           <div className="pt-5 border-t border-accent/10 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-text-muted font-mono">
-              © {year} Collab-Hub · by Reta
+              {t('footer.copyright', { year })}
             </p>
             <div className="flex items-center gap-3 text-xs text-text-muted font-mono">
               <Link to="/privacy" className="hover:text-text transition-colors">
-                gizlilik
+                {t('footer.links.privacy')}
               </Link>
               <span className="text-accent/30">·</span>
               <Link to="/terms" className="hover:text-text transition-colors">
-                şartlar
+                {t('footer.links.terms')}
               </Link>
               <span className="text-accent/30">·</span>
               <Link to="/cookies" className="hover:text-text transition-colors">
-                çerezler
+                {t('footer.links.cookies')}
               </Link>
             </div>
           </div>

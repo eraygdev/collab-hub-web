@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
@@ -22,6 +23,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 export default function EditProject() {
   const { id } = useParams();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -40,7 +42,6 @@ export default function EditProject() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-
   const [warnings, setWarnings] = useState({});
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export default function EditProject() {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => {
-        if (!res.ok) throw new Error('Proje bulunamadı');
+        if (!res.ok) throw new Error('not_found');
         return res.json();
       })
       .then((data) => {
@@ -77,7 +78,7 @@ export default function EditProject() {
       })
       .catch(() => {
         if (cancelled) return;
-        setError('Proje bulunamadı');
+        setError('not_found');
         setLoading(false);
       });
 
@@ -154,27 +155,27 @@ export default function EditProject() {
     setSuccess(false);
 
     if (!form.title.trim() || !form.description.trim()) {
-      setError('Başlık ve kısa açıklama zorunlu.');
+      setError(t('create.error.title_required'));
       return;
     }
 
     for (const [key, max] of Object.entries(PROJECT_LIMITS)) {
       if (form[key] && charCount(form[key]) > max) {
-        setError(`${key} alanı en fazla ${max} karakter olabilir.`);
+        setError(t('create.error.too_long', { field: key, max }));
         return;
       }
     }
 
     if (!isValidUrl(form.githubUrl)) {
-      setError('GitHub URL geçersiz.');
+      setError(t('create.error.github_invalid'));
       return;
     }
     if (!isValidUrl(form.demoUrl)) {
-      setError('Demo URL geçersiz.');
+      setError(t('create.error.demo_invalid'));
       return;
     }
     if (!isValidUrl(form.imageUrl)) {
-      setError('Görsel URL geçersiz.');
+      setError(t('create.error.image_invalid'));
       return;
     }
 
@@ -194,18 +195,8 @@ export default function EditProject() {
         }),
       });
 
-      const text = await res.text();
-      let data = {};
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = { error: 'Sunucu geçersiz cevap döndü' };
-        }
-      }
-
       if (!res.ok) {
-        setError(data.error || 'Bir hata oluştu');
+        setError(t('create.error.generic'));
         setSubmitting(false);
         return;
       }
@@ -215,7 +206,7 @@ export default function EditProject() {
         navigate(`/project/${id}`);
       }, 700);
     } catch {
-      setError('Sunucuya bağlanılamadı');
+      setError(t('create.error.network'));
       setSubmitting(false);
     }
   };
@@ -225,7 +216,7 @@ export default function EditProject() {
   if (authLoading || loading) {
     return (
       <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted font-mono">yükleniyor...</p>
+        <p className="text-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
       </div>
     );
   }
@@ -238,20 +229,21 @@ export default function EditProject() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <PageBreadcrumb
             items={[
-              { label: 'ana sayfa', to: '/' },
-              { label: `proje:${id}`, to: `/project/${id}` },
-              { label: 'düzenle' },
+              { label: t('breadcrumb.home'), to: '/' },
+              { label: t('breadcrumb.project', { id }), to: `/project/${id}` },
+              { label: t('breadcrumb.edit') },
             ]}
           />
           <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
             <Icon.Warning className="w-12 h-12 text-text-muted mx-auto mb-3" />
-            <h2 className="text-lg font-bold text-text mb-1 font-mono">proje bulunamadı</h2>
-            <p className="text-sm text-text-muted mb-5">{error}</p>
+            <h2 className="text-lg font-bold text-text mb-1 font-mono">
+              {t('edit.not_found_title')}
+            </h2>
             <Link
               to="/"
-              className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
+              className="inline-block mt-5 px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
             >
-              ← ana sayfaya dön
+              {t('edit.back_home')}
             </Link>
           </div>
         </div>
@@ -265,18 +257,18 @@ export default function EditProject() {
 
         <PageBreadcrumb
           items={[
-            { label: 'ana sayfa', to: '/' },
-            { label: `proje:${id}`, to: `/project/${id}` },
-            { label: 'düzenle' },
+            { label: t('breadcrumb.home'), to: '/' },
+            { label: t('breadcrumb.project', { id }), to: `/project/${id}` },
+            { label: t('breadcrumb.edit') },
           ]}
         />
 
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
-            Projeyi düzenle.
+            {t('edit.title')}
           </h1>
           <p className="text-sm text-text-muted">
-            Değişiklikleri kaydet veya iptal et.
+            {t('edit.subtitle')}
           </p>
         </div>
 
@@ -288,7 +280,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="title" className="block text-xs font-medium text-text">
-                Proje Başlığı <span className="text-red-400">*</span>
+                {t('create.title_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.title} max={PROJECT_LIMITS.title} id="title-counter" />
             </div>
@@ -311,7 +303,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="description" className="block text-xs font-medium text-text">
-                Kısa Açıklama <span className="text-red-400">*</span>
+                {t('create.description_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.description} max={PROJECT_LIMITS.description} id="description-counter" />
             </div>
@@ -334,7 +326,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="longDescription" className="block text-xs font-medium text-text">
-                Uzun Açıklama
+                {t('create.long_description_label')}
               </label>
               <CharCounter value={form.longDescription} max={PROJECT_LIMITS.longDescription} id="long-description-counter" />
             </div>
@@ -363,7 +355,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="githubUrl" className="block text-xs font-medium text-text">
-                GitHub URL
+                {t('create.github_label')}
               </label>
               <CharCounter value={form.githubUrl} max={PROJECT_LIMITS.githubUrl} id="github-url-counter" />
             </div>
@@ -384,7 +376,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="demoUrl" className="block text-xs font-medium text-text">
-                Demo URL
+                {t('create.demo_label')}
               </label>
               <CharCounter value={form.demoUrl} max={PROJECT_LIMITS.demoUrl} id="demo-url-counter" />
             </div>
@@ -405,7 +397,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="imageUrl" className="block text-xs font-medium text-text">
-                Kapak Görseli URL
+                {t('create.image_label')}
               </label>
               <CharCounter value={form.imageUrl} max={PROJECT_LIMITS.imageUrl} id="image-url-counter" />
             </div>
@@ -439,7 +431,7 @@ export default function EditProject() {
               className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
               <Icon.Check className="w-4 h-4 shrink-0" />
-              Güncellendi! Yönlendiriliyorsun...
+              {t('edit.success')}
             </div>
           )}
 
@@ -450,14 +442,14 @@ export default function EditProject() {
               disabled={submitting}
               className="flex-1 px-5 py-3 bg-transparent text-text text-sm font-semibold rounded-lg border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 font-mono"
             >
-              iptal
+              {t('edit.cancel')}
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="flex-1 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              {submitting ? 'kaydediliyor...' : 'değişiklikleri kaydet'}
+              {submitting ? t('edit.submitting') : t('edit.submit')}
             </button>
           </div>
 

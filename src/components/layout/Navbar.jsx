@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import UserDropdown from './UserDropdown';
 import UserSearch from './UserSearch';
+import LanguageSwitcher from './LanguageSwitcher';
 import * as Icon from '../ui/Icons';
 import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
@@ -13,6 +15,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -55,7 +58,7 @@ export default function Navbar({ onOpenSidebar }) {
           `${API}/api/users/search?q=${encodeURIComponent(mobileDebouncedQuery)}&limit=${PAGINATION_LIMITS.usersPerSearch}`,
           { signal: controller.signal }
         );
-        if (!res.ok) throw new Error('Arama başarısız');
+        if (!res.ok) throw new Error('search_failed');
         const data = await res.json();
         setMobileResults(Array.isArray(data) ? data : []);
       } catch (err) {
@@ -132,15 +135,16 @@ export default function Navbar({ onOpenSidebar }) {
             <button
               onClick={onOpenSidebar}
               className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
-              aria-label="Menüyü Aç"
+              aria-label={t('navbar.aria.open_menu')}
             >
               <Icon.Menu className="w-5 h-5" />
             </button>
 
             <Link
               to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="font-display text-[20px] leading-none text-text hover:text-accent transition-colors shrink-0"
-              aria-label="Collab-Hub ana sayfa"
+              aria-label={t('navbar.aria.logo')}
             >
               Collab-Hub
             </Link>
@@ -151,13 +155,15 @@ export default function Navbar({ onOpenSidebar }) {
             <UserSearch />
           </div>
 
-          {/* SAĞ: Mobil arama + Auth */}
+          {/* SAĞ: Dil + Mobil arama + Auth */}
           <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
+
+            <LanguageSwitcher />
 
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
               className="md:hidden p-2 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
-              aria-label="Kullanıcı ara"
+              aria-label={t('navbar.aria.search_users')}
             >
               <Icon.Search className="w-4 h-4" />
             </button>
@@ -176,13 +182,13 @@ export default function Navbar({ onOpenSidebar }) {
                     }`
                   }
                 >
-                  Giriş Yap
+                  {t('navbar.auth.login')}
                 </NavLink>
                 <NavLink
                   to="/register"
                   className="inline-flex items-center justify-center px-3.5 py-1.5 text-[13px] font-semibold rounded-lg bg-accent text-bg border border-accent hover:bg-accent/90 transition-all cursor-pointer"
                 >
-                  Kayıt Ol
+                  {t('navbar.auth.register')}
                 </NavLink>
               </>
             )}
@@ -204,7 +210,7 @@ export default function Navbar({ onOpenSidebar }) {
                   type="text"
                   value={mobileQuery}
                   onChange={handleMobileChange}
-                  placeholder="Kullanıcı ara..."
+                  placeholder={t('navbar.mobile_search.placeholder')}
                   autoFocus
                   maxLength={SEARCH_LIMITS.userSearchMaxLength}
                   className={`w-full pl-9 pr-9 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all ${
@@ -218,7 +224,7 @@ export default function Navbar({ onOpenSidebar }) {
                       setMobileResults([]);
                     }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
-                    aria-label="Temizle"
+                    aria-label={t('navbar.mobile_search.aria_clear')}
                   >
                     <Icon.Close className="w-3.5 h-3.5" />
                   </button>
@@ -228,7 +234,7 @@ export default function Navbar({ onOpenSidebar }) {
               {mobileWarning && (
                 <p className="mt-1.5 text-[11px] text-amber-400 font-mono inline-flex items-center gap-1">
                   <Icon.Warning className="w-3 h-3" />
-                  Geçersiz karakter: "{mobileWarning}"
+                  {t('navbar.mobile_search.warning_prefix')} "{mobileWarning}"
                 </p>
               )}
 
@@ -278,13 +284,13 @@ export default function Navbar({ onOpenSidebar }) {
                 <>
                   <div className="flex items-center justify-between mt-3 mb-1 px-1">
                     <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
-                      Son Aramalar
+                      {t('navbar.mobile_search.history_label')}
                     </span>
                     <button
                       onClick={mobileClearHistory}
                       className="text-[10px] text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
                     >
-                      tümünü temizle
+                      {t('navbar.mobile_search.history_clear')}
                     </button>
                   </div>
                   <ul className="max-h-60 overflow-y-auto -mx-1">
@@ -301,7 +307,7 @@ export default function Navbar({ onOpenSidebar }) {
                           <button
                             onClick={() => mobileRemoveHistory(username)}
                             className="p-2 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                            aria-label={`${username} aramasını sil`}
+                            aria-label={t('navbar.mobile_search.history_remove', { username })}
                           >
                             <Icon.Close className="w-3.5 h-3.5" />
                           </button>
@@ -314,7 +320,7 @@ export default function Navbar({ onOpenSidebar }) {
 
               {mobileQuery.trim() !== '' && !mobileLoading && mobileResults.length === 0 && (
                 <p className="mt-2 px-2 py-3 text-xs text-text-muted text-center font-mono">
-                  Sonuç bulunamadı
+                  {t('navbar.mobile_search.no_results')}
                 </p>
               )}
             </div>

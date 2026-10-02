@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export default function AuthCallback() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { login, refreshUser } = useAuth();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const token = params.get('token');
@@ -21,11 +23,9 @@ export default function AuthCallback() {
 
   return (
     <div className="w-full flex-1 flex items-center justify-center bg-bg relative overflow-hidden min-h-[60vh]">
-      {/* Glow blob */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.06] blur-[100px] rounded-full pointer-events-none" />
 
       <div className="relative flex flex-col items-center gap-4 text-center px-4">
-        {/* Spinner */}
         <svg
           className="w-8 h-8 text-accent animate-spin"
           fill="none"
@@ -47,7 +47,7 @@ export default function AuthCallback() {
         </svg>
 
         <p className="text-sm text-text-muted font-mono">
-          giriş yapılıyor<span className="animate-pulse">...</span>
+          {t('callback.loading')}<span className="animate-pulse">...</span>
         </p>
       </div>
     </div>

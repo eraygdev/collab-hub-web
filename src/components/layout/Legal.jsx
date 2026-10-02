@@ -1,13 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 // Legal sayfalar için ortak layout.
-// - Breadcrumb
-// - Başlık + son güncelleme tarihi
-// - Sticky "İçindekiler" (TOC) sidebar
-// - Koyu kart içinde prose içerik
-//
-// sections: [{ id: 'misyon', title: 'Misyonumuz', content: <p>...</p> }, ...]
 export default function Legal({ title, updatedAt, sections = [] }) {
+  const { t } = useLanguage();
+
   return (
     <div className="w-full bg-bg px-4 sm:px-6 lg:px-8 py-10">
       <div className="max-w-5xl mx-auto">
@@ -15,7 +12,7 @@ export default function Legal({ title, updatedAt, sections = [] }) {
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-text-muted mb-6 font-mono">
           <Link to="/" className="hover:text-text transition-colors">
-            ana sayfa
+            {t('legal.breadcrumb_home')}
           </Link>
           <span className="text-accent/30">/</span>
           <span className="text-text font-medium truncate">{title.toLowerCase()}</span>
@@ -28,7 +25,7 @@ export default function Legal({ title, updatedAt, sections = [] }) {
           </h1>
           {updatedAt && (
             <p className="text-xs text-text-muted font-mono">
-              son güncelleme: {updatedAt}
+              {t('legal.updated_at', { date: updatedAt })}
             </p>
           )}
         </div>
@@ -36,12 +33,12 @@ export default function Legal({ title, updatedAt, sections = [] }) {
         {/* İçerik + TOC */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-10">
 
-          {/* TOC — masaüstünde sticky */}
+          {/* TOC */}
           {sections.length > 0 && (
             <aside className="lg:col-span-1 order-2 lg:order-1">
               <div className="lg:sticky lg:top-24">
                 <p className="text-xs font-bold text-text uppercase tracking-wider mb-3 font-mono">
-                  /içindekiler
+                  {t('legal.toc')}
                 </p>
                 <nav className="space-y-1.5">
                   {sections.map((s) => (
@@ -77,7 +74,7 @@ export default function Legal({ title, updatedAt, sections = [] }) {
 
             {/* Alt bilgi */}
             <p className="mt-6 text-xs text-text-muted/70 text-center font-mono">
-              bu sayfa bilgilendirme amaçlıdır · yasal danışmanlık değildir
+              {t('legal.footer_disclaimer')}
             </p>
           </main>
 

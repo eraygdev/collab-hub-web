@@ -1,137 +1,134 @@
 import Legal from '../../components/layout/Legal';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export default function Privacy() {
+  const { t } = useLanguage();
+
   const sections = [
     {
-      id: 'giris',
-      title: 'Giriş',
+      id: 'intro',
+      title: 'Introduction',
       content: (
         <>
           <p>
-            Bu gizlilik politikası, Collab-Hub platformunu kullanırken hangi
-            verilerin toplandığını, nasıl kullanıldığını ve haklarınızı
-            açıklar.
+            This privacy policy explains what data is collected when you use
+            the Collab-Hub platform, how it is used, and your rights.
           </p>
           <p>
-            Platformu kullanarak bu politikayı kabul etmiş sayılırsınız.
+            By using the platform, you are deemed to have accepted this policy.
           </p>
         </>
       ),
     },
     {
-      id: 'toplanan-veriler',
-      title: 'Toplanan Veriler',
+      id: 'data-collected',
+      title: 'Data Collected',
       content: (
         <>
-          <p>Hesap oluşturduğunuzda ve platformu kullandığınızda şu veriler toplanır:</p>
+          <p>When you create an account and use the platform, the following data is collected:</p>
           <ul>
             <li>
-              <strong>Kimlik verileri:</strong> GitHub üzerinden gelen kullanıcı
-              adı, e-posta adresi, avatar URL'i.
+              <strong>Identity data:</strong> Username, email address, avatar URL coming
+              from GitHub.
             </li>
             <li>
-              <strong>Profil verileri:</strong> Biyografi, kullanıcı adı
-              değişiklikleri.
+              <strong>Profile data:</strong> Biography, username changes.
             </li>
             <li>
-              <strong>Proje verileri:</strong> Yayınladığınız projeler, başlık,
-              açıklama, linkler, kategoriler.
+              <strong>Project data:</strong> Projects you publish, title, description,
+              links, categories.
             </li>
             <li>
-              <strong>Etkileşim verileri:</strong> Yıldızlar, oturum açma
-              kayıtları (audit log).
+              <strong>Interaction data:</strong> Stars, login records (audit log).
             </li>
             <li>
-              <strong>Teknik veriler:</strong> IP adresi (audit log için),
-              tarayıcı bilgisi.
+              <strong>Technical data:</strong> IP address (for audit log), browser info.
             </li>
           </ul>
         </>
       ),
     },
     {
-      id: 'kullanim-amaci',
-      title: 'Verilerin Kullanım Amacı',
+      id: 'purpose',
+      title: 'Purpose of Data Use',
       content: (
         <>
-          <p>Toplanan veriler şu amaçlarla kullanılır:</p>
+          <p>The collected data is used for:</p>
           <ul>
-            <li>Hesabınızı oluşturmak ve yönetmek</li>
-            <li>Projelerinizi yayınlamak ve görüntülemek</li>
-            <li>Platform güvenliğini sağlamak</li>
-            <li>Kötüye kullanımı tespit etmek ve önlemek</li>
-            <li>Hizmeti geliştirmek</li>
+            <li>Creating and managing your account</li>
+            <li>Publishing and displaying your projects</li>
+            <li>Ensuring platform security</li>
+            <li>Detecting and preventing abuse</li>
+            <li>Improving the service</li>
           </ul>
         </>
       ),
     },
     {
-      id: 'ucuncu-taraflar',
-      title: 'Üçüncü Taraf Hizmetler',
+      id: 'third-parties',
+      title: 'Third-Party Services',
       content: (
         <>
-          <p>Collab-Hub şu üçüncü taraf hizmetleri kullanır:</p>
+          <p>Collab-Hub uses the following third-party services:</p>
           <ul>
             <li>
-              <strong>GitHub OAuth:</strong> Kimlik doğrulama için. GitHub'ın
-              gizlilik politikası geçerlidir.
+              <strong>GitHub OAuth:</strong> For authentication. GitHub's privacy
+              policy applies.
             </li>
             <li>
-              <strong>Neon (PostgreSQL):</strong> Veritabanı barındırma.
+              <strong>Neon (PostgreSQL):</strong> Database hosting.
             </li>
             <li>
-              <strong>Vercel:</strong> Frontend barındırma.
+              <strong>Vercel:</strong> Frontend hosting.
             </li>
           </ul>
         </>
       ),
     },
     {
-      id: 'veri-guvenligi',
-      title: 'Veri Güvenliği',
+      id: 'security',
+      title: 'Data Security',
       content: (
         <>
           <p>
-            Verileriniz şifreli bağlantılar üzerinden iletilir. Şifreler
-            saklanmaz (GitHub OAuth kullanılır). JWT token'lar 7 gün geçerlidir.
+            Your data is transmitted over encrypted connections. Passwords are
+            not stored (GitHub OAuth is used). JWT tokens are valid for 7 days.
           </p>
           <p>
-            Ancak internet üzerinden hiçbir iletim %100 güvenli değildir.
-            Verilerinizi korumak için endüstri standardı önlemler alıyoruz.
+            However, no transmission over the internet is 100% secure. We take
+            industry-standard measures to protect your data.
           </p>
         </>
       ),
     },
     {
-      id: 'haklariniz',
-      title: 'Haklarınız',
+      id: 'rights',
+      title: 'Your Rights',
       content: (
         <>
-          <p>KVKK ve GDPR kapsamında şu haklara sahipsiniz:</p>
+          <p>Under GDPR and similar laws, you have the following rights:</p>
           <ul>
-            <li>Verilerinize erişim talep etme</li>
-            <li>Yanlış verilerin düzeltilmesini isteme</li>
-            <li>Hesabınızın ve verilerinizin silinmesini isteme</li>
-            <li>Veri işlemeye itiraz etme</li>
+            <li>Requesting access to your data</li>
+            <li>Requesting correction of incorrect data</li>
+            <li>Requesting deletion of your account and data</li>
+            <li>Objecting to data processing</li>
           </ul>
           <p>
-            Talepleriniz için{' '}
+            For your requests, write to{' '}
             <a href="mailto:retadeveloper@gmail.com">
               retadeveloper@gmail.com
-            </a>{' '}
-            adresine yazabilirsiniz.
+            </a>.
           </p>
         </>
       ),
     },
     {
-      id: 'degisiklikler',
-      title: 'Politika Değişiklikleri',
+      id: 'changes',
+      title: 'Policy Changes',
       content: (
         <p>
-          Bu politika zaman zaman güncellenebilir. Önemli değişiklikler
-          platform üzerinden duyurulur. Güncel sürüm her zaman bu sayfada
-          yayınlanır.
+          This policy may be updated from time to time. Important changes are
+          announced on the platform. The current version is always published on this page.
         </p>
       ),
     },
@@ -139,8 +136,8 @@ export default function Privacy() {
 
   return (
     <Legal
-      title="Gizlilik Politikası"
-      updatedAt="27 Eylül 2026"
+      title={t('privacy.title')}
+      updatedAt="September 27, 2026"
       sections={sections}
     />
   );

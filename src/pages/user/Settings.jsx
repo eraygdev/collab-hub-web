@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharWarning from '../../components/ui/CharWarning';
 import * as Icon from '../../components/ui/Icons';
@@ -15,6 +16,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Settings() {
   const { user, loading, refreshUser } = useAuth();
+  const { t } = useLanguage();
 
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -29,6 +31,15 @@ export default function Settings() {
 
   useEffect(() => {
     if (!userId) {
+      setFetching(false);
+      return;
+    }
+
+    // ✅ AuthContext'teki user zaten güncel — ekstra fetch gerekmez
+    // Ama tam bio/username için (JWT'de bunlar yok) bir defa çek
+    if (user?.username && user?.bio !== undefined) {
+      setUsername(user.username || '');
+      setBio(user.bio || '');
       setFetching(false);
       return;
     }
@@ -54,7 +65,7 @@ export default function Settings() {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, user?.username, user?.bio]);
 
   const showWarning = (field, char) => {
     setWarnings((prev) => ({ ...prev, [field]: char }));
@@ -69,16 +80,16 @@ export default function Settings() {
     setSuccess('');
 
     if (!username.trim()) {
-      setError('Kullanıcı adı boş olamaz.');
+      setError(t('settings.error.empty_username'));
       return;
     }
 
     if (charCount(username) > PROFILE_LIMITS.username) {
-      setError(`Kullanıcı adı en fazla ${PROFILE_LIMITS.username} karakter olabilir.`);
+      setError(t('settings.error.username_too_long', { max: PROFILE_LIMITS.username }));
       return;
     }
     if (charCount(bio) > PROFILE_LIMITS.bio) {
-      setError(`Hakkımda en fazla ${PROFILE_LIMITS.bio} karakter olabilir.`);
+      setError(t('settings.error.bio_too_long', { max: PROFILE_LIMITS.bio }));
       return;
     }
 
@@ -101,22 +112,27 @@ export default function Settings() {
         try {
           data = JSON.parse(text);
         } catch {
-          data = { error: 'Sunucu geçersiz cevap döndü' };
+          data = { error: 'invalid_response' };
         }
       }
 
       if (!res.ok) {
-        setError(data.error || 'Bir hata oluştu');
+        // Backend mesajı Türkçe dönse bile kendi çevirimizi gösteriyoruz
+        if (res.status === 409) {
+          setError(t('settings.error.username_taken'));
+        } else {
+          setError(t('settings.error.generic'));
+        }
         setSubmitting(false);
         return;
       }
 
       await refreshUser();
 
-      setSuccess('Profil başarıyla güncellendi.');
+      setSuccess(t('settings.success'));
       setSubmitting(false);
     } catch {
-      setError('Sunucuya bağlanılamadı');
+      setError(t('settings.error.network'));
       setSubmitting(false);
     }
   };
@@ -124,7 +140,7 @@ export default function Settings() {
   if (loading || fetching) {
     return (
       <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted font-mono">yükleniyor...</p>
+        <p className="text-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
       </div>
     );
   }
@@ -137,18 +153,18 @@ export default function Settings() {
 
         <PageBreadcrumb
           items={[
-            { label: 'ana sayfa', to: '/' },
-            { label: 'profilim', to: `/profile/${user.username}` },
-            { label: 'ayarlar' },
+            { label: t('breadcrumb.home'), to: '/' },
+            { label: t('breadcrumb.profile_self'), to: `/profile/${user.username}` },
+            { label: t('breadcrumb.settings') },
           ]}
         />
 
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
-            Ayarlar.
+            {t('settings.title')}
           </h1>
           <p className="text-sm text-text-muted">
-            Hesap bilgilerini ve tercihlerini yönet.
+            {t('settings.subtitle')}
           </p>
         </div>
 
@@ -158,7 +174,7 @@ export default function Settings() {
         >
           <div>
             <h2 className="text-xs font-bold text-text uppercase tracking-wider font-mono">
-              /profil bilgileri
+              {t('settings.section.profile')}
             </h2>
           </div>
 
@@ -182,15 +198,15 @@ export default function Settings() {
               )}
             </div>
             <div className="text-xs text-text-muted font-mono">
-              <p className="font-medium text-text">Profil fotoğrafı</p>
-              <p>GitHub hesabından otomatik geliyor.</p>
+              <p className="font-medium text-text">{t('settings.avatar_label')}</p>
+              <p>{t('settings.avatar_hint')}</p>
             </div>
           </div>
 
           {/* Username */}
           <div>
             <label htmlFor="username" className="block text-xs font-medium text-text mb-1.5">
-              Kullanıcı Adı
+              {t('settings.username_label')}
             </label>
             <input
               id="username"
@@ -224,7 +240,7 @@ export default function Settings() {
           {/* Email */}
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-text mb-1.5">
-              E-posta
+              {t('settings.email_label')}
             </label>
             <input
               id="email"
@@ -235,14 +251,14 @@ export default function Settings() {
               className="w-full px-3.5 py-2.5 text-sm bg-bg/60 border border-accent/10 rounded-lg text-text-muted cursor-not-allowed font-mono"
             />
             <p className="mt-1 text-[11px] text-text-muted font-mono">
-              GitHub hesabından geliyor, değiştirilemez.
+              {t('settings.email_hint')}
             </p>
           </div>
 
           {/* Bio */}
           <div>
             <label htmlFor="bio" className="block text-xs font-medium text-text mb-1.5">
-              Hakkımda
+              {t('settings.bio_label')}
             </label>
             <textarea
               id="bio"
@@ -263,7 +279,7 @@ export default function Settings() {
                 setBio(value);
                 setWarnings((prev) => ({ ...prev, bio: '' }));
               }}
-              placeholder="Kendinden kısaca bahset..."
+              placeholder={t('settings.bio_placeholder')}
               rows={4}
               disabled={submitting}
               className="w-full px-3.5 py-2.5 text-sm bg-bg border border-accent/15 rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/40 transition-all resize-y disabled:opacity-50"
@@ -300,7 +316,7 @@ export default function Settings() {
               disabled={submitting}
               className="w-full sm:w-auto px-6 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              {submitting ? 'kaydediliyor...' : 'değişiklikleri kaydet'}
+              {submitting ? t('settings.submitting') : t('settings.submit')}
             </button>
           </div>
         </form>
@@ -308,17 +324,17 @@ export default function Settings() {
         {/* Tehlikeli Bölge */}
         <div className="mt-6 bg-surface border border-red-400/20 rounded-2xl p-6 sm:p-8">
           <h2 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 font-mono">
-            /tehlikeli bölge
+            {t('settings.danger.title')}
           </h2>
           <p className="text-sm text-text-muted mb-4">
-            Hesabını sildiğinde tüm projelerin ve verilerin kalıcı olarak silinir.
+            {t('settings.danger.desc')}
           </p>
           <button
             type="button"
             disabled
             className="px-5 py-2.5 text-sm font-semibold text-red-400 bg-transparent border border-red-400/30 rounded-lg opacity-50 cursor-not-allowed font-mono"
           >
-            hesabı sil (yakında)
+            {t('settings.danger.button')}
           </button>
         </div>
 

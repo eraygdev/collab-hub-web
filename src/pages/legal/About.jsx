@@ -1,73 +1,69 @@
 import Legal from '../../components/layout/Legal';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export default function About() {
+  const { t } = useLanguage();
+
   const sections = [
     {
-      id: 'misyon',
-      title: 'Misyonumuz',
+      id: 'mission',
+      title: 'Our Mission',
       content: (
         <>
           <p>
-            Collab-Hub, geliştiricilerin açık kaynak projelerini paylaşabileceği,
-            keşfedebileceği ve birlikte çalışabileceği bir platformdur.
-            Amacımız, fikirlerin hızla hayata geçmesini ve doğru insanlarla
-            buluşmasını sağlamak.
+            Collab-Hub is a platform where developers can share their open source projects,
+            discover others, and collaborate together. Our goal is to help ideas come to
+            life quickly and connect with the right people.
           </p>
           <p>
-            Projeni yayınla, katkıda bulunacak geliştiriciler bul, ekibini kur.
-            Hepsi tek bir yerde.
+            Publish your project, find contributors, build your team. All in one place.
           </p>
         </>
       ),
     },
     {
-      id: 'nasil-calisir',
-      title: 'Nasıl Çalışır?',
+      id: 'how-it-works',
+      title: 'How It Works',
       content: (
         <>
-          <p>Collab-Hub üç basit adımdan oluşur:</p>
+          <p>Collab-Hub consists of three simple steps:</p>
           <ul>
             <li>
-              <strong>Keşfet:</strong> Kategorilere göre filtrele, ara, beğendiğin
-              projeleri yıldızla.
+              <strong>Discover:</strong> Filter by categories, search, and star the projects you like.
             </li>
             <li>
-              <strong>Paylaş:</strong> Kendi projeni oluştur, GitHub ve demo
-              linklerini ekle, ekibini kur.
+              <strong>Publish:</strong> Create your own project, add GitHub and demo links, build your team.
             </li>
             <li>
-              <strong>Katkıda Bulun:</strong> İlgi duyduğun projelere katıl,
-              geliştiricilerle iletişime geç.
+              <strong>Contribute:</strong> Join projects you're interested in, connect with developers.
             </li>
           </ul>
         </>
       ),
     },
     {
-      id: 'acik-kaynak',
-      title: 'Açık Kaynak',
+      id: 'open-source',
+      title: 'Open Source',
       content: (
         <>
           <p>
-            Collab-Hub bir <strong>açık kaynak proje platformudur</strong>.
-            Projenin kendisi de açık kaynak olarak geliştirilmektedir. Kod,
-            öneri ve geri bildirimlere her zaman açığız.
+            Collab-Hub is an <strong>open source project platform</strong>.
+            The project itself is also developed as open source. We are always open to
+            code, suggestions, and feedback.
           </p>
           <p>
-            GitHub üzerinden katkıda bulunabilir, hata bildirebilir veya yeni
-            özellik önerebilirsin.
+            You can contribute via GitHub, report bugs, or suggest new features.
           </p>
         </>
       ),
     },
     {
-      id: 'iletisim',
-      title: 'İletişim',
+      id: 'contact',
+      title: 'Contact',
       content: (
         <>
           <p>
-            Soruların, önerilerin veya iş birliği taleplerin için bize
-            ulaşabilirsin:
+            Reach out to us for questions, suggestions, or collaboration requests:
           </p>
           <ul>
             <li>
@@ -81,7 +77,7 @@ export default function About() {
               </a>
             </li>
             <li>
-              E-posta:{' '}
+              Email:{' '}
               <a href="mailto:retadeveloper@gmail.com">
                 retadeveloper@gmail.com
               </a>
@@ -94,8 +90,8 @@ export default function About() {
 
   return (
     <Legal
-      title="Hakkımızda"
-      updatedAt="27 Eylül 2026"
+      title={t('about.title')}
+      updatedAt="September 27, 2026"
       sections={sections}
     />
   );

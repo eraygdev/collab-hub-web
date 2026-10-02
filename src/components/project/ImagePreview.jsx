@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 function isValidUrl(str) {
@@ -12,6 +13,7 @@ function isValidUrl(str) {
 }
 
 export default function ImagePreview({ url, debouncedUrl }) {
+  const { t } = useLanguage();
   const [status, setStatus] = useState('idle');
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function ImagePreview({ url, debouncedUrl }) {
     return (
       <p className="mt-2 text-xs text-red-400 font-mono inline-flex items-center gap-1.5">
         <Icon.Warning className="w-3 h-3" />
-        Görsel yüklenemedi. URL'yi kontrol et.
+        {t('image_preview.error')}
       </p>
     );
   }
@@ -56,7 +58,7 @@ export default function ImagePreview({ url, debouncedUrl }) {
   return (
     <img
       src={debouncedUrl}
-      alt="Önizleme"
+      alt="Preview"
       loading="lazy"
       decoding="async"
       width="800"

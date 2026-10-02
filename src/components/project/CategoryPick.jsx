@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -13,6 +14,7 @@ export default function CategoryPick({
   selectedCategories = [],
   maxSelection,
 }) {
+  const { t } = useLanguage();
   const [categories, setCategories] = useState(
     externalCategories?.length ? externalCategories : categoriesCache || []
   );
@@ -62,7 +64,7 @@ export default function CategoryPick({
         clearTimeout(timeoutId);
 
         if (!res.ok) {
-          throw new Error('Kategoriler yüklenemedi');
+          throw new Error('fetch_failed');
         }
 
         const data = await res.json();
@@ -78,7 +80,7 @@ export default function CategoryPick({
           return;
         }
 
-        setError('Kategoriler yüklenemedi. Backend çalışıyor mu?');
+        setError(t('category_picker.error'));
         setCategories([]);
         setLoading(false);
       }
@@ -90,7 +92,7 @@ export default function CategoryPick({
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [isOpen, externalCategories]);
+  }, [isOpen, externalCategories, t]);
 
   if (!isOpen) return null;
 
@@ -130,10 +132,10 @@ export default function CategoryPick({
         {/* Header */}
         <div className="px-6 py-4 border-b border-accent/10 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text">Kategori Seç</h2>
+            <h2 className="text-lg font-bold text-text">{t('category_picker.title')}</h2>
             {maxSelection && (
               <p className="text-xs text-text-muted mt-0.5 font-mono">
-                En fazla {maxSelection} kategori · {tempSelection.length} seçili
+                {t('category_picker.max_info', { max: maxSelection, count: tempSelection.length })}
               </p>
             )}
           </div>
@@ -141,7 +143,7 @@ export default function CategoryPick({
             type="button"
             onClick={handleCancel}
             className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
-            aria-label="Kapat"
+            aria-label={t('category_picker.close')}
           >
             <Icon.Close className="w-5 h-5" />
           </button>
@@ -151,7 +153,7 @@ export default function CategoryPick({
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {loading && (
             <div className="text-center py-10 text-sm text-text-muted font-mono">
-              Kategoriler yükleniyor...
+              {t('category_picker.loading')}
             </div>
           )}
 
@@ -160,14 +162,14 @@ export default function CategoryPick({
               <Icon.Warning className="w-10 h-10 text-text-muted mx-auto mb-2" />
               <p className="text-sm text-red-400 mb-1">{error}</p>
               <p className="text-xs text-text-muted">
-                Backend'in çalıştığından emin ol.
+                {t('category_picker.error_hint')}
               </p>
             </div>
           )}
 
           {!loading && !error && categories.length === 0 && (
             <div className="text-center py-10 text-sm text-text-muted">
-              Kategori bulunamadı.
+              {t('category_picker.empty')}
             </div>
           )}
 
@@ -205,7 +207,7 @@ export default function CategoryPick({
             onClick={handleCancel}
             className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg transition-colors cursor-pointer"
           >
-            İptal
+            {t('category_picker.cancel')}
           </button>
           <button
             type="button"
@@ -213,7 +215,7 @@ export default function CategoryPick({
             disabled={loading}
             className="px-4 py-2 text-sm font-semibold text-bg bg-accent rounded-lg hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Onayla ({tempSelection.length})
+            {t('category_picker.confirm', { count: tempSelection.length })}
           </button>
         </div>
       </div>

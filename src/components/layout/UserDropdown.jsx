@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 export default function UserDropdown() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -47,7 +49,7 @@ export default function UserDropdown() {
       <button
         onClick={() => navigate('/login')}
         className="w-8 h-8 rounded-full bg-surface border border-accent/15 overflow-hidden flex items-center justify-center cursor-pointer hover:border-accent/40 transition-all"
-        aria-label="Giriş Yap"
+        aria-label={t('user_dropdown.menu')}
       >
         <Icon.User className="w-4 h-4 text-text-muted" />
       </button>
@@ -63,7 +65,7 @@ export default function UserDropdown() {
         className="w-8 h-8 rounded-full bg-surface border border-accent/15 overflow-hidden cursor-pointer hover:border-accent/40 hover:ring-2 hover:ring-accent/10 transition-all"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Kullanıcı menüsü"
+        aria-label={t('user_dropdown.menu')}
       >
         {showImage ? (
           <img
@@ -104,7 +106,7 @@ export default function UserDropdown() {
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 <Icon.User className="w-4 h-4" />
-                Profilim
+                {t('user_dropdown.profile')}
               </Link>
               <Link
                 to="/dashboard"
@@ -113,7 +115,7 @@ export default function UserDropdown() {
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 <Icon.LayoutGrid className="w-4 h-4" />
-                Dashboard
+                {t('user_dropdown.dashboard')}
               </Link>
               <Link
                 to="/create-project"
@@ -122,7 +124,7 @@ export default function UserDropdown() {
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 <Icon.Plus className="w-4 h-4" />
-                Yeni Proje Oluştur
+                {t('user_dropdown.new_project')}
               </Link>
               <Link
                 to="/settings"
@@ -131,7 +133,7 @@ export default function UserDropdown() {
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 <Icon.Settings className="w-4 h-4" />
-                Ayarlar
+                {t('user_dropdown.settings')}
               </Link>
 
               <div className="border-t border-accent/10" />
@@ -142,17 +144,17 @@ export default function UserDropdown() {
                 className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
               >
                 <Icon.Logout className="w-4 h-4" />
-                Çıkış Yap
+                {t('user_dropdown.logout')}
               </button>
             </>
           ) : (
             <>
               <div className="px-4 py-3">
                 <p className="text-sm font-semibold text-text mb-1">
-                  Emin misin?
+                  {t('user_dropdown.confirm.title')}
                 </p>
                 <p className="text-xs text-text-muted leading-relaxed">
-                  Hesabından çıkış yapılacak. Devam etmek istiyor musun?
+                  {t('user_dropdown.confirm.desc')}
                 </p>
               </div>
 
@@ -161,7 +163,7 @@ export default function UserDropdown() {
                   onClick={() => setConfirmLogout(false)}
                   className="flex-1 px-3 py-2 text-xs font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg/60 transition-colors cursor-pointer"
                 >
-                  Vazgeç
+                  {t('user_dropdown.confirm.cancel')}
                 </button>
                 <button
                   onClick={() => {
@@ -170,7 +172,7 @@ export default function UserDropdown() {
                   }}
                   className="flex-1 px-3 py-2 text-xs font-semibold text-bg bg-red-400 rounded-lg hover:bg-red-500 transition-colors cursor-pointer"
                 >
-                  Evet, Çıkış
+                  {t('user_dropdown.confirm.yes')}
                 </button>
               </div>
             </>

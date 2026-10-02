@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
@@ -11,6 +12,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function UserSearch() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,7 +54,7 @@ export default function UserSearch() {
           { signal: controller.signal }
         );
 
-        if (!res.ok) throw new Error('Arama başarısız');
+        if (!res.ok) throw new Error('search_failed');
 
         const data = await res.json();
         setResults(Array.isArray(data) ? data : []);
@@ -172,7 +174,7 @@ export default function UserSearch() {
           value={query}
           onChange={handleChange}
           onFocus={handleFocus}
-          placeholder="Kullanıcı ara..."
+          placeholder={t('user_search.placeholder')}
           maxLength={SEARCH_LIMITS.userSearchMaxLength}
           className={`w-full pl-9 pr-8 py-2 text-[13px] bg-surface border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/30 transition-all ${
             warning ? 'border-amber-400/60' : 'border-accent/10'
@@ -182,7 +184,7 @@ export default function UserSearch() {
           <button
             onClick={handleClear}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
-            aria-label="Temizle"
+            aria-label={t('user_search.aria_clear')}
           >
             <Icon.Close className="w-3.5 h-3.5" />
           </button>
@@ -244,14 +246,14 @@ export default function UserSearch() {
             <>
               <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
                 <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
-                  Son Aramalar
+                  {t('user_search.history_label')}
                 </span>
                 <button
                   type="button"
                   onClick={clearHistory}
                   className="text-[10px] text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
                 >
-                  Tümünü temizle
+                  {t('user_search.history_clear')}
                 </button>
               </div>
               <ul className="max-h-72 overflow-y-auto">
@@ -270,7 +272,7 @@ export default function UserSearch() {
                         type="button"
                         onClick={() => removeHistory(username)}
                         className="p-2 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                        aria-label={`${username} aramasını sil`}
+                        aria-label={t('user_search.history_remove', { username })}
                       >
                         <Icon.Close className="w-3.5 h-3.5" />
                       </button>
@@ -283,7 +285,7 @@ export default function UserSearch() {
 
           {showEmpty && (
             <div className="px-4 py-3 text-xs text-text-muted text-center font-mono">
-              Sonuç bulunamadı
+              {t('user_search.no_results')}
             </div>
           )}
         </div>

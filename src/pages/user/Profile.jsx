@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
@@ -12,6 +13,7 @@ const LIMIT = 20;
 export default function UserProfile() {
   const { username } = useParams();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const { isCompact, view, setView } = useProjectView();
 
@@ -41,8 +43,8 @@ export default function UserProfile() {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => {
-        if (res.status === 404) throw new Error('Kullanıcı bulunamadı');
-        if (!res.ok) throw new Error('Profil yüklenemedi');
+        if (res.status === 404) throw new Error('not_found');
+        if (!res.ok) throw new Error('fetch_failed');
         return res.json();
       })
       .then((data) => {
@@ -77,7 +79,7 @@ export default function UserProfile() {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
-        if (!res.ok) throw new Error('Katkılar yüklenemedi');
+        if (!res.ok) throw new Error('fetch_failed');
         return res.json();
       })
       .then((data) => {
@@ -113,7 +115,7 @@ export default function UserProfile() {
         }
       );
 
-      if (!res.ok) throw new Error('Yüklenemedi');
+      if (!res.ok) throw new Error('fetch_failed');
 
       const data = await res.json();
       setProjects((prev) => [...prev, ...(data.projects || [])]);
@@ -129,20 +131,21 @@ export default function UserProfile() {
     const params = {};
     if (newSort !== 'newest') params.sort = newSort;
     if (tab !== 'projects') params.tab = tab;
-    setSearchParams(params);
+    // replace: false → tarayıcı geri tuşu önceki sıralamaya döner
+    setSearchParams(params, { replace: false });
   };
 
   const handleTabChange = (newTab) => {
     const params = {};
     if (sort !== 'newest') params.sort = sort;
     if (newTab !== 'projects') params.tab = newTab;
-    setSearchParams(params);
+    setSearchParams(params, { replace: false });
   };
 
   if (loading) {
     return (
       <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted font-mono">profil yükleniyor...</p>
+        <p className="text-sm text-text-muted font-mono">{t('profile.loading')}</p>
       </div>
     );
   }
@@ -153,23 +156,23 @@ export default function UserProfile() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <PageBreadcrumb
             items={[
-              { label: 'ana sayfa', to: '/' },
-              { label: `profil:${username}` },
+              { label: t('breadcrumb.home'), to: '/' },
+              { label: t('breadcrumb.profile_other', { username }) },
             ]}
           />
           <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
             <Icon.Search className="w-12 h-12 text-text-muted mx-auto mb-3" />
             <h2 className="text-lg font-bold text-text mb-1 font-mono">
-              kullanıcı bulunamadı
+              {t('profile.not_found_title')}
             </h2>
             <p className="text-sm text-text-muted mb-5">
-              @{username} adlı kullanıcı sistemde yok.
+              {t('profile.not_found_desc', { username })}
             </p>
             <Link
               to="/"
               className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
             >
-              ← ana sayfaya dön
+              {t('profile.back_home')}
             </Link>
           </div>
         </div>
@@ -188,25 +191,23 @@ export default function UserProfile() {
         {/* Breadcrumb */}
         <PageBreadcrumb
           items={[
-            { label: 'ana sayfa', to: '/' },
-            { label: isSelf ? 'profilim' : `profil:${profile.username}` },
+            { label: t('breadcrumb.home'), to: '/' },
+            {
+              label: isSelf
+                ? t('breadcrumb.profile_self')
+                : t('breadcrumb.profile_other', { username: profile.username }),
+            },
           ]}
         />
 
-        {/* ═══════════════════════════════════════════
-            PROFİL KARTI — Cover + Overlap
-        ═══════════════════════════════════════════ */}
+        {/* PROFİL KARTI — Cover + Overlap */}
         <div className="bg-surface border border-accent/10 rounded-2xl mb-6">
 
-          {/* COVER BANNER — daha kısa */}
+          {/* COVER BANNER */}
           <div className="relative h-20 sm:h-24 overflow-hidden rounded-t-2xl">
-            {/* Gradient zemin */}
             <div className="absolute inset-0 bg-gradient-to-br from-surface via-bg to-surface" />
-
-            {/* Glow blob — üst yarıda */}
             <div className="absolute top-[-60px] left-1/4 w-[400px] h-[200px] bg-accent opacity-[0.1] blur-[100px] rounded-full pointer-events-none" />
 
-            {/* Noktalı pattern — SADECE SAĞ ÜST KÖŞE (stats arkası) */}
             <div
               className="absolute top-0 right-0 w-72 h-full opacity-[0.25] pointer-events-none"
               style={{
@@ -217,10 +218,12 @@ export default function UserProfile() {
               }}
             />
 
-            {/* İstatistikler — sağ üst, desktop */}
+            {/* İstatistikler */}
             <div className="hidden sm:flex absolute top-3 right-4 items-center gap-4 text-xs font-mono z-10">
               <div className="text-right">
-                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">proje</p>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">
+                  {t('profile.stat.projects')}
+                </p>
                 <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-sm">
                   <Icon.Folder className="w-3.5 h-3.5 text-text-muted" />
                   {profile.stats.totalProjects}
@@ -228,7 +231,9 @@ export default function UserProfile() {
               </div>
               <div className="w-px h-5 bg-accent/20" />
               <div className="text-right">
-                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">yıldız</p>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">
+                  {t('profile.stat.stars')}
+                </p>
                 <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-sm">
                   <Icon.Star className="w-3.5 h-3.5 text-text-muted" />
                   {profile.stats.totalStars}
@@ -236,7 +241,9 @@ export default function UserProfile() {
               </div>
               <div className="w-px h-5 bg-accent/20" />
               <div className="text-right">
-                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">katkıcı</p>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px]">
+                  {t('profile.stat.contributors')}
+                </p>
                 <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-sm">
                   <Icon.Users className="w-3.5 h-3.5 text-text-muted" />
                   {profile.stats.totalContributors}
@@ -248,7 +255,6 @@ export default function UserProfile() {
           {/* AVATAR + BİLGİLER */}
           <div className="px-6 sm:px-8 pb-6">
 
-            {/* Avatar — overlap artırıldı (üst boşluk azalsın) */}
             <div className="relative z-10 -mt-12 sm:-mt-14 mb-4 flex items-end justify-between gap-4 flex-wrap">
               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-bg border-4 border-surface overflow-hidden shrink-0 shadow-lg">
                 {profile.avatar_url ? (
@@ -274,15 +280,14 @@ export default function UserProfile() {
                   className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-text-muted bg-surface border border-accent/20 rounded-lg hover:border-accent hover:text-text transition-all font-mono"
                 >
                   <Icon.Settings className="w-4 h-4" />
-                  ayarlar
+                  {t('profile.settings')}
                 </Link>
               )}
             </div>
 
-            {/* Username + bio */}
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-text tracking-tight mb-1">
-                {isSelf ? 'Profilim' : profile.username}
+                {isSelf ? t('profile.title_self') : profile.username}
               </h1>
               <p className="text-sm text-text-muted font-mono mb-3">
                 @{profile.username}
@@ -293,7 +298,7 @@ export default function UserProfile() {
                 </p>
               ) : (
                 <p className="text-sm text-text-muted/60 italic font-mono">
-                  henüz bir bio eklenmemiş.
+                  {t('profile.empty_bio')}
                 </p>
               )}
             </div>
@@ -301,7 +306,9 @@ export default function UserProfile() {
             {/* İstatistikler — mobil */}
             <div className="sm:hidden mt-5 flex items-center gap-4 text-xs font-mono">
               <div>
-                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">proje</p>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">
+                  {t('profile.stat.projects')}
+                </p>
                 <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-base">
                   <Icon.Folder className="w-3.5 h-3.5 text-text-muted" />
                   {profile.stats.totalProjects}
@@ -309,7 +316,9 @@ export default function UserProfile() {
               </div>
               <div className="w-px h-8 bg-accent/20" />
               <div>
-                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">yıldız</p>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">
+                  {t('profile.stat.stars')}
+                </p>
                 <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-base">
                   <Icon.Star className="w-3.5 h-3.5 text-text-muted" />
                   {profile.stats.totalStars}
@@ -317,7 +326,9 @@ export default function UserProfile() {
               </div>
               <div className="w-px h-8 bg-accent/20" />
               <div>
-                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">katkıcı</p>
+                <p className="text-text-muted/60 uppercase tracking-wider text-[10px] mb-1">
+                  {t('profile.stat.contributors')}
+                </p>
                 <p className="inline-flex items-center gap-1 text-text font-bold tabular-nums text-base">
                   <Icon.Users className="w-3.5 h-3.5 text-text-muted" />
                   {profile.stats.totalContributors}
@@ -328,7 +339,7 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* TAB'LAR */}
+        {/* TAB'LAR — sadece kendi profilinde */}
         {isSelf && (
           <div className="mb-6 border-b border-accent/10">
             <div className="flex items-center gap-6">
@@ -340,7 +351,7 @@ export default function UserProfile() {
                     : 'text-text-muted border-transparent hover:text-text'
                 }`}
               >
-                /projelerim
+                {t('profile.tab.projects')}
               </button>
               <button
                 onClick={() => handleTabChange('contributions')}
@@ -350,23 +361,38 @@ export default function UserProfile() {
                     : 'text-text-muted border-transparent hover:text-text'
                 }`}
               >
-                /katkıda bulunduğum
+                {t('profile.tab.contributions')}
               </button>
             </div>
           </div>
         )}
 
         {/* BAŞLIK + SIRALAMA + GÖRÜNÜM */}
-        <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-sm font-bold text-text uppercase tracking-wider font-mono">
+        <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+          {/* SOL: Başlık */}
+          <h2 className="text-sm font-bold text-text uppercase tracking-wider font-mono shrink-0">
             {!isSelf
-              ? '/projeler'
+              ? t('profile.section.projects_other')
               : tab === 'projects'
-              ? '/projelerim'
-              : '/katkıda bulunduğum projeler'}
+              ? t('profile.section.projects_self')
+              : t('profile.section.contributions')}
           </h2>
 
-          <div className="flex items-center gap-3">
+          {/* SAĞ: Kontroller — [+ yeni] [toggle] [sıralama] */}
+          <div className="flex items-center gap-3 flex-wrap">
+
+            {/* + Yeni proje — en solda, CTA */}
+            {isSelf && tab === 'projects' && (
+              <Link
+                to="/create-project"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-muted bg-transparent border border-accent/20 rounded-lg hover:border-accent/50 hover:text-text transition-all font-mono"
+              >
+                <Icon.Plus className="w-3.5 h-3.5" />
+                {t('profile.new_project')}
+              </Link>
+            )}
+
+            {/* Görünüm toggle */}
             <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60">
               <button
                 onClick={() => setView('normal')}
@@ -375,8 +401,8 @@ export default function UserProfile() {
                     ? 'bg-accent text-bg shadow-sm'
                     : 'text-text-muted hover:text-text'
                 }`}
-                aria-label="Büyük kartlar"
-                title="Büyük kartlar"
+                aria-label={t('profile.view_normal')}
+                title={t('profile.view_normal')}
               >
                 <Icon.List className="w-3.5 h-3.5" />
               </button>
@@ -387,23 +413,14 @@ export default function UserProfile() {
                     ? 'bg-accent text-bg shadow-sm'
                     : 'text-text-muted hover:text-text'
                 }`}
-                aria-label="Küçük kartlar"
-                title="Küçük kartlar"
+                aria-label={t('profile.view_compact')}
+                title={t('profile.view_compact')}
               >
                 <Icon.LayoutGrid className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {isSelf && tab === 'projects' && (
-              <Link
-                to="/create-project"
-                className="inline-flex items-center gap-1 text-xs font-medium text-text-muted hover:text-text transition-colors font-mono"
-              >
-                <Icon.Plus className="w-3.5 h-3.5" />
-                yeni proje
-              </Link>
-            )}
-
+            {/* Sıralama */}
             {tab === 'projects' && (
               <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60">
                 <button
@@ -414,7 +431,7 @@ export default function UserProfile() {
                       : 'text-text-muted hover:text-text'
                   }`}
                 >
-                  en yeni
+                  {t('profile.sort.newest')}
                 </button>
                 <button
                   onClick={() => handleSortChange('popular')}
@@ -424,7 +441,7 @@ export default function UserProfile() {
                       : 'text-text-muted hover:text-text'
                   }`}
                 >
-                  en popüler
+                  {t('profile.sort.popular')}
                 </button>
               </div>
             )}
@@ -455,11 +472,11 @@ export default function UserProfile() {
                       className="inline-flex items-center gap-2 px-6 py-3 bg-surface text-text text-sm font-semibold rounded-xl border border-accent/20 hover:border-accent/60 hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
                     >
                       {loadingMore ? (
-                        <>yükleniyor<span className="animate-pulse">...</span></>
+                        <>{t('home.load_more_loading')}<span className="animate-pulse">...</span></>
                       ) : (
                         <>
                           <Icon.ChevronDown className="w-4 h-4" />
-                          daha fazla yükle
+                          {t('home.load_more')}
                         </>
                       )}
                     </button>
@@ -470,19 +487,21 @@ export default function UserProfile() {
               <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
                 <Icon.Package className="w-12 h-12 text-text-muted mx-auto mb-3" />
                 <h3 className="text-base font-bold text-text mb-1 font-mono">
-                  {isSelf ? 'henüz projen yok' : 'henüz proje yok'}
+                  {isSelf
+                    ? t('profile.empty.projects_self_title')
+                    : t('profile.empty.projects_other_title')}
                 </h3>
                 <p className="text-sm text-text-muted mb-4">
                   {isSelf
-                    ? 'İlk projeni oluşturarak başla.'
-                    : `@${profile.username} henüz proje paylaşmamış.`}
+                    ? t('profile.empty.projects_self_desc')
+                    : t('profile.empty.projects_other_desc', { username: profile.username })}
                 </p>
                 {isSelf && (
                   <Link
                     to="/create-project"
                     className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
                   >
-                    proje oluştur
+                    {t('profile.empty.projects_cta')}
                   </Link>
                 )}
               </div>
@@ -508,16 +527,16 @@ export default function UserProfile() {
               <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
                 <Icon.Users className="w-12 h-12 text-text-muted mx-auto mb-3" />
                 <h3 className="text-base font-bold text-text mb-1 font-mono">
-                  henüz bir projeye katkıda bulunmadın
+                  {t('profile.empty.contributions_title')}
                 </h3>
                 <p className="text-sm text-text-muted mb-4">
-                  Keşfet sayfasından projelere göz at, ekibe katıl.
+                  {t('profile.empty.contributions_desc')}
                 </p>
                 <Link
                   to="/"
                   className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
                 >
-                  projeleri keşfet
+                  {t('profile.empty.contributions_cta')}
                 </Link>
               </div>
             )}

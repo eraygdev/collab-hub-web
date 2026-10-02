@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 export default function ContributorCard({ contributor }) {
+  const { t } = useLanguage();
+
   return (
     <Link
       to={`/profile/${contributor.username}`}
@@ -31,7 +34,9 @@ export default function ContributorCard({ contributor }) {
         <p className="text-sm font-medium text-text truncate group-hover:text-accent transition-colors font-mono">
           {contributor.username}
         </p>
-        <p className="text-[10px] text-text-muted font-mono">katkıcı</p>
+        <p className="text-[10px] text-text-muted font-mono">
+          {t('contributor_card.label')}
+        </p>
       </div>
     </Link>
   );

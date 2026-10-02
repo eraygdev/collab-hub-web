@@ -1,0 +1,523 @@
+// ═══════════════════════════════════════════════════════════
+// TÜRKÇE ÇEVİRİLER
+// ═══════════════════════════════════════════════════════════
+
+export const tr = {
+  // ─── HOME ───
+  home: {
+    hero: {
+      eyebrow: "Açık kaynak · Topluluk · Kollaborasyon",
+      title_1: "Fikirlerini paylaş,",
+      title_2: "ekibini kur.",
+      subtitle:
+        "Açık kaynak projeleri keşfet, katkıda bulun veya kendi projeni yayınla. Tüm geliştiriciler tek bir yerde.",
+    },
+    search: {
+      placeholder: "Proje, kategori veya teknoloji ara...",
+      aria_clear: "Aramayı temizle",
+      button: "ara",
+      warning_prefix: "Geçersiz karakter:",
+      history_label: "Son Aramalar",
+      history_clear: "tümünü temizle",
+      history_remove: '"{{query}}" aramasını sil',
+      no_results: "Sonuç bulunamadı",
+    },
+    quick: {
+      create: "Proje Oluştur",
+      dashboard: "Dashboard",
+    },
+    explore: {
+      title: "/keşfet",
+      subtitle: "Topluluk tarafından oluşturulan en son projeler.",
+      view_normal: "Büyük kartlar",
+      view_compact: "Küçük kartlar",
+    },
+    categories: {
+      all: "tümü",
+      more: "+{{count}} daha",
+    },
+    match: {
+      label: "eşleşme:",
+      any: "herhangi",
+      all: "hepsi",
+    },
+    filters: {
+      count: "{{count}} proje",
+      count_with_categories: "{{count}} proje · {{catCount}} kategori",
+      clear: "filtreleri temizle",
+    },
+    error: {
+      title: "projeler yüklenemedi",
+      retry: "tekrar dene",
+    },
+    load_more: "daha fazla yükle",
+    load_more_loading: "yükleniyor",
+    empty: {
+      filtered_title: "sonuç bulunamadı",
+      empty_title: "henüz proje yok",
+      filtered_desc: "Arama veya filtre kriterlerine uygun proje yok.",
+      empty_desc: "İlk projeyi sen oluştur!",
+      clear_filters: "filtreleri temizle",
+      create: "proje oluştur",
+    },
+  },
+
+  // ─── NAVBAR ───
+  navbar: {
+    aria: {
+      open_menu: "Menüyü Aç",
+      close_menu: "Menüyü Kapat",
+      search_users: "Kullanıcı ara",
+      logo: "Collab-Hub ana sayfa",
+    },
+    auth: {
+      login: "Giriş Yap",
+      register: "Kayıt Ol",
+    },
+    mobile_search: {
+      placeholder: "Kullanıcı ara...",
+      aria_clear: "Temizle",
+      warning_prefix: "Geçersiz karakter:",
+      history_label: "Son Aramalar",
+      history_clear: "tümünü temizle",
+      history_remove: '"{{username}}" aramasını sil',
+      no_results: "Sonuç bulunamadı",
+    },
+  },
+
+  // ─── USER SEARCH ───
+  user_search: {
+    placeholder: "Kullanıcı ara...",
+    aria_clear: "Temizle",
+    history_label: "Son Aramalar",
+    history_clear: "Tümünü temizle",
+    history_remove: '"{{username}}" aramasını sil',
+    no_results: "Sonuç bulunamadı",
+  },
+
+  // ─── USER DROPDOWN ───
+  user_dropdown: {
+    menu: "Kullanıcı menüsü",
+    profile: "Profilim",
+    dashboard: "Dashboard",
+    new_project: "Yeni Proje Oluştur",
+    settings: "Ayarlar",
+    logout: "Çıkış Yap",
+    confirm: {
+      title: "Emin misin?",
+      desc: "Hesabından çıkış yapılacak. Devam etmek istiyor musun?",
+      cancel: "Vazgeç",
+      yes: "Evet, Çıkış",
+    },
+  },
+
+  // ─── SIDEBAR ───
+  sidebar: {
+    title: "Menü",
+    aria: {
+      menu: "Ana menü",
+      close: "Menüyü Kapat",
+    },
+    home: "Home",
+    dashboard: "Dashboard",
+    new_project: "Yeni Proje",
+    profile: "Profilim",
+    settings: "Ayarlar",
+    login: "Giriş Yap",
+    register: "Kayıt Ol",
+    brand: "Collab-Hub · by Reta",
+  },
+
+  // ─── FOOTER ───
+  footer: {
+    cta: {
+      welcome_user: "Hoş geldin, {{username}}",
+      title: "Projeni Paylaş, Ekibe Katıl",
+      desc_user: "Yeni bir proje oluştur veya paneline göz at.",
+      desc_guest: "Hesap oluştur, projeni yayınla ve topluluğa katıl.",
+      create: "Proje Oluştur",
+      dashboard: "Dashboard",
+      github_start: "GitHub ile Başla",
+    },
+    brand: {
+      tagline:
+        "Geliştiricilerin projelerini paylaştığı, keşfettiği ve ekibe katıldığı açık kaynak platform.",
+    },
+    section: {
+      product: "/ürün",
+      resources: "/kaynaklar",
+      company: "/şirket",
+    },
+    link: {
+      explore: "Keşfet",
+      create: "Proje Oluştur",
+      dashboard: "Dashboard",
+      developer: "Geliştirici",
+      contact: "İletişim",
+      twitter: "Twitter",
+      about: "Hakkımızda",
+      privacy: "Gizlilik",
+      terms: "Kullanım Şartları",
+    },
+    copyright: "© {{year}} Collab-Hub · by Reta",
+    links: {
+      privacy: "gizlilik",
+      terms: "şartlar",
+      cookies: "çerezler",
+    },
+    aria: {
+      github: "GitHub Profili",
+      email: "E-posta",
+      twitter: "Twitter",
+    },
+  },
+
+  // ─── LANGUAGE SWITCHER ───
+  language_switcher: {
+    aria: "Dili değiştir",
+  },
+
+  // ─── BREADCRUMB ───
+  breadcrumb: {
+    home: "ana sayfa",
+    dashboard: "dashboard",
+    settings: "ayarlar",
+    profile_self: "profilim",
+    profile_other: "profil:{{username}}",
+    project: "proje:{{id}}",
+    new_project: "yeni proje",
+    edit: "düzenle",
+    about: "hakkımızda",
+    privacy: "gizlilik",
+    terms: "şartlar",
+    cookies: "çerezler",
+  },
+
+  // ─── DASHBOARD ───
+  dashboard: {
+    greeting: "Merhaba, {{username}}",
+    subtitle:
+      "Projelerini yönet, başvuruları değerlendir, yeni fikirler yayınla.",
+    stat: {
+      projects: "proje",
+      stars: "yıldız",
+      contributors: "katkıcı",
+      pending: "bekleyen",
+    },
+    new_project: "Yeni Proje",
+    tab: {
+      projects: "/projelerim",
+      requests: "/gelen başvurular",
+    },
+    view_normal: "Büyük kartlar",
+    view_compact: "Küçük kartlar",
+    loading: "Yükleniyor...",
+    error: "Projeler yüklenemedi",
+    projects: {
+      empty_title: "henüz projen yok",
+      empty_desc: "İlk projeni oluşturarak başla.",
+      empty_cta: "proje oluştur",
+    },
+    requests: {
+      empty_title: "bekleyen başvuru yok",
+      empty_desc: "Projelerine katılmak isteyenler burada görünecek.",
+    },
+    request: {
+      wants_to_join: "şu projeye katılmak istiyor:",
+      reject: "reddet",
+      approve: "onayla",
+    },
+  },
+
+  // ─── PROFILE ───
+  profile: {
+    loading: "Profil yükleniyor...",
+    not_found_title: "kullanıcı bulunamadı",
+    not_found_desc: "@{{username}} adlı kullanıcı sistemde yok.",
+    back_home: "← ana sayfaya dön",
+    title_self: "Profilim",
+    settings: "ayarlar",
+    empty_bio: "henüz bir bio eklenmemiş.",
+    stat: {
+      projects: "proje",
+      stars: "yıldız",
+      contributors: "katkıcı",
+    },
+    tab: {
+      projects: "/projelerim",
+      contributions: "/katkıda bulunduğum",
+    },
+    section: {
+      projects_self: "/projelerim",
+      contributions: "/katkıda bulunduğum projeler",
+      projects_other: "/projeler",
+    },
+    empty: {
+      projects_self_title: "henüz projen yok",
+      projects_other_title: "henüz proje yok",
+      projects_self_desc: "İlk projeni oluşturarak başla.",
+      projects_other_desc: "@{{username}} henüz proje paylaşmamış.",
+      projects_cta: "proje oluştur",
+      contributions_title: "henüz bir projeye katkıda bulunmadın",
+      contributions_desc: "Keşfet sayfasından projelere göz at, ekibe katıl.",
+      contributions_cta: "projeleri keşfet",
+    },
+    sort: {
+      newest: "en yeni",
+      popular: "en popüler",
+    },
+    new_project: "yeni proje",
+    view_normal: "Büyük kartlar",
+    view_compact: "Küçük kartlar",
+  },
+
+  // ─── SETTINGS ───
+  settings: {
+    title: "Ayarlar.",
+    subtitle: "Hesap bilgilerini ve tercihlerini yönet.",
+    section: {
+      profile: "/profil bilgileri",
+    },
+    avatar_label: "Profil fotoğrafı",
+    avatar_hint: "GitHub hesabından otomatik geliyor.",
+    username_label: "Kullanıcı Adı",
+    email_label: "E-posta",
+    email_hint: "GitHub hesabından geliyor, değiştirilemez.",
+    bio_label: "Hakkımda",
+    bio_placeholder: "Kendinden kısaca bahset...",
+    submitting: "kaydediliyor...",
+    submit: "değişiklikleri kaydet",
+    success: "Profil başarıyla güncellendi.",
+    error: {
+      empty_username: "Kullanıcı adı boş olamaz.",
+      username_too_long: "Kullanıcı adı en fazla {{max}} karakter olabilir.",
+      bio_too_long: "Hakkımda en fazla {{max}} karakter olabilir.",
+      username_taken: "Bu kullanıcı adı zaten alınmış",
+      generic: "Bir hata oluştu",
+      network: "Sunucuya bağlanılamadı",
+    },
+    danger: {
+      title: "/tehlikeli bölge",
+      desc: "Hesabını sildiğinde tüm projelerin ve verilerin kalıcı olarak silinir.",
+      button: "hesabı sil (yakında)",
+    },
+  },
+
+  // ─── AUTH ───
+  auth: {
+    loading: "Yükleniyor...",
+    github_oauth_note:
+      "Collab-Hub, kimlik doğrulama için GitHub OAuth kullanır. Şifre saklanmaz.",
+  },
+
+  login: {
+    eyebrow: "giriş",
+    title: "Tekrar hoş geldin.",
+    subtitle: "Hesabına giriş yap ve kaldığın yerden devam et.",
+    github_button: "GitHub ile Devam Et",
+    no_account: "Hesabın yok mu?",
+    register_link: "Kayıt ol",
+  },
+
+  register: {
+    eyebrow: "kayıt",
+    title: "Hesap oluştur.",
+    subtitle: "Topluluğa katıl, projeni paylaş, ekibini kur.",
+    github_button: "GitHub ile Kayıt Ol",
+    terms_prefix: "Kayıt olurken",
+    terms_link: "kullanım şartlarını",
+    and: "ve",
+    privacy_link: "gizlilik politikasını",
+    terms_suffix: " kabul etmiş sayılırsın.",
+    has_account: "Zaten hesabın var mı?",
+    login_link: "Giriş yap",
+  },
+
+  callback: {
+    loading: "giriş yapılıyor",
+  },
+
+  // ─── DETAILS ───
+  details: {
+    loading: "Proje yükleniyor...",
+    not_found_title: "proje bulunamadı",
+    not_found_desc: "Aradığın proje silinmiş veya taşınmış olabilir.",
+    back_home: "← ana sayfaya dön",
+    edit: "düzenle",
+    deleting: "siliniyor...",
+    delete: "sil",
+    delete_confirm:
+      "Bu projeyi silmek istediğine emin misin? Bu işlem geri alınamaz.",
+    delete_failed: "Silme başarısız oldu",
+    section: {
+      links: "/bağlantılar",
+      contributors: "/katkıcılar ({{count}})",
+      about: "/proje hakkında",
+      info: "/proje bilgileri",
+      share: "/paylaş",
+    },
+    meta: {
+      stars: "yıldız",
+      contributors: "katkıcı",
+      status: "durum",
+    },
+    cta: {
+      your_project: "bu proje senin · {{count}} yıldız",
+      starring: "...",
+      starred: "yıldızlandı ({{count}})",
+      star: "yıldızla ({{count}})",
+      leave: "projeden ayrıl",
+      join: "ekibe katıl",
+      owner: "bu projenin sahibisin",
+      pending: "başvurun onay bekliyor",
+    },
+    share: {
+      copied: "kopyalandı",
+      copy: "linki kopyala",
+      link: "link",
+      twitter: "twitter",
+      copy_success: "Link kopyalandı!",
+      copy_failed: "Link kopyalanamadı",
+    },
+  },
+
+  // ─── CREATE / EDIT ───
+  create: {
+    title: "Yeni proje oluştur.",
+    subtitle: "Projeni topluluğa tanıt, katkıda bulunacak geliştiriciler bul.",
+    title_label: "Proje Başlığı",
+    title_placeholder: "Örn: AI Destekli Kod Asistanı",
+    description_label: "Kısa Açıklama",
+    description_placeholder: "Projeni 1-2 cümleyle özetle.",
+    long_description_label: "Uzun Açıklama",
+    long_description_placeholder:
+      "Projenin detayları, kullanılan teknolojiler, hedef kitlesi... (opsiyonel)",
+    github_label: "GitHub URL",
+    github_placeholder: "https://github.com/kullanici/proje (opsiyonel)",
+    demo_label: "Demo URL",
+    demo_placeholder: "https://proje-demo.com (opsiyonel)",
+    image_label: "Kapak Görseli URL",
+    image_placeholder: "https://... (opsiyonel)",
+    image_hint: "URL yapıştır, önizleme otomatik görünür.",
+    submitting: "kaydediliyor...",
+    submit: "projeyi yayınla",
+    cancel: "iptal",
+    success: "Proje oluşturuldu! Yönlendiriliyorsun...",
+    error: {
+      title_required: "Başlık ve kısa açıklama zorunlu.",
+      too_long: "{{field}} alanı en fazla {{max}} karakter olabilir.",
+      github_invalid:
+        "GitHub URL geçersiz. http:// veya https:// ile başlamalı.",
+      demo_invalid: "Demo URL geçersiz. http:// veya https:// ile başlamalı.",
+      image_invalid:
+        "Görsel URL geçersiz. http:// veya https:// ile başlamalı.",
+      generic: "Bir hata oluştu",
+      network: "Sunucuya bağlanılamadı",
+    },
+  },
+
+  edit: {
+    title: "Projeyi düzenle.",
+    subtitle: "Değişiklikleri kaydet veya iptal et.",
+    submitting: "kaydediliyor...",
+    submit: "değişiklikleri kaydet",
+    cancel: "iptal",
+    success: "Güncellendi! Yönlendiriliyorsun...",
+    not_found_title: "proje bulunamadı",
+    back_home: "← ana sayfaya dön",
+  },
+
+  // ─── LEGAL ───
+  legal: {
+    updated_at: "son güncelleme: {{date}}",
+    footer_disclaimer:
+      "bu sayfa bilgilendirme amaçlıdır · yasal danışmanlık değildir",
+    breadcrumb_home: "ana sayfa",
+    toc: "/içindekiler",
+  },
+
+  about: { title: "Hakkımızda" },
+  privacy: { title: "Gizlilik Politikası" },
+  terms: { title: "Kullanım Şartları" },
+  cookies: { title: "Çerez Politikası" },
+
+  // ─── NOT FOUND ───
+  not_found: {
+    eyebrow: "hata · 404",
+    code: "4 0 4",
+    title: "Sayfa bulunamadı",
+    desc: "Aradığın sayfa silinmiş, taşınmış veya hiç var olmamış olabilir.",
+    back_home: "Ana Sayfaya Dön",
+    dashboard: "Dashboard",
+  },
+
+  // ─── SMALL COMPONENTS ───
+  category_picker: {
+    title: "Kategori Seç",
+    max_info: "En fazla {{max}} kategori · {{count}} seçili",
+    loading: "Kategoriler yükleniyor...",
+    error: "Kategoriler yüklenemedi. Backend çalışıyor mu?",
+    error_hint: "Backend'in çalıştığından emin ol.",
+    empty: "Kategori bulunamadı.",
+    cancel: "İptal",
+    confirm: "Onayla ({{count}})",
+    close: "Kapat",
+  },
+
+  category_chips: {
+    label: "Kategoriler",
+    counter: "{{count}} / {{max}}",
+    loading: "Kategoriler yükleniyor...",
+    more: "+{{count}} daha",
+    hint: "En fazla {{max}} kategori seçebilirsin. (Opsiyonel)",
+  },
+
+  join_request: {
+    title: "Ekibe Katıl",
+    desc: "Bu projeye katkıda bulunmak için başvuru gönder. Proje sahibi onayladığında ekibe katılacaksın.",
+    premium_label: "Neden katılmak istiyorsun?",
+    premium_badge: "(Premium)",
+    message_placeholder:
+      "Kısaca kendinden ve ne katkı sağlayabileceğinden bahset...",
+    message_hint: "Mesajın proje sahibine iletilir. Opsiyonel.",
+    premium_warning:
+      "üyelik ile başvuruna kişisel bir mesaj ekleyebilirsin. Standart üyeler direkt başvuru gönderir.",
+    premium_warning_strong: "Premium",
+    cancel: "İptal",
+    submit: "Başvuru Gönder",
+    submitting: "Gönderiliyor...",
+  },
+
+  leave_confirm: {
+    title: "Emin misin?",
+    warning_title: "Bu projeden ayrılıyorsun.",
+    warning_desc:
+      "Katkıcı statün sona erecek. İstediğin zaman tekrar başvurabilirsin.",
+    confirm_desc: "Devam etmek istediğinden emin misin?",
+    cancel: "Vazgeç",
+    submitting: "Ayrılıyor...",
+    wait: "Bekle ({{count}}s)",
+    confirm: "Evet, Ayrıl",
+  },
+
+  image_preview: {
+    error: "Görsel yüklenemedi. URL'yi kontrol et.",
+  },
+
+  contributor_card: {
+    label: "katkıcı",
+  },
+
+  // ─── SCROLL HINT ───
+  scroll_hint: {
+    label: "kaydır ve keşfet",
+    aria: "Keşfetmek için aşağı kaydır",
+  },
+
+  // ─── COMMON ───
+  common: {
+    error_generic: "Bir hata oluştu",
+    optional: "(opsiyonel)",
+    required: "*",
+  },
+};

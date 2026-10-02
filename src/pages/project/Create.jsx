@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
@@ -18,11 +19,11 @@ import {
 } from '../../utils/validators';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-
 const DRAFT_KEY = 'createProjectDraft';
 
 export default function CreateProject() {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -39,7 +40,6 @@ export default function CreateProject() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-
   const [warnings, setWarnings] = useState({});
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function CreateProject() {
 
   useEffect(() => {
     if (!draftLoaded) return;
-    const t = setTimeout(() => {
+    const t2 = setTimeout(() => {
       try {
         localStorage.setItem(
           DRAFT_KEY,
@@ -84,7 +84,7 @@ export default function CreateProject() {
         );
       } catch {}
     }, 800);
-    return () => clearTimeout(t);
+    return () => clearTimeout(t2);
   }, [form, selectedCategories, draftLoaded]);
 
   const debouncedImageUrl = useDebounced(form.imageUrl, 400);
@@ -144,27 +144,27 @@ export default function CreateProject() {
     setSuccess(false);
 
     if (!form.title.trim() || !form.description.trim()) {
-      setError('Başlık ve kısa açıklama zorunlu.');
+      setError(t('create.error.title_required'));
       return;
     }
 
     for (const [key, max] of Object.entries(PROJECT_LIMITS)) {
       if (form[key] && charCount(form[key]) > max) {
-        setError(`${key} alanı en fazla ${max} karakter olabilir.`);
+        setError(t('create.error.too_long', { field: key, max }));
         return;
       }
     }
 
     if (!isValidUrl(form.githubUrl)) {
-      setError('GitHub URL geçersiz. http:// veya https:// ile başlamalı.');
+      setError(t('create.error.github_invalid'));
       return;
     }
     if (!isValidUrl(form.demoUrl)) {
-      setError('Demo URL geçersiz. http:// veya https:// ile başlamalı.');
+      setError(t('create.error.demo_invalid'));
       return;
     }
     if (!isValidUrl(form.imageUrl)) {
-      setError('Görsel URL geçersiz. http:// veya https:// ile başlamalı.');
+      setError(t('create.error.image_invalid'));
       return;
     }
 
@@ -184,21 +184,13 @@ export default function CreateProject() {
         }),
       });
 
-      const text = await res.text();
-      let data = {};
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = { error: 'Sunucu geçersiz cevap döndü' };
-        }
-      }
-
       if (!res.ok) {
-        setError(data.error || 'Bir hata oluştu');
+        setError(t('create.error.generic'));
         setSubmitting(false);
         return;
       }
+
+      const data = await res.json();
 
       localStorage.removeItem(DRAFT_KEY);
       setSelectedCategories([]);
@@ -208,7 +200,7 @@ export default function CreateProject() {
         navigate(`/project/${data.id}`);
       }, 700);
     } catch {
-      setError('Sunucuya bağlanılamadı');
+      setError(t('create.error.network'));
       setSubmitting(false);
     }
   };
@@ -224,7 +216,7 @@ export default function CreateProject() {
   if (loading) {
     return (
       <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted font-mono">yükleniyor...</p>
+        <p className="text-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
       </div>
     );
   }
@@ -237,18 +229,18 @@ export default function CreateProject() {
 
         <PageBreadcrumb
           items={[
-            { label: 'ana sayfa', to: '/' },
-            { label: 'dashboard', to: '/dashboard' },
-            { label: 'yeni proje' },
+            { label: t('breadcrumb.home'), to: '/' },
+            { label: t('breadcrumb.dashboard'), to: '/dashboard' },
+            { label: t('breadcrumb.new_project') },
           ]}
         />
 
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
-            Yeni proje oluştur.
+            {t('create.title')}
           </h1>
           <p className="text-sm text-text-muted">
-            Projeni topluluğa tanıt, katkıda bulunacak geliştiriciler bul.
+            {t('create.subtitle')}
           </p>
         </div>
 
@@ -260,7 +252,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="title" className="block text-xs font-medium text-text">
-                Proje Başlığı <span className="text-red-400">*</span>
+                {t('create.title_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.title} max={PROJECT_LIMITS.title} id="title-counter" />
             </div>
@@ -270,7 +262,7 @@ export default function CreateProject() {
               type="text"
               value={form.title}
               onChange={handleTitleChange}
-              placeholder="Örn: AI Destekli Kod Asistanı"
+              placeholder={t('create.title_placeholder')}
               required
               disabled={submitting}
               aria-describedby="title-counter"
@@ -286,7 +278,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="description" className="block text-xs font-medium text-text">
-                Kısa Açıklama <span className="text-red-400">*</span>
+                {t('create.description_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.description} max={PROJECT_LIMITS.description} id="description-counter" />
             </div>
@@ -295,7 +287,7 @@ export default function CreateProject() {
               name="description"
               value={form.description}
               onChange={handleTextChange}
-              placeholder="Projeni 1-2 cümleyle özetle."
+              placeholder={t('create.description_placeholder')}
               required
               rows={3}
               disabled={submitting}
@@ -312,7 +304,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="longDescription" className="block text-xs font-medium text-text">
-                Uzun Açıklama
+                {t('create.long_description_label')}
               </label>
               <CharCounter value={form.longDescription} max={PROJECT_LIMITS.longDescription} id="long-description-counter" />
             </div>
@@ -321,7 +313,7 @@ export default function CreateProject() {
               name="longDescription"
               value={form.longDescription}
               onChange={handleTextChange}
-              placeholder="Projenin detayları, kullanılan teknolojiler, hedef kitlesi... (opsiyonel)"
+              placeholder={t('create.long_description_placeholder')}
               rows={6}
               disabled={submitting}
               aria-describedby="long-description-counter"
@@ -344,7 +336,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="githubUrl" className="block text-xs font-medium text-text">
-                GitHub URL
+                {t('create.github_label')}
               </label>
               <CharCounter value={form.githubUrl} max={PROJECT_LIMITS.githubUrl} id="github-url-counter" />
             </div>
@@ -354,7 +346,7 @@ export default function CreateProject() {
               type="url"
               value={form.githubUrl}
               onChange={handleUrlChange}
-              placeholder="https://github.com/kullanici/proje (opsiyonel)"
+              placeholder={t('create.github_placeholder')}
               disabled={submitting}
               aria-describedby="github-url-counter"
               aria-invalid={overLimit('githubUrl')}
@@ -368,7 +360,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="demoUrl" className="block text-xs font-medium text-text">
-                Demo URL
+                {t('create.demo_label')}
               </label>
               <CharCounter value={form.demoUrl} max={PROJECT_LIMITS.demoUrl} id="demo-url-counter" />
             </div>
@@ -378,7 +370,7 @@ export default function CreateProject() {
               type="url"
               value={form.demoUrl}
               onChange={handleUrlChange}
-              placeholder="https://proje-demo.com (opsiyonel)"
+              placeholder={t('create.demo_placeholder')}
               disabled={submitting}
               aria-describedby="demo-url-counter"
               aria-invalid={overLimit('demoUrl')}
@@ -392,7 +384,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="imageUrl" className="block text-xs font-medium text-text">
-                Kapak Görseli URL
+                {t('create.image_label')}
               </label>
               <CharCounter value={form.imageUrl} max={PROJECT_LIMITS.imageUrl} id="image-url-counter" />
             </div>
@@ -402,7 +394,7 @@ export default function CreateProject() {
               type="url"
               value={form.imageUrl}
               onChange={handleUrlChange}
-              placeholder="https://... (opsiyonel)"
+              placeholder={t('create.image_placeholder')}
               disabled={submitting}
               aria-describedby="image-url-counter image-url-hint"
               aria-invalid={overLimit('imageUrl')}
@@ -411,7 +403,7 @@ export default function CreateProject() {
               }`}
             />
             <p id="image-url-hint" className="mt-1 text-[11px] text-text-muted font-mono">
-              URL yapıştır, önizleme otomatik görünür.
+              {t('create.image_hint')}
             </p>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
@@ -432,7 +424,7 @@ export default function CreateProject() {
               className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
               <Icon.Check className="w-4 h-4 shrink-0" />
-              Proje oluşturuldu! Yönlendiriliyorsun...
+              {t('create.success')}
             </div>
           )}
 
@@ -443,14 +435,14 @@ export default function CreateProject() {
               disabled={submitting}
               className="flex-1 px-5 py-3 bg-transparent text-text text-sm font-semibold rounded-lg border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              iptal
+              {t('create.cancel')}
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="flex-1 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              {submitting ? 'kaydediliyor...' : 'projeyi yayınla'}
+              {submitting ? t('create.submitting') : t('create.submit')}
             </button>
           </div>
 

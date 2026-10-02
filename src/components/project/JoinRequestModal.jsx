@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 
 export default function JoinRequestModal({
@@ -9,6 +10,7 @@ export default function JoinRequestModal({
   isPremium = false,
   submitting = false,
 }) {
+  const { t } = useLanguage();
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -40,10 +42,9 @@ export default function JoinRequestModal({
         className="w-full max-w-md bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="px-6 py-4 border-b border-accent/10 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text">Ekibe Katıl</h2>
+            <h2 className="text-lg font-bold text-text">{t('join_request.title')}</h2>
             <p className="text-xs text-text-muted mt-0.5 truncate max-w-[280px] font-mono">
               {projectTitle}
             </p>
@@ -53,25 +54,25 @@ export default function JoinRequestModal({
             onClick={handleCancel}
             disabled={submitting}
             className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
-            aria-label="Kapat"
+            aria-label={t('category_picker.close')}
           >
             <Icon.Close className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Body */}
         <div className="px-6 py-5">
           <p className="text-sm text-text leading-relaxed mb-4">
-            Bu projeye katkıda bulunmak için başvuru gönder. Proje sahibi
-            onayladığında ekibe katılacaksın.
+            {t('join_request.desc')}
           </p>
 
           {isPremium ? (
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label htmlFor="join-message" className="block text-xs font-medium text-text">
-                  Neden katılmak istiyorsun?{' '}
-                  <span className="text-accent font-semibold">(Premium)</span>
+                  {t('join_request.premium_label')}{' '}
+                  <span className="text-accent font-semibold">
+                    {t('join_request.premium_badge')}
+                  </span>
                 </label>
                 <span
                   className={`text-[11px] tabular-nums font-mono ${
@@ -85,7 +86,7 @@ export default function JoinRequestModal({
                 id="join-message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Kısaca kendinden ve ne katkı sağlayabileceğinden bahset..."
+                placeholder={t('join_request.message_placeholder')}
                 rows={4}
                 maxLength={MAX_MESSAGE + 50}
                 disabled={submitting}
@@ -94,21 +95,22 @@ export default function JoinRequestModal({
                 }`}
               />
               <p className="mt-1 text-[11px] text-text-muted">
-                Mesajın proje sahibine iletilir. Opsiyonel.
+                {t('join_request.message_hint')}
               </p>
             </div>
           ) : (
             <div className="flex items-start gap-2.5 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
               <Icon.Sparkles className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
               <p className="text-xs text-amber-200/90 leading-relaxed">
-                <strong className="text-amber-200">Premium</strong> üyelik ile başvuruna kişisel bir mesaj
-                ekleyebilirsin. Standart üyeler direkt başvuru gönderir.
+                <strong className="text-amber-200">
+                  {t('join_request.premium_warning_strong')}
+                </strong>{' '}
+                {t('join_request.premium_warning')}
               </p>
             </div>
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-4 border-t border-accent/10 flex items-center justify-end gap-2">
           <button
             type="button"
@@ -116,7 +118,7 @@ export default function JoinRequestModal({
             disabled={submitting}
             className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
           >
-            İptal
+            {t('join_request.cancel')}
           </button>
           <button
             type="button"
@@ -124,7 +126,7 @@ export default function JoinRequestModal({
             disabled={submitting || isOverLimit}
             className="px-4 py-2 text-sm font-semibold text-bg bg-accent rounded-lg hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? 'Gönderiliyor...' : 'Başvuru Gönder'}
+            {submitting ? t('join_request.submitting') : t('join_request.submit')}
           </button>
         </div>
       </div>
