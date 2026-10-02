@@ -120,13 +120,13 @@ export default function CategoryPick({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/70 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/70 backdrop-blur-sm animate-overlay-in"
       onClick={handleCancel}
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="w-full max-w-lg bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+        className="w-full max-w-lg bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -174,30 +174,31 @@ export default function CategoryPick({
           )}
 
           {!loading && !error && categories.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => {
-                const isSelected = tempSelection.includes(cat.id);
-                const isDisabled =
-                  !isSelected && maxSelection && tempSelection.length >= maxSelection;
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat, index) => {
+              const isSelected = tempSelection.includes(cat.id);
+              const isDisabled =
+                !isSelected && maxSelection && tempSelection.length >= maxSelection;
 
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => toggle(cat.id)}
-                    disabled={isDisabled}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
-                      isSelected
-                        ? 'bg-accent text-bg border-accent'
-                        : 'bg-bg text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => toggle(cat.id)}
+                  disabled={isDisabled}
+                  style={{ animationDelay: `${Math.min(index, 15) * 25}ms` }}
+                  className={`animate-chip px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
+                    isSelected
+                      ? 'bg-accent text-bg border-accent'
+                      : 'bg-bg text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
         </div>
 
         {/* Footer */}

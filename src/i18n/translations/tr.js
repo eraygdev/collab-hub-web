@@ -519,5 +519,9 @@ export const tr = {
     error_generic: "Bir hata oluştu",
     optional: "(opsiyonel)",
     required: "*",
+    copied: "Link kopyalandı!",
+    copy_failed: "Link kopyalanamadı",
+    delete_failed: "Silme başarısız oldu",
+    action_failed: "İşlem başarısız oldu",
   },
 };

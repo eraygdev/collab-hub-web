@@ -48,7 +48,7 @@ export default function LanguageSwitcher() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-40 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]"
+          className="absolute right-0 mt-2 w-40 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown"
         >
           {LANGS.map((l) => {
             const isActive = l.code === lang;

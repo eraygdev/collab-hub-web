@@ -38,7 +38,7 @@ export default function CategoryChips({ categories, selected, onChange, disabled
         <p className="text-[11px] text-text-muted font-mono">{t('category_chips.loading')}</p>
       ) : (
         <div className="flex flex-wrap gap-2">
-          {visibleCategories.map((cat) => {
+          {visibleCategories.map((cat, index) => {
             const isSelected = selected.includes(cat.id);
             const isDisabled = !isSelected && selected.length >= MAX_SELECTION;
 
@@ -48,7 +48,8 @@ export default function CategoryChips({ categories, selected, onChange, disabled
                 type="button"
                 onClick={() => toggle(cat.id)}
                 disabled={disabled || isDisabled}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
+                style={{ animationDelay: `${index * 30}ms` }}
+                className={`animate-chip px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
                   isSelected
                     ? 'bg-accent text-bg border-accent'
                     : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
@@ -64,7 +65,8 @@ export default function CategoryChips({ categories, selected, onChange, disabled
               type="button"
               onClick={() => setIsModalOpen(true)}
               disabled={disabled}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
+              style={{ animationDelay: `${Math.min(VISIBLE_LIMIT, 12) * 30}ms` }}
+              className="animate-chip inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
             >
               <Icon.Plus className="w-3 h-3" />
               {t('category_chips.more', { count: categories.length - VISIBLE_LIMIT })}

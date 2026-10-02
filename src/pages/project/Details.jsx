@@ -7,6 +7,7 @@ import JoinRequestModal from '../../components/project/JoinRequestModal';
 import ContributorCard from '../../components/project/ContributorCard';
 import LeaveConfirmModal from '../../components/project/LeaveConfirmModal';
 import * as Icon from '../../components/ui/Icons';
+import { useToast } from '../../components/ui/Toast';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -14,6 +15,7 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const { t, lang } = useLanguage();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
@@ -131,13 +133,13 @@ export default function ProjectDetail() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
-        alert(t('details.delete_failed'));
+        toast.error(t('details.delete_failed'));
         setDeleting(false);
         return;
       }
       navigate('/');
     } catch {
-      alert(t('common.error_generic'));
+      toast.error(t('common.error_generic'));
       setDeleting(false);
     }
   };
@@ -157,7 +159,7 @@ export default function ProjectDetail() {
       });
 
       if (!res.ok) {
-        alert(t('common.error_generic'));
+        toast.error(t('common.error_generic'));
         setJoinSubmitting(false);
         return;
       }
@@ -166,7 +168,7 @@ export default function ProjectDetail() {
       setIsJoinModalOpen(false);
       setJoinSubmitting(false);
     } catch {
-      alert(t('common.error_generic'));
+      toast.error(t('common.error_generic'));
       setJoinSubmitting(false);
     }
   };
@@ -189,7 +191,7 @@ export default function ProjectDetail() {
       });
 
       if (!res.ok) {
-        alert(t('common.error_generic'));
+        toast.error(t('common.error_generic'));
         setLeaveSubmitting(false);
         setIsLeaveModalOpen(false);
         return;
@@ -205,7 +207,7 @@ export default function ProjectDetail() {
       setIsLeaveModalOpen(false);
       setLeaveSubmitting(false);
     } catch {
-      alert(t('common.error_generic'));
+      toast.error(t('common.error_generic'));
       setLeaveSubmitting(false);
       setIsLeaveModalOpen(false);
     }
@@ -215,9 +217,10 @@ export default function ProjectDetail() {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      toast.success(t('common.copied'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      alert(t('details.share.copy_failed'));
+      toast.error(t('details.share.copy_failed'));
     }
   };
 

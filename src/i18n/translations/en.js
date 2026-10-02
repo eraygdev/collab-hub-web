@@ -519,5 +519,9 @@ export const en = {
     error_generic: "Something went wrong",
     optional: "(optional)",
     required: "*",
+    copied: "Link copied!",
+    copy_failed: "Couldn't copy link",
+    delete_failed: "Delete failed",
+    action_failed: "Action failed",
   },
 };

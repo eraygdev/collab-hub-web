@@ -197,8 +197,7 @@ export default function UserSearch() {
       />
 
       {isDropdownOpen && !warning && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]">
-          {showResults && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown-center">          {showResults && (
             <ul className="max-h-80 overflow-y-auto">
               {results.map((user) => (
                 <li key={user.user_id}>

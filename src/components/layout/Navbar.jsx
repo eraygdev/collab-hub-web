@@ -199,7 +199,7 @@ export default function Navbar({ onOpenSidebar }) {
         {mobileSearchOpen && (
           <div
             ref={mobileSearchRef}
-            className="md:hidden absolute top-full left-0 right-0 bg-surface border-b border-accent/20 shadow-2xl"
+            className="md:hidden absolute top-full left-0 right-0 bg-surface border-b border-accent/20 shadow-2xl animate-dropdown-left"
           >
             <div className="px-4 py-3">
               <div className="relative">

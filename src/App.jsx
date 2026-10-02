@@ -6,6 +6,7 @@ import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
 import ScrollToTopButton from './components/ui/ScrollToTopButton';
+import { ToastProvider } from './components/ui/Toast';
 import PageTransition from './components/ui/PageTransition';
 import Home from './pages/project/Home';
 import UserProfile from './pages/user/Profile';
@@ -90,8 +91,10 @@ export default function App() {
     <BrowserRouter>
       <LanguageProvider>
         <AuthProvider>
-          <ScrollToTop />
-          <AppContent />
+          <ToastProvider>
+            <ScrollToTop />
+            <AppContent />
+          </ToastProvider>
         </AuthProvider>
       </LanguageProvider>
     </BrowserRouter>

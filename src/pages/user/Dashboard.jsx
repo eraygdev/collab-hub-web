@@ -5,6 +5,7 @@ import { useLanguage } from '../../i18n/LanguageContext';
 import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
+import { useToast } from '../../components/ui/Toast';
 import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -12,6 +13,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 export default function Dashboard() {
   const { user, loading } = useAuth();
   const { t, lang } = useLanguage();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { isCompact, view, setView } = useProjectView();
 
@@ -124,7 +126,7 @@ export default function Dashboard() {
 
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
     } catch {
-      alert(t('common.error_generic'));
+      toast.error(t('common.action_failed'));
     } finally {
       setRequestActionId(null);
     }

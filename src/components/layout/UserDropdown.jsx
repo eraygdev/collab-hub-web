@@ -88,7 +88,7 @@ export default function UserDropdown() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-56 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]"
+          className="absolute right-0 mt-2 w-56 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown"
         >
           <div className="px-4 py-3 border-b border-accent/10">
             <p className="text-sm font-semibold text-text truncate font-mono">

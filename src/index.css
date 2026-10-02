@@ -6,31 +6,40 @@
    Inter           → Genel metin
    JetBrains Mono  → Kod / metrik
 ───────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Carter+One&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 /* ─────────────────────────────────────────────────────────
    DESIGN TOKENS (Tailwind v4 @theme)
 ───────────────────────────────────────────────────────── */
 @theme {
   /* Renkler */
-  --color-bg: #161A22;
-  --color-surface: #252A33;
-  --color-surface-hover: #2E3440;
+  --color-bg: #161a22;
+  --color-surface: #252a33;
+  --color-surface-hover: #2e3440;
 
-  --color-text: #EFE4CE;
-  --color-text-muted: #9E9381;
-  --color-text-faint: #6F6656;
+  --color-text: #efe4ce;
+  --color-text-muted: #9e9381;
+  --color-text-faint: #6f6656;
 
-  --color-accent: #EFE4CE;
-  --color-accent-muted: #9E9381;
+  --color-accent: #efe4ce;
+  --color-accent-muted: #9e9381;
 
-  --color-danger: #E57373;
-  --color-success: #81C784;
+  --color-danger: #e57373;
+  --color-success: #81c784;
 
   /* Fontlar */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-  --font-display: 'Carter One', 'Inter', system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-display: "Carter One", "Inter", system-ui, sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────
+   COLOR SCHEME — Dark only
+   Tarayıcı ve eklentilerin (Dark Reader vs) site rengini
+   otomatik değiştirmesini engeller.
+───────────────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -42,7 +51,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   font-family: var(--font-sans);
@@ -50,6 +60,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-bg);
   color: var(--color-text);
+  color-scheme: dark;
 }
 
 #root {
@@ -87,7 +98,8 @@ html, body {
    SCROLL HINT — Bounce animasyonu
 ───────────────────────────────────────────────────────── */
 @keyframes bounce-slow {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
     opacity: 0.6;
   }
@@ -104,6 +116,117 @@ html, body {
 /* prefers-reduced-motion → animasyon kapat */
 @media (prefers-reduced-motion: reduce) {
   .animate-bounce-slow {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   DROPDOWN ANIMASYONU — fade + slide
+───────────────────────────────────────────────────────── */
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-dropdown,
+.animate-dropdown-left,
+.animate-dropdown-center {
+  animation: dropdown-enter 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─────────────────────────────────────────────────────────
+   CHIP STAGGER — Sıralı fade + slide
+───────────────────────────────────────────────────────── */
+@keyframes chip-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-chip {
+  animation: chip-enter 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-chip {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   TOAST — Sağdan slide in
+───────────────────────────────────────────────────────── */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast-in {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   MODAL ANIMASYONLARI
+───────────────────────────────────────────────────────── */
+
+/* Overlay — fade in */
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-overlay-in {
+  animation: overlay-in 180ms ease-out;
+}
+
+/* Modal kartı — fade + scale (merkezden) */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center center;
+}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-overlay-in,
+  .animate-modal-in {
     animation: none;
   }
 }

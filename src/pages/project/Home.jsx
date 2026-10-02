@@ -357,8 +357,7 @@ export default function Home() {
 
             {/* History dropdown */}
             {showHistoryDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]">
-                <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown-center">                <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
                   <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
                     {t('home.search.history_label')}
                   </span>
@@ -471,7 +470,8 @@ export default function Home() {
             <div className="mb-5 flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedCategories([])}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer font-mono ${
+                style={{ animationDelay: '0ms' }}
+                className={`animate-chip px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer font-mono ${
                   selectedCategories.length === 0
                     ? 'bg-accent text-bg border-accent'
                     : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
@@ -479,13 +479,14 @@ export default function Home() {
               >
                 {t('home.categories.all')}
               </button>
-              {allCategories.slice(0, VISIBLE_LIMIT).map((cat) => {
+              {allCategories.slice(0, VISIBLE_LIMIT).map((cat, index) => {
                 const isSelected = selectedCategories.includes(cat.id);
                 return (
                   <button
                     key={cat.id}
                     onClick={() => toggleCategory(cat.id)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer font-mono ${
+                    style={{ animationDelay: `${(index + 1) * 30}ms` }}
+                    className={`animate-chip px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer font-mono ${
                       isSelected
                         ? 'bg-accent text-bg border-accent'
                         : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
@@ -498,7 +499,8 @@ export default function Home() {
               {allCategories.length > VISIBLE_LIMIT && (
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
+                  style={{ animationDelay: `${Math.min(VISIBLE_LIMIT + 1, 12) * 30}ms` }}
+                  className="animate-chip inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer font-mono"
                 >
                   <Icon.Plus className="w-3 h-3" />
                   {t('home.categories.more', { count: allCategories.length - VISIBLE_LIMIT })}
@@ -508,7 +510,7 @@ export default function Home() {
           )}
 
           {selectedCategories.length > 1 && (
-            <div className="mb-5 flex items-center gap-2 text-xs">
+            <div className="animate-dropdown-center mb-5 flex items-center gap-2 text-xs">
               <span className="text-text-muted font-mono">{t('home.match.label')}</span>
               <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60">
                 <button
