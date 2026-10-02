@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharCounter from '../../components/ui/CharCounter';
 import CharWarning from '../../components/ui/CharWarning';
 import ImagePreview from '../../components/project/ImagePreview';
@@ -40,7 +41,6 @@ export default function CreateProject() {
 
   const [warnings, setWarnings] = useState({});
 
-  // ✅ Auth yönlendirmesi — sadece user değişince
   useEffect(() => {
     if (!loading && !user) {
       navigate('/login');
@@ -70,7 +70,6 @@ export default function CreateProject() {
     setDraftLoaded(true);
   }, []);
 
-  // ✅ Draft kaydetme — debounce ile
   useEffect(() => {
     if (!draftLoaded) return;
     const t = setTimeout(() => {
@@ -223,8 +222,8 @@ export default function CreateProject() {
 
   if (loading) {
     return (
-      <div className="w-full px-4 py-10 text-center text-sm text-gray-500">
-        Yükleniyor...
+      <div className="w-full bg-bg min-h-screen flex items-center justify-center">
+        <p className="text-sm text-text-muted font-mono">yükleniyor...</p>
       </div>
     );
   }
@@ -232,24 +231,37 @@ export default function CreateProject() {
   if (!user) return null;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
-      <div className="max-w-2xl mx-auto">
+    <div className="w-full bg-bg min-h-screen">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
+        {/* Breadcrumb */}
+        <PageBreadcrumb
+          items={[
+            { label: 'ana sayfa', to: '/' },
+            { label: 'dashboard', to: '/dashboard' },
+            { label: 'yeni proje' },
+          ]}
+        />
+
+        {/* Başlık */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-black">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
             Yeni proje oluştur.
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="text-sm text-text-muted">
             Projeni topluluğa tanıt, katkıda bulunacak geliştiriciler bul.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5 bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5 bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8"
+        >
+          {/* Title */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="title" className="block text-xs font-medium text-gray-700">
-                Proje Başlığı <span className="text-red-500">*</span>
+              <label htmlFor="title" className="block text-xs font-medium text-text">
+                Proje Başlığı <span className="text-red-400">*</span>
               </label>
               <CharCounter value={form.title} max={PROJECT_LIMITS.title} id="title-counter" />
             </div>
@@ -264,17 +276,18 @@ export default function CreateProject() {
               disabled={submitting}
               aria-describedby="title-counter"
               aria-invalid={overLimit('title')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
-                overLimit('title') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
+              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                overLimit('title') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
               }`}
             />
             <CharWarning char={warnings.title} />
           </div>
 
+          {/* Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="description" className="block text-xs font-medium text-gray-700">
-                Kısa Açıklama <span className="text-red-500">*</span>
+              <label htmlFor="description" className="block text-xs font-medium text-text">
+                Kısa Açıklama <span className="text-red-400">*</span>
               </label>
               <CharCounter value={form.description} max={PROJECT_LIMITS.description} id="description-counter" />
             </div>
@@ -289,16 +302,17 @@ export default function CreateProject() {
               disabled={submitting}
               aria-describedby="description-counter"
               aria-invalid={overLimit('description')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y disabled:opacity-50 ${
-                overLimit('description') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
+              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                overLimit('description') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
               }`}
             />
             <CharWarning char={warnings.description} />
           </div>
 
+          {/* Long Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="longDescription" className="block text-xs font-medium text-gray-700">
+              <label htmlFor="longDescription" className="block text-xs font-medium text-text">
                 Uzun Açıklama
               </label>
               <CharCounter value={form.longDescription} max={PROJECT_LIMITS.longDescription} id="long-description-counter" />
@@ -313,13 +327,14 @@ export default function CreateProject() {
               disabled={submitting}
               aria-describedby="long-description-counter"
               aria-invalid={overLimit('longDescription')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y disabled:opacity-50 ${
-                overLimit('longDescription') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
+              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                overLimit('longDescription') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
               }`}
             />
             <CharWarning char={warnings.longDescription} />
           </div>
 
+          {/* Kategoriler */}
           <CategorySelector
             categories={categories}
             selected={selectedCategories}
@@ -327,9 +342,10 @@ export default function CreateProject() {
             disabled={submitting}
           />
 
+          {/* GitHub URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="githubUrl" className="block text-xs font-medium text-gray-700">
+              <label htmlFor="githubUrl" className="block text-xs font-medium text-text">
                 GitHub URL
               </label>
               <CharCounter value={form.githubUrl} max={PROJECT_LIMITS.githubUrl} id="github-url-counter" />
@@ -344,15 +360,16 @@ export default function CreateProject() {
               disabled={submitting}
               aria-describedby="github-url-counter"
               aria-invalid={overLimit('githubUrl')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
-                overLimit('githubUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
+              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
               }`}
             />
           </div>
 
+          {/* Demo URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="demoUrl" className="block text-xs font-medium text-gray-700">
+              <label htmlFor="demoUrl" className="block text-xs font-medium text-text">
                 Demo URL
               </label>
               <CharCounter value={form.demoUrl} max={PROJECT_LIMITS.demoUrl} id="demo-url-counter" />
@@ -367,15 +384,16 @@ export default function CreateProject() {
               disabled={submitting}
               aria-describedby="demo-url-counter"
               aria-invalid={overLimit('demoUrl')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
-                overLimit('demoUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
+              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                overLimit('demoUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
               }`}
             />
           </div>
 
+          {/* Image URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="imageUrl" className="block text-xs font-medium text-gray-700">
+              <label htmlFor="imageUrl" className="block text-xs font-medium text-text">
                 Kapak Görseli URL
               </label>
               <CharCounter value={form.imageUrl} max={PROJECT_LIMITS.imageUrl} id="image-url-counter" />
@@ -390,49 +408,52 @@ export default function CreateProject() {
               disabled={submitting}
               aria-describedby="image-url-counter image-url-hint"
               aria-invalid={overLimit('imageUrl')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-white border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 transition-all disabled:opacity-50 ${
-                overLimit('imageUrl') ? 'border-red-400' : 'border-gray-200 focus:border-gray-400'
+              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                overLimit('imageUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
               }`}
             />
-            <p id="image-url-hint" className="mt-1 text-[11px] text-gray-400">
+            <p id="image-url-hint" className="mt-1 text-[11px] text-text-muted font-mono">
               URL yapıştır, önizleme otomatik görünür.
             </p>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 
+          {/* Error */}
           {error && (
             <div
               role="alert"
-              className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5"
+              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono"
             >
-              {error}
+              ⚠ {error}
             </div>
           )}
 
+          {/* Success */}
           {success && (
             <div
               role="status"
-              className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-2.5"
+              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono"
             >
-              Proje oluşturuldu! Yönlendiriliyorsun...
+              ✓ Proje oluşturuldu! Yönlendiriliyorsun...
             </div>
           )}
 
+          {/* Actions */}
           <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-2">
             <button
               type="button"
               onClick={handleCancel}
               disabled={submitting}
-              className="flex-1 px-5 py-3 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-5 py-3 bg-transparent text-text text-sm font-semibold rounded-lg border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              İptal
+              iptal
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-5 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
-              {submitting ? 'Kaydediliyor...' : 'Projeyi Yayınla'}
+              {submitting ? 'kaydediliyor...' : 'projeyi yayınla'}
             </button>
           </div>
 

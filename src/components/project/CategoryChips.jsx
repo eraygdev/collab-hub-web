@@ -25,17 +25,18 @@ export default function CategoryChips({ categories, selected, onChange, disabled
 
   return (
     <div>
+      {/* Başlık + sayaç */}
       <div className="flex items-center justify-between mb-1.5">
-        <label className="block text-xs font-medium text-gray-700">
+        <label className="block text-xs font-medium text-text">
           Kategoriler
         </label>
-        <span className="text-[11px] text-gray-400 tabular-nums">
+        <span className="text-[11px] text-text-muted tabular-nums font-mono">
           {selected.length} / {MAX_SELECTION}
         </span>
       </div>
 
       {categories.length === 0 ? (
-        <p className="text-[11px] text-gray-400">Kategoriler yükleniyor...</p>
+        <p className="text-[11px] text-text-muted font-mono">Kategoriler yükleniyor...</p>
       ) : (
         <div className="flex flex-wrap gap-2">
           {visibleCategories.map((cat) => {
@@ -48,10 +49,10 @@ export default function CategoryChips({ categories, selected, onChange, disabled
                 type="button"
                 onClick={() => toggle(cat.id)}
                 disabled={disabled || isDisabled}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
                   isSelected
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                    ? 'bg-accent text-bg border-accent'
+                    : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
                 }`}
               >
                 {cat.name}
@@ -64,7 +65,7 @@ export default function CategoryChips({ categories, selected, onChange, disabled
               type="button"
               onClick={() => setIsModalOpen(true)}
               disabled={disabled}
-              className="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-gray-300 text-gray-600 hover:border-gray-500 hover:text-black transition-colors cursor-pointer disabled:opacity-40"
+              className="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
             >
               +{categories.length - VISIBLE_LIMIT} daha
             </button>
@@ -72,7 +73,7 @@ export default function CategoryChips({ categories, selected, onChange, disabled
         </div>
       )}
 
-      <p className="mt-1 text-[11px] text-gray-400">
+      <p className="mt-1.5 text-[11px] text-text-muted/70 font-mono">
         En fazla {MAX_SELECTION} kategori seçebilirsin. (Opsiyonel)
       </p>
 

@@ -1,71 +1,350 @@
-import { Link, NavLink } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import UserDropdown from './UserDropdown';
 import UserSearch from './UserSearch';
+import { useDebounced } from '../../hooks/useDebounced';
+import { useSearchHistory } from '../../hooks/useSearchHistory';
+import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
+import { SEARCH_LIMITS, PAGINATION_LIMITS } from '../../constants/limits';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Mobil arama dropdown state
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileQuery, setMobileQuery] = useState('');
+  const [mobileResults, setMobileResults] = useState([]);
+  const [mobileWarning, setMobileWarning] = useState('');
+  const [mobileLoading, setMobileLoading] = useState(false);
+
+  const mobileDebouncedQuery = useDebounced(mobileQuery, 300);
+  const mobileSearchRef = useRef(null);
+  const mobileAbortRef = useRef(null);
+
+  const {
+    filteredHistory: mobileHistory,
+    hasHistory: mobileHasHistory,
+    isDropdownOpen: mobileHistoryOpen,
+    openDropdown: mobileOpenHistory,
+    hideDropdown: mobileHideHistory,
+    add: mobileAddHistory,
+    remove: mobileRemoveHistory,
+    clear: mobileClearHistory,
+  } = useSearchHistory('user', mobileQuery);
+
+  // Mobil arama isteği
+  useEffect(() => {
+    if (!mobileSearchOpen) return;
+
+    if (mobileAbortRef.current) {
+      mobileAbortRef.current.abort();
+    }
+
+    if (!mobileDebouncedQuery.trim()) {
+      setMobileResults([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    mobileAbortRef.current = controller;
+
+    const search = async () => {
+      setMobileLoading(true);
+      try {
+        const res = await fetch(
+          `${API}/api/users/search?q=${encodeURIComponent(mobileDebouncedQuery)}&limit=${PAGINATION_LIMITS.usersPerSearch}`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error('Arama başarısız');
+        const data = await res.json();
+        setMobileResults(Array.isArray(data) ? data : []);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setMobileResults([]);
+        }
+      } finally {
+        setMobileLoading(false);
+      }
+    };
+
+    search();
+
+    return () => {
+      controller.abort();
+    };
+  }, [mobileDebouncedQuery, mobileSearchOpen]);
+
+  // Mobil arama dışına tıklayınca kapat
+  useEffect(() => {
+    if (!mobileSearchOpen) return;
+
+    const handleClickOutside = (e) => {
+      if (mobileSearchRef.current && !mobileSearchRef.current.contains(e.target)) {
+        setMobileSearchOpen(false);
+      }
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setMobileSearchOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [mobileSearchOpen]);
+
+  const handleMobileChange = (e) => {
+    const value = e.target.value;
+    if (value === '') {
+      setMobileQuery('');
+      setMobileWarning('');
+      return;
+    }
+    if (!USERNAME_REGEX.test(value)) {
+      const bad = findInvalidChar(value, USERNAME_REGEX);
+      if (bad) {
+        setMobileWarning(bad);
+        setTimeout(() => setMobileWarning(''), 3000);
+      }
+      return;
+    }
+    if (value.length > SEARCH_LIMITS.userSearchMaxLength) return;
+    setMobileQuery(value);
+    setMobileWarning('');
+    mobileOpenHistory();
+  };
+
+  const handleMobileSelect = (username) => {
+    mobileAddHistory(username);
+    setMobileQuery('');
+    setMobileResults([]);
+    setMobileSearchOpen(false);
+    mobileHideHistory();
+    navigate(`/profile/${encodeURIComponent(username)}`);
+  };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 shadow-xs">
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          
-            <span className="text-[26px] font-extrabold text-gray-900/70 hover:text-gray-900 transition-colors font-dm">
-              Collab-Hub.
-            </span>
+    <>
+      <header className="sticky top-0 z-50 w-full bg-bg/80 backdrop-blur-md border-b border-accent/10">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3 sm:gap-6 lg:gap-10">
 
-          <button
-            onClick={onOpenSidebar}
-            className="p-2 rounded-lg text-gray-600 hover:text-black hover:bg-gray-100 transition-colors focus:outline-hidden cursor-pointer"
-            aria-label="Menüyü Aç"
+          {/* ───────── SOL: Sidebar toggle + Logo ───────── */}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={onOpenSidebar}
+              className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
+              aria-label="Menüyü Aç"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            {/* Logo — sadece Collab-Hub */}
+            <Link
+              to="/"
+              className="font-display text-[20px] leading-none text-text hover:text-accent transition-colors shrink-0"
+              aria-label="Collab-Hub ana sayfa"
+            >
+              Collab-Hub
+            </Link>
+          </div>
+
+          {/* ───────── ORTA: Kullanıcı arama (desktop) ───────── */}
+          <div className="hidden md:flex flex-1 justify-center min-w-0">
+            <UserSearch />
+          </div>
+
+          {/* ───────── SAĞ: Mobil arama + Auth ───────── */}
+          <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
+
+            {/* Mobil arama butonu */}
+            <button
+              onClick={() => setMobileSearchOpen((v) => !v)}
+              className="md:hidden p-2 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
+              aria-label="Kullanıcı ara"
+            >
+              <svg style={{ width: 18, height: 18 }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+              </svg>
+            </button>
+
+            {user ? (
+              // Giriş yapmış: sadece avatar dropdown
+              <UserDropdown />
+            ) : (
+              // Giriş yapmamış: Giriş Yap + Kayıt Ol
+              <>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `hidden sm:inline-flex items-center justify-center px-3 py-1.5 text-[13px] font-medium rounded-lg transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-surface text-text'
+                        : 'text-text-muted hover:text-text hover:bg-surface'
+                    }`
+                  }
+                >
+                  Giriş Yap
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-[13px] font-semibold rounded-lg bg-accent text-bg border border-accent hover:bg-accent/90 transition-all cursor-pointer"
+                >
+                  Kayıt Ol
+                </NavLink>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ───────── MOBİL ARAMA DROPDOWN ───────── */}
+        {mobileSearchOpen && (
+          <div
+            ref={mobileSearchRef}
+            className="md:hidden absolute top-full left-0 right-0 bg-surface border-b border-accent/20 shadow-2xl"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+            <div className="px-4 py-3">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  value={mobileQuery}
+                  onChange={handleMobileChange}
+                  placeholder="Kullanıcı ara..."
+                  autoFocus
+                  maxLength={SEARCH_LIMITS.userSearchMaxLength}
+                  className={`w-full pl-9 pr-9 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all ${
+                    mobileWarning ? 'border-amber-400/60' : 'border-accent/15 focus:border-accent/40'
+                  }`}
+                />
+                {mobileQuery && (
+                  <button
+                    onClick={() => {
+                      setMobileQuery('');
+                      setMobileResults([]);
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
+                    aria-label="Temizle"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
 
-        </div>
+              {mobileWarning && (
+                <p className="mt-1.5 text-[11px] text-amber-400 font-mono">
+                  ⚠ Geçersiz karakter: "{mobileWarning}"
+                </p>
+              )}
 
-        {/* ✅ Kullanıcı Arama */}
-        <UserSearch />
+              {mobileQuery.trim() !== '' && mobileResults.length > 0 && (
+                <ul className="mt-2 max-h-72 overflow-y-auto -mx-1">
+                  {mobileResults.map((u) => (
+                    <li key={u.user_id}>
+                      <button
+                        onClick={() => handleMobileSelect(u.username)}
+                        className="w-full flex items-center gap-3 px-2 py-2.5 hover:bg-bg/60 rounded-lg transition-colors cursor-pointer text-left"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-bg border border-accent/15 overflow-hidden shrink-0">
+                          {u.avatar_url ? (
+                            <img
+                              src={u.avatar_url}
+                              alt={u.username}
+                              loading="lazy"
+                              decoding="async"
+                              width="32"
+                              height="32"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-text truncate font-mono">
+                            {u.username}
+                          </p>
+                          {u.bio && (
+                            <p className="text-xs text-text-muted truncate">{u.bio}</p>
+                          )}
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          {user ? (
-            <>
-              <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  `hidden sm:inline-flex items-center justify-center max-w-[140px] truncate px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-gray-100 text-black'
-                      : 'text-gray-700 hover:text-black hover:bg-gray-100'
-                  }`
-                }
-              >
-                Merhaba, {user.username}
-              </NavLink>
-              <UserDropdown />
-            </>
-          ) : (
-            <>
-              <NavLink
-                to="/login"
-                className={({ isActive }) =>
-                  `hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-gray-100 text-black'
-                      : 'text-gray-700 hover:text-black hover:bg-gray-100'
-                  }`
-                }
-              >
-                Giriş Yap
-              </NavLink>
-              <UserDropdown />
-            </>
-          )}
-        </div>
-      </div>
-    </header>
+              {mobileQuery.trim() === '' && mobileHasHistory && (
+                <>
+                  <div className="flex items-center justify-between mt-3 mb-1 px-1">
+                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
+                      Son Aramalar
+                    </span>
+                    <button
+                      onClick={mobileClearHistory}
+                      className="text-[10px] text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
+                    >
+                      tümünü temizle
+                    </button>
+                  </div>
+                  <ul className="max-h-60 overflow-y-auto -mx-1">
+                    {mobileHistory.map((username) => (
+                      <li key={username}>
+                        <div className="flex items-center group">
+                          <button
+                            onClick={() => handleMobileSelect(username)}
+                            className="flex-1 flex items-center gap-2.5 px-2 py-2 text-sm text-text/80 hover:bg-bg/60 hover:text-text rounded-lg transition-colors cursor-pointer text-left font-mono"
+                          >
+                            <svg className="w-3.5 h-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="truncate">{username}</span>
+                          </button>
+                          <button
+                            onClick={() => mobileRemoveHistory(username)}
+                            className="p-2 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                            aria-label={`${username} aramasını sil`}
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {mobileQuery.trim() !== '' && !mobileLoading && mobileResults.length === 0 && (
+                <p className="mt-2 px-2 py-3 text-xs text-text-muted text-center font-mono">
+                  Sonuç bulunamadı
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 }

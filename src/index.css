@@ -1,8 +1,47 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* ─────────────────────────────────────────────────────────
+   FONTS
+   Carter One      → Logo (Collab-Hub)
+   Inter           → Genel metin
+   JetBrains Mono  → Kod / metrik
+───────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-/* Global reset ve temel ayarlar */
+/* ─────────────────────────────────────────────────────────
+   DESIGN TOKENS (Tailwind v4 @theme)
+   Buradaki değerler otomatik utility üretir:
+   colors.bg     → bg-bg, text-bg, border-bg
+   colors.surface → bg-surface, text-surface, ...
+   fonts.sans    → font-sans
+   fonts.mono    → font-mono
+   fonts.display → font-display
+───────────────────────────────────────────────────────── */
+@theme {
+  /* Renkler */
+  --color-bg: #161A22;
+  --color-surface: #252A33;
+  --color-surface-hover: #2E3440;
+
+  --color-text: #EFE4CE;
+  --color-text-muted: #9E9381;
+  --color-text-faint: #6F6656;
+
+  --color-accent: #EFE4CE;
+  --color-accent-muted: #9E9381;
+
+  --color-danger: #E57373;
+  --color-success: #81C784;
+
+  /* Fontlar */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --font-display: 'Carter One', 'Inter', system-ui, sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────
+   GLOBAL RESET
+───────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -12,9 +51,11 @@
 html, body {
   margin: 0;
   padding: 0;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 #root {
@@ -23,12 +64,15 @@ html, body {
   flex-direction: column;
 }
 
+/* ─────────────────────────────────────────────────────────
+   ESKİ UYUMLULUK (sonra temizlenebilir)
+───────────────────────────────────────────────────────── */
 .font-dm {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: -0.02em;
 }
 
 .font-manrope {
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: var(--font-sans);
   letter-spacing: -0.02em;
 }

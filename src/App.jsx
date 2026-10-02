@@ -33,10 +33,10 @@ function Layout({ children, hideFooter }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans text-gray-900 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-bg flex flex-col font-sans text-text selection:bg-accent selection:text-bg">
       <Navbar onOpenSidebar={() => setIsSidebarOpen(true)} />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className={`flex-1 flex flex-col w-full bg-gray-50 ${hideFooter ? 'overflow-hidden' : ''}`}>
+      <main className={`flex-1 flex flex-col w-full bg-bg ${hideFooter ? 'overflow-hidden' : ''}`}>
         {children}
       </main>
       {!hideFooter && <Footer />}

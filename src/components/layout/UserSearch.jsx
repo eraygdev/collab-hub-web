@@ -19,7 +19,6 @@ export default function UserSearch() {
   const containerRef = useRef(null);
   const abortRef = useRef(null);
 
-  // ✅ Arama geçmişi hook'u (query'yi geçiriyoruz)
   const {
     filteredHistory,
     hasHistory,
@@ -31,7 +30,6 @@ export default function UserSearch() {
     clear: clearHistory,
   } = useSearchHistory('user', query);
 
-  // Arama isteği
   useEffect(() => {
     if (abortRef.current) {
       abortRef.current.abort();
@@ -74,7 +72,6 @@ export default function UserSearch() {
     };
   }, [debouncedQuery, openDropdown]);
 
-  // Dışına tıklayınca / ESC ile kapat
   useEffect(() => {
     if (!isDropdownOpen) return;
 
@@ -155,7 +152,6 @@ export default function UserSearch() {
     }
   };
 
-  // Gösterme koşulları
   const showResults = query.trim() !== '' && results.length > 0;
   const showHistory = !showResults && hasHistory;
   const showEmpty =
@@ -165,10 +161,10 @@ export default function UserSearch() {
     !hasHistory;
 
   return (
-    <div ref={containerRef} className="relative hidden md:block">
+    <div ref={containerRef} className="relative hidden md:block flex-1 max-w-md">
       {/* Arama kutusu */}
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
           </svg>
@@ -180,14 +176,14 @@ export default function UserSearch() {
           onFocus={handleFocus}
           placeholder="Kullanıcı ara..."
           maxLength={SEARCH_LIMITS.userSearchMaxLength}
-          className={`w-56 pl-9 pr-8 py-2 text-sm bg-gray-50 border rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white transition-all ${
-            warning ? 'border-amber-400' : 'border-gray-200 focus:border-gray-300'
+          className={`w-full pl-9 pr-8 py-2 text-[13px] bg-surface border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/30 transition-all ${
+            warning ? 'border-amber-400/60' : 'border-accent/10'
           }`}
         />
         {query && (
           <button
             onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-black transition-colors cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
             aria-label="Temizle"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -204,17 +200,17 @@ export default function UserSearch() {
 
       {/* Dropdown */}
       {isDropdownOpen && !warning && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
-          {/* Kullanıcı arama sonuçları */}
+        <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]">
+          {/* Kullanıcı sonuçları */}
           {showResults && (
             <ul className="max-h-80 overflow-y-auto">
               {results.map((user) => (
                 <li key={user.user_id}>
                   <button
                     onClick={() => handleSelect(user.username)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-bg/60 transition-colors cursor-pointer text-left"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gray-200 border border-gray-200 overflow-hidden shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-bg border border-accent/15 overflow-hidden shrink-0">
                       {user.avatar_url ? (
                         <img
                           src={user.avatar_url}
@@ -230,18 +226,18 @@ export default function UserSearch() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                           </svg>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-black truncate">
+                      <p className="text-sm font-medium text-text truncate font-mono">
                         {user.username}
                       </p>
                       {user.bio && (
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-text-muted truncate">
                           {user.bio}
                         </p>
                       )}
@@ -252,17 +248,17 @@ export default function UserSearch() {
             </ul>
           )}
 
-          {/* Filtrelenmiş geçmiş aramalar */}
+          {/* Geçmiş */}
           {showHistory && (
             <>
-              <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
+                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
                   Son Aramalar
                 </span>
                 <button
                   type="button"
                   onClick={clearHistory}
-                  className="text-[10px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                  className="text-[10px] text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
                 >
                   Tümünü temizle
                 </button>
@@ -274,9 +270,9 @@ export default function UserSearch() {
                       <button
                         type="button"
                         onClick={() => handleSelectHistory(username)}
-                        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer text-left"
+                        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-sm text-text/80 hover:bg-bg/60 hover:text-text transition-colors cursor-pointer text-left font-mono"
                       >
-                        <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 text-text-muted shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="truncate">{username}</span>
@@ -284,7 +280,7 @@ export default function UserSearch() {
                       <button
                         type="button"
                         onClick={() => removeHistory(username)}
-                        className="p-2 mr-1 text-gray-300 hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                        className="p-2 mr-1 text-text-muted hover:text-text transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                         aria-label={`${username} aramasını sil`}
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -298,9 +294,9 @@ export default function UserSearch() {
             </>
           )}
 
-          {/* Boş sonuç */}
+          {/* Boş */}
           {showEmpty && (
-            <div className="px-4 py-3 text-xs text-gray-500 text-center">
+            <div className="px-4 py-3 text-xs text-text-muted text-center font-mono">
               Sonuç bulunamadı
             </div>
           )}

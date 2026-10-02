@@ -11,15 +11,15 @@ export default function CharWarning({
   if (!char && !message) return null;
 
   const styles = {
-    warning: 'text-amber-600',
-    error: 'text-red-500',
-    info: 'text-blue-500',
+    warning: 'text-amber-400',
+    error: 'text-red-400',
+    info: 'text-accent',
   };
 
   const icons = {
-    warning: '⚠️',
-    error: '❌',
-    info: 'ℹ️',
+    warning: '⚠',
+    error: '✕',
+    info: 'ℹ',
   };
 
   const text = message
@@ -27,7 +27,7 @@ export default function CharWarning({
     : `Geçersiz karakter: "${char}" — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.`;
 
   return (
-    <p role="alert" className={`text-[11px] ${styles[type]} ${className}`}>
+    <p role="alert" className={`text-[11px] ${styles[type]} ${className} font-mono`}>
       {icons[type]} {text}
     </p>
   );

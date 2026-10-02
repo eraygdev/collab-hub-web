@@ -28,23 +28,20 @@ export default function CategoryPick({
     }
   }, [isOpen, selectedCategories]);
 
-  // ✅ Kategorileri sadece GEREKTİĞİNDE fetch et
+  // Kategorileri sadece GEREKTİĞİNDE fetch et
   useEffect(() => {
     if (!isOpen) return;
 
-    // Dışarıdan kategoriler geldiyse fetch etme
     if (externalCategories?.length > 0) {
       setCategories(externalCategories);
       return;
     }
 
-    // Cache varsa fetch etme
     if (categoriesCache?.length > 0) {
       setCategories(categoriesCache);
       return;
     }
 
-    // ✅ Önceki isteği iptal et
     if (abortRef.current) {
       abortRef.current.abort();
     }
@@ -52,7 +49,6 @@ export default function CategoryPick({
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ✅ 5 saniye timeout — backend kapalıysa sonsuza kadar bekleme
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, 5000);
@@ -74,13 +70,12 @@ export default function CategoryPick({
         const data = await res.json();
         const list = Array.isArray(data) ? data : [];
 
-        categoriesCache = list; // ✅ Cache'e kaydet
+        categoriesCache = list;
         setCategories(list);
         setLoading(false);
       } catch (err) {
         clearTimeout(timeoutId);
 
-        // ✅ AbortError'ı sessizce yut — StrictMode/cleanup normal
         if (err.name === 'AbortError') {
           return;
         }
@@ -99,7 +94,6 @@ export default function CategoryPick({
     };
   }, [isOpen, externalCategories]);
 
-  // Modal kapalıysa hiçbir şey render etme
   if (!isOpen) return null;
 
   const toggle = (id) => {
@@ -108,7 +102,7 @@ export default function CategoryPick({
         return prev.filter((x) => x !== id);
       }
       if (maxSelection && prev.length >= maxSelection) {
-        return prev; // sınırı aşma
+        return prev;
       }
       return [...prev, id];
     });
@@ -120,27 +114,27 @@ export default function CategoryPick({
   };
 
   const handleCancel = () => {
-    setTempSelection(selectedCategories); // değişiklikleri iptal et
+    setTempSelection(selectedCategories);
     onClose();
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/70 backdrop-blur-sm"
       onClick={handleCancel}
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+        className="w-full max-w-lg bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-accent/10 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-black">Kategori Seç</h2>
+            <h2 className="text-lg font-bold text-text">Kategori Seç</h2>
             {maxSelection && (
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-text-muted mt-0.5 font-mono">
                 En fazla {maxSelection} kategori · {tempSelection.length} seçili
               </p>
             )}
@@ -148,7 +142,7 @@ export default function CategoryPick({
           <button
             type="button"
             onClick={handleCancel}
-            className="p-2 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
             aria-label="Kapat"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -160,7 +154,7 @@ export default function CategoryPick({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {loading && (
-            <div className="text-center py-10 text-sm text-gray-500">
+            <div className="text-center py-10 text-sm text-text-muted font-mono">
               Kategoriler yükleniyor...
             </div>
           )}
@@ -168,15 +162,15 @@ export default function CategoryPick({
           {error && !loading && (
             <div className="text-center py-10">
               <div className="text-4xl mb-2">⚠️</div>
-              <p className="text-sm text-red-500 mb-1">{error}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-sm text-red-400 mb-1">{error}</p>
+              <p className="text-xs text-text-muted">
                 Backend'in çalıştığından emin ol.
               </p>
             </div>
           )}
 
           {!loading && !error && categories.length === 0 && (
-            <div className="text-center py-10 text-sm text-gray-500">
+            <div className="text-center py-10 text-sm text-text-muted">
               Kategori bulunamadı.
             </div>
           )}
@@ -194,10 +188,10 @@ export default function CategoryPick({
                     type="button"
                     onClick={() => toggle(cat.id)}
                     disabled={isDisabled}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
                       isSelected
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                        ? 'bg-accent text-bg border-accent'
+                        : 'bg-bg text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
                     }`}
                   >
                     {cat.name}
@@ -209,11 +203,11 @@ export default function CategoryPick({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-2">
+        <div className="px-6 py-4 border-t border-accent/10 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg transition-colors cursor-pointer"
           >
             İptal
           </button>
@@ -221,7 +215,7 @@ export default function CategoryPick({
             type="button"
             onClick={handleConfirm}
             disabled={loading}
-            className="px-4 py-2 text-sm font-semibold text-white bg-black rounded-lg hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-semibold text-bg bg-accent rounded-lg hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Onayla ({tempSelection.length})
           </button>

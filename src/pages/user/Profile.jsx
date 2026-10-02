@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProjectCard from '../../components/project/ProjectCard';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -139,52 +140,62 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="w-full px-4 py-10 text-center text-sm text-gray-500">
-        Profil yükleniyor...
+      <div className="w-full bg-bg min-h-screen flex items-center justify-center">
+        <p className="text-sm text-text-muted font-mono">profil yükleniyor...</p>
       </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-20">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="text-6xl mb-4">🔍</div>
-          <h2 className="text-2xl font-bold text-black mb-2">Kullanıcı bulunamadı</h2>
-          <p className="text-gray-500 mb-6">
-            @{username} adlı kullanıcı sistemde yok.
-          </p>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            ← Ana Sayfaya Dön
-          </Link>
+      <div className="w-full bg-bg min-h-screen">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <PageBreadcrumb
+            items={[
+              { label: 'ana sayfa', to: '/' },
+              { label: `profil:${username}` },
+            ]}
+          />
+          <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
+            <div className="text-5xl mb-3">🔍</div>
+            <h2 className="text-lg font-bold text-text mb-1 font-mono">
+              kullanıcı bulunamadı
+            </h2>
+            <p className="text-sm text-text-muted mb-5">
+              @{username} adlı kullanıcı sistemde yok.
+            </p>
+            <Link
+              to="/"
+              className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
+            >
+              ← ana sayfaya dön
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Grid sınıfları
   const gridClass = isCompact
     ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
     : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6';
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
-      <div className="max-w-5xl mx-auto">
+    <div className="w-full bg-bg min-h-screen">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <Link to="/" className="hover:text-black transition-colors">Ana Sayfa</Link>
-          <span className="text-gray-300">/</span>
-          <span className="text-gray-900 font-medium">
-            {isSelf ? 'Profilim' : profile.username}
-          </span>
-        </nav>
+        {/* Breadcrumb */}
+        <PageBreadcrumb
+          items={[
+            { label: 'ana sayfa', to: '/' },
+            { label: isSelf ? 'profilim' : `profil:${profile.username}` },
+          ]}
+        />
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm mb-6">
+        {/* ───── Profil Kartı ───── */}
+        <div className="bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-gray-200 border border-gray-300 overflow-hidden shrink-0">
+            <div className="w-20 h-20 rounded-full bg-bg border border-accent/15 overflow-hidden shrink-0">
               {profile.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -197,111 +208,131 @@ export default function UserProfile() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <svg className="w-10 h-10 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-10 h-10 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                   </svg>
                 </div>
               )}
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-black mb-1">
+              <h1 className="text-2xl font-bold text-text mb-1">
                 {isSelf ? 'Profilim' : profile.username}
               </h1>
-              <p className="text-sm text-gray-500 mb-1">@{profile.username}</p>
+              <p className="text-sm text-text-muted font-mono mb-1">
+                @{profile.username}
+              </p>
               {profile.bio && (
-                <p className="text-sm text-gray-600 leading-relaxed">{profile.bio}</p>
+                <p className="text-sm text-text-muted leading-relaxed">
+                  {profile.bio}
+                </p>
               )}
             </div>
             {isSelf && (
               <Link
                 to="/settings"
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shrink-0 text-center"
+                className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:border-accent hover:bg-bg transition-all shrink-0 text-center font-mono"
               >
-                Ayarlar
+                ayarlar
               </Link>
             )}
           </div>
         </div>
 
+        {/* ───── İstatistikler ───── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white border border-gray-200 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-wider text-gray-400 mb-1">Proje</p>
-            <p className="text-2xl font-bold text-black">{profile.stats.totalProjects}</p>
+          <div className="bg-surface border border-accent/10 rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-wider text-text-muted mb-1 font-mono">
+              /proje
+            </p>
+            <p className="text-2xl font-bold text-text font-mono tabular-nums">
+              {profile.stats.totalProjects}
+            </p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-wider text-gray-400 mb-1">Toplam Yıldız</p>
-            <p className="text-2xl font-bold text-black">⭐ {profile.stats.totalStars}</p>
+          <div className="bg-surface border border-accent/10 rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-wider text-text-muted mb-1 font-mono">
+              /toplam yıldız
+            </p>
+            <p className="text-2xl font-bold text-text font-mono tabular-nums">
+              ⭐ {profile.stats.totalStars}
+            </p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-wider text-gray-400 mb-1">Toplam Katkıcı</p>
-            <p className="text-2xl font-bold text-black">👥 {profile.stats.totalContributors}</p>
+          <div className="bg-surface border border-accent/10 rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-wider text-text-muted mb-1 font-mono">
+              /toplam katkıcı
+            </p>
+            <p className="text-2xl font-bold text-text font-mono tabular-nums">
+              👥 {profile.stats.totalContributors}
+            </p>
           </div>
         </div>
 
+        {/* ───── Tab'lar (sadece kendi profilinde) ───── */}
         {isSelf && (
-          <div className="mb-6 border-b border-gray-200">
+          <div className="mb-6 border-b border-accent/10">
             <div className="flex items-center gap-6">
               <button
                 onClick={() => handleTabChange('projects')}
-                className={`pb-3 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px ${
+                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 -mb-px font-mono ${
                   tab === 'projects'
-                    ? 'text-black border-black'
-                    : 'text-gray-500 border-transparent hover:text-black'
+                    ? 'text-text border-accent'
+                    : 'text-text-muted border-transparent hover:text-text'
                 }`}
               >
-                Projelerim
+                /projelerim
               </button>
               <button
                 onClick={() => handleTabChange('contributions')}
-                className={`pb-3 text-sm font-semibold transition-colors cursor-pointer border-b-2 -mb-px ${
+                className={`pb-3 text-sm font-semibold transition-all cursor-pointer border-b-2 -mb-px font-mono ${
                   tab === 'contributions'
-                    ? 'text-black border-black'
-                    : 'text-gray-500 border-transparent hover:text-black'
+                    ? 'text-text border-accent'
+                    : 'text-text-muted border-transparent hover:text-text'
                 }`}
               >
-                Katkıda Bulunduğum
+                /katkıda bulunduğum
               </button>
             </div>
           </div>
         )}
 
-        {/* Başlık + Görünüm Toggle + Sıralama */}
+        {/* ───── Başlık + Toggle + Sıralama ───── */}
         <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-text uppercase tracking-wider font-mono">
             {!isSelf
-              ? 'Projeler'
+              ? '/projeler'
               : tab === 'projects'
-              ? 'Projelerim'
-              : 'Katkıda Bulunduğum Projeler'}
+              ? '/projelerim'
+              : '/katkıda bulunduğum projeler'}
           </h2>
 
           <div className="flex items-center gap-3">
             {/* Görünüm toggle */}
-            <div className="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+            <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60">
               <button
                 onClick={() => setView('normal')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
                   view === 'normal'
-                    ? 'bg-white text-black shadow-sm'
-                    : 'text-gray-500 hover:text-black'
+                    ? 'bg-accent text-bg shadow-sm'
+                    : 'text-text-muted hover:text-text'
                 }`}
-                aria-label="Normal görünüm"
+                aria-label="Büyük kartlar"
+                title="Büyük kartlar"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
               <button
                 onClick={() => setView('compact')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
                   view === 'compact'
-                    ? 'bg-white text-black shadow-sm'
-                    : 'text-gray-500 hover:text-black'
+                    ? 'bg-accent text-bg shadow-sm'
+                    : 'text-text-muted hover:text-text'
                 }`}
-                aria-label="Küçük görünüm"
+                aria-label="Küçük kartlar"
+                title="Küçük kartlar"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                 </svg>
               </button>
             </div>
@@ -309,39 +340,40 @@ export default function UserProfile() {
             {isSelf && tab === 'projects' && (
               <Link
                 to="/create-project"
-                className="text-xs font-medium text-gray-500 hover:text-black transition-colors"
+                className="text-xs font-medium text-text-muted hover:text-text transition-colors font-mono"
               >
-                + Yeni proje
+                + yeni proje
               </Link>
             )}
 
             {tab === 'projects' && (
-              <div className="inline-flex rounded-lg border border-gray-200 p-0.5 bg-gray-50">
+              <div className="inline-flex rounded-lg border border-accent/20 p-0.5 bg-surface/60">
                 <button
                   onClick={() => handleSortChange('newest')}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer font-mono ${
                     sort === 'newest'
-                      ? 'bg-white text-black shadow-sm'
-                      : 'text-gray-500 hover:text-black'
+                      ? 'bg-accent text-bg shadow-sm'
+                      : 'text-text-muted hover:text-text'
                   }`}
                 >
-                  En Yeni
+                  en yeni
                 </button>
                 <button
                   onClick={() => handleSortChange('popular')}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer font-mono ${
                     sort === 'popular'
-                      ? 'bg-white text-black shadow-sm'
-                      : 'text-gray-500 hover:text-black'
+                      ? 'bg-accent text-bg shadow-sm'
+                      : 'text-text-muted hover:text-text'
                   }`}
                 >
-                  En Popüler
+                  en popüler
                 </button>
               </div>
             )}
           </div>
         </div>
 
+        {/* ───── İçerik ───── */}
         {tab === 'projects' && (
           <>
             {projects.length > 0 ? (
@@ -362,20 +394,24 @@ export default function UserProfile() {
                     <button
                       onClick={handleLoadMore}
                       disabled={loadingMore}
-                      className="px-6 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-surface text-text text-sm font-semibold rounded-xl border border-accent/20 hover:border-accent/60 hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
                     >
-                      {loadingMore ? 'Yükleniyor...' : 'Daha Fazla Yükle'}
+                      {loadingMore ? (
+                        <>yükleniyor<span className="animate-pulse">...</span></>
+                      ) : (
+                        <>↓ daha fazla yükle</>
+                      )}
                     </button>
                   </div>
                 )}
               </>
             ) : (
-              <div className="text-center py-16 border border-dashed border-gray-200 rounded-2xl">
+              <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
                 <div className="text-5xl mb-3">📦</div>
-                <h3 className="text-base font-bold text-black mb-1">
-                  {isSelf ? 'Henüz projen yok' : 'Henüz proje yok'}
+                <h3 className="text-base font-bold text-text mb-1 font-mono">
+                  {isSelf ? 'henüz projen yok' : 'henüz proje yok'}
                 </h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-text-muted mb-4">
                   {isSelf
                     ? 'İlk projeni oluşturarak başla.'
                     : `@${profile.username} henüz proje paylaşmamış.`}
@@ -383,9 +419,9 @@ export default function UserProfile() {
                 {isSelf && (
                   <Link
                     to="/create-project"
-                    className="inline-block px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
                   >
-                    Proje Oluştur
+                    proje oluştur
                   </Link>
                 )}
               </div>
@@ -407,19 +443,19 @@ export default function UserProfile() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 border border-dashed border-gray-200 rounded-2xl">
+              <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
                 <div className="text-5xl mb-3">🤝</div>
-                <h3 className="text-base font-bold text-black mb-1">
-                  Henüz bir projeye katkıda bulunmadın
+                <h3 className="text-base font-bold text-text mb-1 font-mono">
+                  henüz bir projeye katkıda bulunmadın
                 </h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-text-muted mb-4">
                   Keşfet sayfasından projelere göz at, ekibe katıl.
                 </p>
                 <Link
                   to="/"
-                  className="inline-block px-4 py-2 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  className="inline-block px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
                 >
-                  Projeleri Keşfet
+                  projeleri keşfet
                 </Link>
               </div>
             )}

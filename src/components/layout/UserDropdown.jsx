@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-// Avatar + dropdown menü. Hem giriş yapmış hem yapmamış kullanıcı için.
 export default function UserDropdown() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -12,12 +11,10 @@ export default function UserDropdown() {
   const [avatarError, setAvatarError] = useState(false);
   const menuRef = useRef(null);
 
-  // Menü kapanınca onay durumunu da sıfırla.
   useEffect(() => {
     if (!open) setConfirmLogout(false);
   }, [open]);
 
-  // Dışına tıklayınca menüyü kapat.
   useEffect(() => {
     if (!open) return;
 
@@ -44,15 +41,14 @@ export default function UserDropdown() {
     };
   }, [open, confirmLogout]);
 
-  // Giriş yapılmamışsa: avatar tıklanınca login'e yönlendir.
   if (!user) {
     return (
       <button
         onClick={() => navigate('/login')}
-        className="w-9 h-9 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-black transition-all"
+        className="w-8 h-8 rounded-full bg-surface border border-accent/15 overflow-hidden flex items-center justify-center cursor-pointer hover:border-accent/40 transition-all"
         aria-label="Giriş Yap"
       >
-        <svg className="w-5 h-5 text-gray-500 mt-1" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
         </svg>
       </button>
@@ -63,10 +59,10 @@ export default function UserDropdown() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Avatar butonu */}
+      {/* Avatar */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-9 h-9 rounded-full bg-gray-200 border border-gray-300 overflow-hidden cursor-pointer hover:ring-2 hover:ring-black transition-all"
+        className="w-8 h-8 rounded-full bg-surface border border-accent/15 overflow-hidden cursor-pointer hover:border-accent/40 hover:ring-2 hover:ring-accent/10 transition-all"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Kullanıcı menüsü"
@@ -77,14 +73,14 @@ export default function UserDropdown() {
             alt={user.username}
             loading="lazy"
             decoding="async"
-            width="36"
-            height="36"
+            width="32"
+            height="32"
             className="w-full h-full object-cover"
             onError={() => setAvatarError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-5 h-5 text-gray-500 mt-1" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-text-muted" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
             </svg>
           </div>
@@ -95,39 +91,40 @@ export default function UserDropdown() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50"
+          className="absolute right-0 mt-2 w-56 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100]"
         >
           {/* Kullanıcı başlığı */}
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-sm font-semibold text-black truncate">{user.username}</p>
-            <p className="text-xs text-gray-500 truncate">{user.email}</p>
+          <div className="px-4 py-3 border-b border-accent/10">
+            <p className="text-sm font-semibold text-text truncate font-mono">
+              {user.username}
+            </p>
+            <p className="text-xs text-text-muted truncate">{user.email}</p>
           </div>
 
-          {/* Normal menü ya da onay ekranı */}
           {!confirmLogout ? (
             <>
-              {/* Menü öğeleri */}
-              <Link
-                to="/dashboard"
-                role="menuitem"
-                onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Dashboard
-              </Link>
+              {/* ✅ Sıralama: Profilim en üstte */}
               <Link
                 to={`/profile/${user.username}`}
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 Profilim
+              </Link>
+              <Link
+                to="/dashboard"
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
+              >
+                Dashboard
               </Link>
               <Link
                 to="/create-project"
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 Yeni Proje Oluştur
               </Link>
@@ -135,31 +132,28 @@ export default function UserDropdown() {
                 to="/settings"
                 role="menuitem"
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="block px-4 py-2.5 text-sm text-text-muted hover:text-text hover:bg-bg/60 transition-colors"
               >
                 Ayarlar
               </Link>
 
-              {/* Ayraç */}
-              <div className="border-t border-gray-100" />
+              <div className="border-t border-accent/10" />
 
-              {/* Çıkış tetikleyicisi */}
               <button
                 role="menuitem"
                 onClick={() => setConfirmLogout(true)}
-                className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
               >
                 Çıkış Yap
               </button>
             </>
           ) : (
             <>
-              {/* Onay ekranı */}
               <div className="px-4 py-3">
-                <p className="text-sm font-semibold text-black mb-1">
+                <p className="text-sm font-semibold text-text mb-1">
                   Emin misin?
                 </p>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-text-muted leading-relaxed">
                   Hesabından çıkış yapılacak. Devam etmek istiyor musun?
                 </p>
               </div>
@@ -167,7 +161,7 @@ export default function UserDropdown() {
               <div className="px-4 pb-3 flex gap-2">
                 <button
                   onClick={() => setConfirmLogout(false)}
-                  className="flex-1 px-3 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="flex-1 px-3 py-2 text-xs font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg/60 transition-colors cursor-pointer"
                 >
                   Vazgeç
                 </button>
@@ -176,7 +170,7 @@ export default function UserDropdown() {
                     setOpen(false);
                     logout();
                   }}
-                  className="flex-1 px-3 py-2 text-xs font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+                  className="flex-1 px-3 py-2 text-xs font-semibold text-bg bg-red-400 rounded-lg hover:bg-red-500 transition-colors cursor-pointer"
                 >
                   Evet, Çıkış
                 </button>
