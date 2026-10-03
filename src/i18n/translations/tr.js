@@ -23,6 +23,7 @@ export const tr = {
       no_results: "Sonuç bulunamadı",
       searching_hint: "aranıyor...",
       results_hint: "{{count}} proje bulundu · aşağıda",
+      no_results_hint: "sonuç bulunamadı",
     },
     quick: {
       create: "Proje Oluştur",

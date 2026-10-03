@@ -23,6 +23,7 @@ export const en = {
       no_results: "No results found",
       searching_hint: "searching...",
       results_hint: "{{count}} projects found · scroll down",
+      no_results_hint: "no results found",
     },
     quick: {
       create: "Create Project",

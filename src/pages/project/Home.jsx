@@ -34,8 +34,6 @@ export default function Home() {
   const [matchMode, setMatchMode] = useState('or');
 
   const [allCategories, setAllCategories] = useState([]);
-  const [wowExpanded, setWowExpanded] = useState(true);
-  const [instantCollapse, setInstantCollapse] = useState(false);
 
   const searchContainerRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -53,29 +51,6 @@ export default function Home() {
     remove: removeHistory,
     clear: clearHistory,
   } = useSearchHistory('project', searchInput);
-
-    // Wow bloğu (eyebrow + başlık + subtitle) scroll pozisyonuna göre açılıp kapanır.
-  // - Yukarıda → açık
-  // - Aşağıda → kapalı
-  // Arama yapınca scroll değişmese bile, aşağıdaki effect onu küçültür.
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (y < 30) setWowExpanded(true);
-      else if (y > 150) setWowExpanded(false);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Arama veya kategori filtresi aktif olunca wow bloğu küçülür.
-  // Temizlenince scroll pozisyonuna göre eski haline döner.
-  useEffect(() => {
-    const hasFilters =
-      activeSearch.trim() !== '' || selectedCategories.length > 0;
-    if (hasFilters) setWowExpanded(false);
-    else if (window.scrollY < 30) setWowExpanded(true);
-  }, [activeSearch, selectedCategories.length]);
 
   const categoryKey = useMemo(
     () => [...selectedCategories].sort().join(','),
@@ -294,43 +269,26 @@ export default function Home() {
           <div className="absolute -top-50 left-1/2 -translate-x-1/2 w-175 h-100 bg-accent opacity-[0.08] blur-[120px] rounded-full" />
         </div>
 
-        <div
-          className={`relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center transition-all duration-500 ease-out ${
-            wowExpanded ? 'py-20 sm:py-24' : 'py-8 sm:py-10'
-          }`}
-        >
-          {/* Wow bloğu — scroll / arama / filtre ile collapse olur */}
-          <div
-            className="grid"
-            style={{
-              gridTemplateRows: wowExpanded ? '1fr' : '0fr',
-              opacity: wowExpanded ? 1 : 0,
-              transition: instantCollapse
-                ? 'none'
-                : 'grid-template-rows 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-          >
-            <div className="overflow-hidden">
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-accent/15 bg-surface/60">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                <span className="text-[11px] font-mono tracking-wider text-text-muted uppercase">
-                  {t('home.hero.eyebrow')}
-                </span>
-              </div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center">
 
-              {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-text leading-[1.08] mb-5">
-                {t('home.hero.title_1')}
-                <br />
-                <span className="text-text-muted">{t('home.hero.title_2')}</span>
-              </h1>
-
-              <p className="max-w-xl mx-auto text-sm sm:text-base text-text-muted leading-relaxed mb-10">
-                {t('home.hero.subtitle')}
-              </p>
-            </div>
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-accent/15 bg-surface/60">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="text-[11px] font-mono tracking-wider text-text-muted uppercase">
+              {t('home.hero.eyebrow')}
+            </span>
           </div>
+
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-text leading-[1.08] mb-5">
+            {t('home.hero.title_1')}
+            <br />
+            <span className="text-text-muted">{t('home.hero.title_2')}</span>
+          </h1>
+
+          <p className="max-w-xl mx-auto text-sm sm:text-base text-text-muted leading-relaxed mb-10">
+            {t('home.hero.subtitle')}
+          </p>
 
           {/* COMMAND PALETTE */}
           <div ref={searchContainerRef} className="relative max-w-xl mx-auto">
@@ -458,23 +416,28 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Scroll hint / arama sonuç hint'i */}
-          <ScrollHint
-            targetId="explore"
-            offset={200}
-            onBeforeScroll={() => {
-              setInstantCollapse(true);
-              setWowExpanded(false);
-              setTimeout(() => setInstantCollapse(false), 80);
-            }}
-            label={
-              hasActiveFilters
-                ? loading
-                  ? t('home.search.searching_hint')
-                  : t('home.search.results_hint', { count: projects.length })
-                : undefined
-            }
-          />
+          {/* Scroll hint — filtre yoksa default, varsa sonuç özeti */}
+          {!hasActiveFilters ? (
+            <ScrollHint targetId="explore" />
+          ) : (
+            <ScrollHint
+              targetId="explore"
+              label={
+                loading ? (
+                  <>
+                    {t('home.load_more_loading')}
+                    <span className="animate-pulse">...</span>
+                  </>
+                ) : projects.length > 0 ? (
+                  t('home.search.results_hint', { count: projects.length })
+                ) : (
+                  t('home.search.no_results_hint')
+                )
+              }
+              showIcon={!loading && projects.length > 0}
+              disabled={loading || projects.length === 0}
+            />
+          )}
         </div>
       </section>
 
