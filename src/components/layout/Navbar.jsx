@@ -163,6 +163,7 @@ export default function Navbar({ onOpenSidebar }) {
 
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
+              onMouseDown={(e) => e.stopPropagation()}
               className="md:hidden p-2 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
               aria-label={t('navbar.aria.search_users')}
             >

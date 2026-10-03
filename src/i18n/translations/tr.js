@@ -21,6 +21,8 @@ export const tr = {
       history_clear: "tümünü temizle",
       history_remove: '"{{query}}" aramasını sil',
       no_results: "Sonuç bulunamadı",
+      searching_hint: "aranıyor...",
+      results_hint: "{{count}} proje bulundu · aşağıda",
     },
     quick: {
       create: "Proje Oluştur",
@@ -522,6 +524,10 @@ export const tr = {
     aria: "Keşfetmek için aşağı kaydır",
   },
 
+  scroll_to_top: {
+    aria: "Yukarı çık",
+  },
+
   // ─── HATALAR (backend error code → mesaj) ───
   errors: {
     generic: "Bir hata oluştu",
@@ -589,6 +595,10 @@ export const tr = {
     title_too_short: "Başlık çok kısa (en az 3 karakter)",
     description_too_short: "Açıklama çok kısa (en az 20 karakter)",
     username_too_short: "Kullanıcı adı çok kısa (en az 3 karakter)",
+
+    // generic char warning
+    invalid_char:
+      'Geçersiz karakter: "{{char}}" — sadece harf, rakam, nokta ve alt çizgi kullanabilirsin.',
   },
 
   // ─── COMMON ───

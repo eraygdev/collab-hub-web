@@ -21,6 +21,8 @@ export const en = {
       history_clear: "clear all",
       history_remove: 'Remove "{{query}}" search',
       no_results: "No results found",
+      searching_hint: "searching...",
+      results_hint: "{{count}} projects found · scroll down",
     },
     quick: {
       create: "Create Project",
@@ -522,6 +524,10 @@ export const en = {
     aria: "Scroll down to explore",
   },
 
+  scroll_to_top: {
+    aria: "Back to top",
+  },
+
   // ─── ERRORS (backend error code → mesaj) ───
   errors: {
     generic: "Something went wrong",
@@ -590,6 +596,10 @@ export const en = {
     title_too_short: "Title is too short (min 3 characters)",
     description_too_short: "Description is too short (min 20 characters)",
     username_too_short: "Username is too short (min 3 characters)",
+
+    // generic char warning
+    invalid_char:
+      'Invalid character: "{{char}}" — you can only use letters, numbers, dot and underscore.',
   },
 
   // ─── COMMON ───

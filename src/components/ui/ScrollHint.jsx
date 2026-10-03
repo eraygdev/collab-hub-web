@@ -3,30 +3,58 @@ import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from './Icons';
 
 // Hero'nun altında görünen "aşağı kaydır" hint'i.
-// - Sayfa en üstteyken görünür (scrollY < 100)
+// - Sayfa en üstteyken görünür
 // - Aşağı kaydırınca fade out
 // - Tıklanınca hedefe yumuşak scroll
-export default function ScrollHint({ targetId = 'explore' }) {
+//
+// label verilirse "results" modu → accent renkli, farklı threshold.
+//
+// offset: Hedefin üstünde kaç px boşluk kalacağı.
+//   0   → en üste yapıştırır (en fazla aşağı atar)
+//   200 → belirgin şekilde yukarıda durur (en az aşağı atar)
+//
+// onBeforeScroll: scrollTo'dan hemen önce çağrılır.
+//   Parent burada hero'yu anında kapatabilir → hedef doğru hesaplanır.
+export default function ScrollHint({
+  targetId = 'explore',
+  label,
+  offset = 40,
+  onBeforeScroll,
+}) {
   const { t } = useLanguage();
   const [visible, setVisible] = useState(true);
+  const isResults = !!label;
 
   useEffect(() => {
     const handleScroll = () => {
-      setVisible(window.scrollY < 100);
+      const threshold = isResults ? 150 : 100;
+      setVisible(window.scrollY < threshold);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isResults]);
 
   const handleClick = () => {
-    const target = document.getElementById(targetId);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      // Fallback: bir ekran boyu aşağı
-      window.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
-    }
+    // 1) Parent'a "hero'yu kapat" sinyali ver
+    onBeforeScroll?.();
+
+    // 2) İki frame bekle → React commit + layout oturur
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const target = document.getElementById(targetId);
+        if (target) {
+          const y =
+            target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        } else {
+          window.scrollTo({
+            top: window.innerHeight * 0.9,
+            behavior: 'smooth',
+          });
+        }
+      });
+    });
   };
 
   return (
@@ -39,12 +67,23 @@ export default function ScrollHint({ targetId = 'explore' }) {
           : 'opacity-0 translate-y-4 pointer-events-none'
       }`}
     >
-      <span className="text-[10px] font-mono tracking-wider text-text-muted/70 uppercase group-hover:text-text-muted transition-colors">
-        {t('scroll_hint.label')}
+      <span
+        className={`text-[10px] font-mono tracking-wider uppercase transition-colors ${
+          isResults
+            ? 'text-accent group-hover:text-accent/80'
+            : 'text-text-muted/70 group-hover:text-text-muted'
+        }`}
+      >
+        {label || t('scroll_hint.label')}
       </span>
 
-      {/* Bounce animasyonlu ikon */}
-      <span className="animate-bounce-slow text-text-muted group-hover:text-accent transition-colors">
+      <span
+        className={`animate-bounce-slow transition-colors ${
+          isResults
+            ? 'text-accent'
+            : 'text-text-muted group-hover:text-accent'
+        }`}
+      >
         <Icon.ChevronDown className="w-4 h-4" />
       </span>
     </button>
