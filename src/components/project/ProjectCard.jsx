@@ -51,22 +51,22 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
         )}
 
         {/* Yıldız badge */}
-        {project.stars !== undefined && (
-          <div
-            className={`absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono font-semibold rounded-full border backdrop-blur-sm transition-all ${
-              project.starred
-                ? 'text-accent bg-accent/10 border-accent/50 shadow-[0_0_12px_-2px_rgba(239,228,206,0.3)]'
-                : 'text-text-muted bg-bg/70 border-accent/20'
-            }`}
-          >
-            {project.starred ? (
-              <Icon.StarFilled className="w-3 h-3 text-accent drop-shadow-[0_0_4px_rgba(239,228,206,0.6)]" />
-            ) : (
-              <Icon.Star className="w-3 h-3" />
-            )}
-            <span className="tabular-nums">{project.stars}</span>
-          </div>
-        )}
+{project.stars !== undefined && (
+  <div
+    className={`absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono font-semibold rounded-full border backdrop-blur-md transition-all ${
+      project.starred
+        ? 'text-accent bg-bg/75 border-accent/60 shadow-[0_0_12px_-2px_rgba(239,228,206,0.35)]'
+        : 'text-text-muted bg-bg/75 border-accent/25'
+    }`}
+  >
+    {project.starred ? (
+      <Icon.StarFilled className="w-3 h-3 text-accent drop-shadow-[0_0_4px_rgba(239,228,206,0.7)]" />
+    ) : (
+      <Icon.Star className="w-3 h-3" />
+    )}
+    <span className="tabular-nums">{project.stars}</span>
+  </div>
+)}
       </div>
 
       <div className={`${compact ? 'p-3' : 'p-4'} flex flex-col flex-1`}>

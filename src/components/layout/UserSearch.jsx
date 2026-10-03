@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfig } from "../../context/ConfigContext";
 import { useLanguage } from '../../i18n/LanguageContext';
 import * as Icon from '../ui/Icons';
 import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
-import { SEARCH_LIMITS, PAGINATION_LIMITS } from '../../constants/limits';
 import CharWarning from '../ui/CharWarning';
+import InputClearButton from '../ui/InputClearButton';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function UserSearch() {
+  const { limits } = useConfig();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [query, setQuery] = useState('');
@@ -50,7 +52,7 @@ export default function UserSearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${API}/api/users/search?q=${encodeURIComponent(debouncedQuery)}&limit=${PAGINATION_LIMITS.usersPerSearch}`,
+          `${API}/api/users/search?q=${encodeURIComponent(debouncedQuery)}&limit=${limits.maxUsersPerSearch}`,
           { signal: controller.signal }
         );
 
@@ -119,7 +121,7 @@ export default function UserSearch() {
       return;
     }
 
-    if (value.length > SEARCH_LIMITS.userSearchMaxLength) return;
+    if (value.length > limits.username.max) return;
 
     setQuery(value);
     setWarning('');
@@ -175,20 +177,18 @@ export default function UserSearch() {
           onChange={handleChange}
           onFocus={handleFocus}
           placeholder={t('user_search.placeholder')}
-          maxLength={SEARCH_LIMITS.userSearchMaxLength}
+          maxLength={limits.username.max}
           className={`w-full pl-9 pr-8 py-2 text-[13px] bg-surface border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/30 transition-all ${
             warning ? 'border-amber-400/60' : 'border-accent/10'
           }`}
         />
-        {query && (
-          <button
-            onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text transition-colors cursor-pointer"
-            aria-label={t('user_search.aria_clear')}
-          >
-            <Icon.Close className="w-3.5 h-3.5" />
-          </button>
-        )}
+        <InputClearButton
+          visible={!!query}
+          onClick={handleClear}
+          ariaLabel={t('user_search.aria_clear')}
+          size="sm"
+          className="right-2"
+        />
       </div>
 
       <CharWarning
@@ -197,7 +197,7 @@ export default function UserSearch() {
       />
 
       {isDropdownOpen && !warning && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown-center">          {showResults && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-100 animate-dropdown-center">          {showResults && (
             <ul className="max-h-80 overflow-y-auto">
               {results.map((user) => (
                 <li key={user.user_id}>

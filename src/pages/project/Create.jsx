@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useConfig } from '../../context/ConfigContext';
 import { useLanguage } from '../../i18n/LanguageContext';
-import { PROJECT_LIMITS } from '../../constants/limits';
 import { useDebounced } from '../../hooks/useDebounced';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharCounter from '../../components/ui/CharCounter';
 import CharWarning from '../../components/ui/CharWarning';
+import InputClearButton from '../../components/ui/InputClearButton';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import * as Icon from '../../components/ui/Icons';
+import { extractErrorMessage } from '../../utils/errors';
 import {
   TITLE_REGEX,
   TEXT_REGEX,
@@ -22,7 +24,8 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const DRAFT_KEY = 'createProjectDraft';
 
 export default function CreateProject() {
-  const { user, loading } = useAuth();
+  const { user, loading, setProjectCount } = useAuth();
+  const { limits } = useConfig();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -77,10 +80,7 @@ export default function CreateProject() {
       try {
         localStorage.setItem(
           DRAFT_KEY,
-          JSON.stringify({
-            ...form,
-            _selectedCategories: selectedCategories,
-          })
+          JSON.stringify({ ...form, _selectedCategories: selectedCategories })
         );
       } catch {}
     }, 800);
@@ -96,6 +96,11 @@ export default function CreateProject() {
     }, 3000);
   };
 
+  const clearField = (name) => {
+    setForm((prev) => ({ ...prev, [name]: '' }));
+    setWarnings((prev) => ({ ...prev, [name]: '' }));
+  };
+
   const handleTitleChange = (e) => {
     const value = e.target.value;
     if (value === '') {
@@ -108,7 +113,7 @@ export default function CreateProject() {
       if (bad) showWarning('title', bad);
       return;
     }
-    if (charCount(value) > PROJECT_LIMITS.title) return;
+    if (charCount(value) > limits.title.max) return;
     setForm({ ...form, title: value });
     setWarnings((prev) => ({ ...prev, title: '' }));
   };
@@ -125,46 +130,67 @@ export default function CreateProject() {
       if (bad) showWarning(name, bad);
       return;
     }
-    if (PROJECT_LIMITS[name] && charCount(value) > PROJECT_LIMITS[name]) return;
+    if (limits[name]?.max && charCount(value) > limits[name].max) return;
     setForm({ ...form, [name]: value });
     setWarnings((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleUrlChange = (e) => {
     const { name, value } = e.target;
-    if (PROJECT_LIMITS[name] && charCount(value) > PROJECT_LIMITS[name]) return;
+    if (limits[name]?.max && charCount(value) > limits[name].max) return;
     setForm({ ...form, [name]: value });
   };
 
-  const overLimit = (key) => charCount(form[key]) > PROJECT_LIMITS[key];
+  const overLimit = (key) => charCount(form[key]) > (limits[key]?.max || 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess(false);
 
+    // Zorunlu alanlar
     if (!form.title.trim() || !form.description.trim()) {
-      setError(t('create.error.title_required'));
+      setError(t('errors.title_and_description_required'));
       return;
     }
 
-    for (const [key, max] of Object.entries(PROJECT_LIMITS)) {
+    // Min uzunluk kontrolleri
+    if (charCount(form.title.trim()) < limits.title.min) {
+      setError(t('errors.title_too_short'));
+      return;
+    }
+    if (charCount(form.description.trim()) < limits.description.min) {
+      setError(t('errors.description_too_short'));
+      return;
+    }
+
+    // Max uzunluk kontrolleri
+    const maxLimits = {
+      title: limits.title.max,
+      description: limits.description.max,
+      longDescription: limits.longDescription.max,
+      githubUrl: limits.githubUrl.max,
+      demoUrl: limits.demoUrl.max,
+      imageUrl: limits.imageUrl.max,
+    };
+
+    for (const [key, max] of Object.entries(maxLimits)) {
       if (form[key] && charCount(form[key]) > max) {
-        setError(t('create.error.too_long', { field: key, max }));
+        setError(t('errors.generic'));
         return;
       }
     }
 
     if (!isValidUrl(form.githubUrl)) {
-      setError(t('create.error.github_invalid'));
+      setError(t('errors.invalid_github_url'));
       return;
     }
     if (!isValidUrl(form.demoUrl)) {
-      setError(t('create.error.demo_invalid'));
+      setError(t('errors.invalid_demo_url'));
       return;
     }
     if (!isValidUrl(form.imageUrl)) {
-      setError(t('create.error.image_invalid'));
+      setError(t('errors.invalid_image_url'));
       return;
     }
 
@@ -178,19 +204,20 @@ export default function CreateProject() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...form,
-          categoryIds: selectedCategories,
-        }),
+        body: JSON.stringify({ ...form, categoryIds: selectedCategories }),
       });
 
       if (!res.ok) {
-        setError(t('create.error.generic'));
+        setError(await extractErrorMessage(res, t));
         setSubmitting(false);
         return;
       }
 
       const data = await res.json();
+
+      if (data.projectCount !== undefined) {
+        setProjectCount(data.projectCount);
+      }
 
       localStorage.removeItem(DRAFT_KEY);
       setSelectedCategories([]);
@@ -200,7 +227,7 @@ export default function CreateProject() {
         navigate(`/project/${data.id}`);
       }, 700);
     } catch {
-      setError(t('create.error.network'));
+      setError(t('errors.server_error'));
       setSubmitting(false);
     }
   };
@@ -223,6 +250,11 @@ export default function CreateProject() {
 
   if (!user) return null;
 
+  const maxProjects = user?.maxProjects || limits.maxProjectsPerUser;
+  const projectCount = user?.projectCount || 0;
+  const isLimitReached = projectCount >= maxProjects;
+  const percent = Math.min((projectCount / maxProjects) * 100, 100);
+
   return (
     <div className="w-full bg-bg min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -244,6 +276,65 @@ export default function CreateProject() {
           </p>
         </div>
 
+        {/* Proje limiti kartı */}
+        <div className="mb-6 relative bg-surface border border-accent/10 rounded-2xl p-5 overflow-hidden">
+          {isLimitReached && (
+            <div className="absolute -top-20 -right-20 w-60 h-60 bg-red-400 opacity-[0.08] blur-[80px] rounded-full pointer-events-none" />
+          )}
+
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs font-mono uppercase tracking-wider text-text-muted">
+                {t('create.limit.title')}
+              </p>
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider rounded-full border ${
+                  isLimitReached
+                    ? 'text-red-400 bg-red-400/10 border-red-400/30'
+                    : 'text-accent bg-accent/10 border-accent/20'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    isLimitReached ? 'bg-red-400' : 'bg-accent animate-pulse'
+                  }`}
+                />
+                {isLimitReached ? t('create.limit.full') : t('create.limit.active')}
+              </span>
+            </div>
+
+            <div className="flex items-baseline gap-2 mb-3">
+              <span
+                className={`text-4xl font-extrabold font-mono tabular-nums leading-none ${
+                  isLimitReached ? 'text-red-400' : 'text-text'
+                }`}
+              >
+                {projectCount}
+              </span>
+              <span className="text-base text-text-muted font-mono">/ {maxProjects}</span>
+            </div>
+
+            <div className="h-1.5 bg-bg rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isLimitReached ? 'bg-red-400' : 'bg-accent'
+                }`}
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+
+            <p
+              className={`mt-3 text-xs font-mono ${
+                isLimitReached ? 'text-red-400' : 'text-text-muted'
+              }`}
+            >
+              {isLimitReached
+                ? t('create.limit.reached')
+                : t('create.limit.remaining', { count: maxProjects - projectCount })}
+            </p>
+          </div>
+        </div>
+
         <form
           onSubmit={handleSubmit}
           className="space-y-5 bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8"
@@ -254,23 +345,24 @@ export default function CreateProject() {
               <label htmlFor="title" className="block text-xs font-medium text-text">
                 {t('create.title_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
-              <CharCounter value={form.title} max={PROJECT_LIMITS.title} id="title-counter" />
+              <CharCounter value={form.title} max={limits.title.max} id="title-counter" />
             </div>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              value={form.title}
-              onChange={handleTitleChange}
-              placeholder={t('create.title_placeholder')}
-              required
-              disabled={submitting}
-              aria-describedby="title-counter"
-              aria-invalid={overLimit('title')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
-                overLimit('title') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
-              }`}
-            />
+            <div className="relative">
+              <input
+                id="title"
+                name="title"
+                type="text"
+                value={form.title}
+                onChange={handleTitleChange}
+                placeholder={t('create.title_placeholder')}
+                required
+                disabled={submitting}
+                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                  overLimit('title') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
+                }`}
+              />
+              <InputClearButton visible={!!form.title} onClick={() => clearField('title')} />
+            </div>
             <CharWarning char={warnings.title} />
           </div>
 
@@ -280,23 +372,28 @@ export default function CreateProject() {
               <label htmlFor="description" className="block text-xs font-medium text-text">
                 {t('create.description_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
-              <CharCounter value={form.description} max={PROJECT_LIMITS.description} id="description-counter" />
+              <CharCounter value={form.description} max={limits.description.max} id="description-counter" />
             </div>
-            <textarea
-              id="description"
-              name="description"
-              value={form.description}
-              onChange={handleTextChange}
-              placeholder={t('create.description_placeholder')}
-              required
-              rows={3}
-              disabled={submitting}
-              aria-describedby="description-counter"
-              aria-invalid={overLimit('description')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
-                overLimit('description') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
-              }`}
-            />
+            <div className="relative">
+              <textarea
+                id="description"
+                name="description"
+                value={form.description}
+                onChange={handleTextChange}
+                placeholder={t('create.description_placeholder')}
+                required
+                rows={3}
+                disabled={submitting}
+                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                  overLimit('description') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
+                }`}
+              />
+              <InputClearButton
+                visible={!!form.description}
+                onClick={() => clearField('description')}
+                className="top-4 translate-y-0"
+              />
+            </div>
             <CharWarning char={warnings.description} />
           </div>
 
@@ -306,22 +403,27 @@ export default function CreateProject() {
               <label htmlFor="longDescription" className="block text-xs font-medium text-text">
                 {t('create.long_description_label')}
               </label>
-              <CharCounter value={form.longDescription} max={PROJECT_LIMITS.longDescription} id="long-description-counter" />
+              <CharCounter value={form.longDescription} max={limits.longDescription.max} id="long-description-counter" />
             </div>
-            <textarea
-              id="longDescription"
-              name="longDescription"
-              value={form.longDescription}
-              onChange={handleTextChange}
-              placeholder={t('create.long_description_placeholder')}
-              rows={6}
-              disabled={submitting}
-              aria-describedby="long-description-counter"
-              aria-invalid={overLimit('longDescription')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
-                overLimit('longDescription') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
-              }`}
-            />
+            <div className="relative">
+              <textarea
+                id="longDescription"
+                name="longDescription"
+                value={form.longDescription}
+                onChange={handleTextChange}
+                placeholder={t('create.long_description_placeholder')}
+                rows={6}
+                disabled={submitting}
+                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                  overLimit('longDescription') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
+                }`}
+              />
+              <InputClearButton
+                visible={!!form.longDescription}
+                onClick={() => clearField('longDescription')}
+                className="top-4 translate-y-0"
+              />
+            </div>
             <CharWarning char={warnings.longDescription} />
           </div>
 
@@ -338,22 +440,23 @@ export default function CreateProject() {
               <label htmlFor="githubUrl" className="block text-xs font-medium text-text">
                 {t('create.github_label')}
               </label>
-              <CharCounter value={form.githubUrl} max={PROJECT_LIMITS.githubUrl} id="github-url-counter" />
+              <CharCounter value={form.githubUrl} max={limits.githubUrl.max} id="github-url-counter" />
             </div>
-            <input
-              id="githubUrl"
-              name="githubUrl"
-              type="url"
-              value={form.githubUrl}
-              onChange={handleUrlChange}
-              placeholder={t('create.github_placeholder')}
-              disabled={submitting}
-              aria-describedby="github-url-counter"
-              aria-invalid={overLimit('githubUrl')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
-                overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
-              }`}
-            />
+            <div className="relative">
+              <input
+                id="githubUrl"
+                name="githubUrl"
+                type="url"
+                value={form.githubUrl}
+                onChange={handleUrlChange}
+                placeholder={t('create.github_placeholder')}
+                disabled={submitting}
+                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                  overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
+                }`}
+              />
+              <InputClearButton visible={!!form.githubUrl} onClick={() => clearField('githubUrl')} />
+            </div>
           </div>
 
           {/* Demo URL */}
@@ -362,22 +465,23 @@ export default function CreateProject() {
               <label htmlFor="demoUrl" className="block text-xs font-medium text-text">
                 {t('create.demo_label')}
               </label>
-              <CharCounter value={form.demoUrl} max={PROJECT_LIMITS.demoUrl} id="demo-url-counter" />
+              <CharCounter value={form.demoUrl} max={limits.demoUrl.max} id="demo-url-counter" />
             </div>
-            <input
-              id="demoUrl"
-              name="demoUrl"
-              type="url"
-              value={form.demoUrl}
-              onChange={handleUrlChange}
-              placeholder={t('create.demo_placeholder')}
-              disabled={submitting}
-              aria-describedby="demo-url-counter"
-              aria-invalid={overLimit('demoUrl')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
-                overLimit('demoUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
-              }`}
-            />
+            <div className="relative">
+              <input
+                id="demoUrl"
+                name="demoUrl"
+                type="url"
+                value={form.demoUrl}
+                onChange={handleUrlChange}
+                placeholder={t('create.demo_placeholder')}
+                disabled={submitting}
+                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                  overLimit('demoUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
+                }`}
+              />
+              <InputClearButton visible={!!form.demoUrl} onClick={() => clearField('demoUrl')} />
+            </div>
           </div>
 
           {/* Image URL */}
@@ -386,23 +490,24 @@ export default function CreateProject() {
               <label htmlFor="imageUrl" className="block text-xs font-medium text-text">
                 {t('create.image_label')}
               </label>
-              <CharCounter value={form.imageUrl} max={PROJECT_LIMITS.imageUrl} id="image-url-counter" />
+              <CharCounter value={form.imageUrl} max={limits.imageUrl.max} id="image-url-counter" />
             </div>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              type="url"
-              value={form.imageUrl}
-              onChange={handleUrlChange}
-              placeholder={t('create.image_placeholder')}
-              disabled={submitting}
-              aria-describedby="image-url-counter image-url-hint"
-              aria-invalid={overLimit('imageUrl')}
-              className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
-                overLimit('imageUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
-              }`}
-            />
-            <p id="image-url-hint" className="mt-1 text-[11px] text-text-muted font-mono">
+            <div className="relative">
+              <input
+                id="imageUrl"
+                name="imageUrl"
+                type="url"
+                value={form.imageUrl}
+                onChange={handleUrlChange}
+                placeholder={t('create.image_placeholder')}
+                disabled={submitting}
+                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                  overLimit('imageUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
+                }`}
+              />
+              <InputClearButton visible={!!form.imageUrl} onClick={() => clearField('imageUrl')} />
+            </div>
+            <p className="mt-1 text-[11px] text-text-muted font-mono">
               {t('create.image_hint')}
             </p>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
@@ -439,7 +544,7 @@ export default function CreateProject() {
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || isLimitReached}
               className="flex-1 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
               {submitting ? t('create.submitting') : t('create.submit')}

@@ -402,6 +402,14 @@ export const tr = {
     submitting: "kaydediliyor...",
     submit: "projeyi yayınla",
     cancel: "iptal",
+    limit: {
+      title: "Proje Limiti",
+      active: "aktif",
+      full: "dolu",
+      remaining: "{{count}} proje daha oluşturabilirsin.",
+      reached:
+        "Maksimum proje sayısına ulaştın. Yeni proje için mevcut bir projeyi silmelisin.",
+    },
     success: "Proje oluşturuldu! Yönlendiriliyorsun...",
     error: {
       title_required: "Başlık ve kısa açıklama zorunlu.",
@@ -512,6 +520,75 @@ export const tr = {
   scroll_hint: {
     label: "kaydır ve keşfet",
     aria: "Keşfetmek için aşağı kaydır",
+  },
+
+  // ─── HATALAR (backend error code → mesaj) ───
+  errors: {
+    generic: "Bir hata oluştu",
+    server_error: "Sunucu hatası, lütfen tekrar dene",
+
+    // oturum
+    missing_token: "Oturum bilgisi eksik",
+    invalid_token: "Geçersiz oturum",
+    invalid_claims: "Oturum bilgisi bozuk",
+    invalid_user_id: "Kullanıcı kimliği geçersiz",
+    google_no_email: "Google e-posta döndürmedi",
+
+    // kullanıcı / profil
+    user_not_found: "Kullanıcı bulunamadı",
+    invalid_data: "Geçersiz veri",
+    username_empty: "Kullanıcı adı boş olamaz",
+    username_required: "Kullanıcı adı gerekli",
+    username_taken: "Bu kullanıcı adı zaten alınmış",
+
+    // proje
+    project_not_found: "Proje bulunamadı",
+    invalid_project_id: "Geçersiz proje kimliği",
+    title_and_description_required: "Başlık ve açıklama zorunlu",
+    github_url_too_long: "GitHub URL çok uzun",
+    demo_url_too_long: "Demo URL çok uzun",
+    image_url_too_long: "Görsel URL çok uzun",
+    invalid_github_url: "GitHub URL geçersiz",
+    invalid_demo_url: "Demo URL geçersiz",
+    invalid_image_url: "Görsel URL geçersiz",
+    cannot_star_own_project: "Kendi projeni yıldızlayamazsın",
+    project_limit_reached: "Proje limitine ulaştın",
+
+    // kategori
+    invalid_category_id: "Geçersiz kategori",
+    too_many_categories: "Çok fazla kategori seçildi",
+
+    // katkıcı
+    cannot_join_own_project: "Kendi projene katılamazsın",
+    message_too_long: "Mesaj çok uzun",
+    already_pending: "Başvurun zaten onay bekliyor",
+    already_contributor: "Zaten bu projenin katkıcısısın",
+    owner_cannot_leave: "Proje sahibi ayrılamaz",
+    not_a_contributor: "Bu projede katkıcı değilsin",
+    invalid_request_id: "Geçersiz başvuru kimliği",
+    request_not_found: "Başvuru bulunamadı",
+
+    // yetki
+    forbidden: "Bu işlem için yetkin yok",
+
+    // validation
+    username_too_long: "Kullanıcı adı çok uzun",
+    username_invalid_char: "Kullanıcı adı geçersiz karakter içeriyor",
+    bio_too_long: "Hakkımda çok uzun",
+    bio_invalid_char: "Hakkımda geçersiz karakter içeriyor",
+    title_too_long: "Başlık çok uzun",
+    title_invalid_char: "Başlık geçersiz karakter içeriyor",
+    description_too_long: "Açıklama çok uzun",
+    description_invalid_char: "Açıklama geçersiz karakter içeriyor",
+    longDescription_too_long: "Uzun açıklama çok uzun",
+    longDescription_invalid_char: "Uzun açıklama geçersiz karakter içeriyor",
+    search_too_long: "Arama metni çok uzun",
+    search_invalid_char: "Arama metni geçersiz karakter içeriyor",
+
+    // min-length
+    title_too_short: "Başlık çok kısa (en az 3 karakter)",
+    description_too_short: "Açıklama çok kısa (en az 20 karakter)",
+    username_too_short: "Kullanıcı adı çok kısa (en az 3 karakter)",
   },
 
   // ─── COMMON ───

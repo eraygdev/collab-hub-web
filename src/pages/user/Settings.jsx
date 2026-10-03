@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useConfig } from "../../context/ConfigContext";
 import { useLanguage } from '../../i18n/LanguageContext';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharWarning from '../../components/ui/CharWarning';
+import InputClearButton from '../../components/ui/InputClearButton';
 import * as Icon from '../../components/ui/Icons';
-import { PROFILE_LIMITS } from '../../constants/limits';
+import { extractErrorMessage } from '../../utils/errors';
 import {
   USERNAME_REGEX,
   BIO_REGEX,
@@ -16,6 +18,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Settings() {
   const { user, loading, refreshUser } = useAuth();
+  const { limits } = useConfig();
   const { t } = useLanguage();
 
   const [username, setUsername] = useState('');
@@ -35,8 +38,6 @@ export default function Settings() {
       return;
     }
 
-    // ✅ AuthContext'teki user zaten güncel — ekstra fetch gerekmez
-    // Ama tam bio/username için (JWT'de bunlar yok) bir defa çek
     if (user?.username && user?.bio !== undefined) {
       setUsername(user.username || '');
       setBio(user.bio || '');
@@ -74,6 +75,12 @@ export default function Settings() {
     }, 3000);
   };
 
+  const clearField = (name) => {
+    if (name === 'username') setUsername('');
+    if (name === 'bio') setBio('');
+    setWarnings((prev) => ({ ...prev, [name]: '' }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -84,12 +91,17 @@ export default function Settings() {
       return;
     }
 
-    if (charCount(username) > PROFILE_LIMITS.username) {
-      setError(t('settings.error.username_too_long', { max: PROFILE_LIMITS.username }));
+    if (charCount(username.trim()) < limits.username.min) {
+      setError(t('errors.username_too_short'));
       return;
     }
-    if (charCount(bio) > PROFILE_LIMITS.bio) {
-      setError(t('settings.error.bio_too_long', { max: PROFILE_LIMITS.bio }));
+
+    if (charCount(username) > limits.username.max) {
+      setError(t('settings.error.username_too_long', { max: limits.username.max }));
+      return;
+    }
+    if (charCount(bio) > limits.bio.max) {
+      setError(t('settings.error.bio_too_long', { max: limits.bio.max }));
       return;
     }
 
@@ -106,23 +118,8 @@ export default function Settings() {
         body: JSON.stringify({ username: username.trim(), bio: bio.trim() }),
       });
 
-      const text = await res.text();
-      let data = {};
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = { error: 'invalid_response' };
-        }
-      }
-
       if (!res.ok) {
-        // Backend mesajı Türkçe dönse bile kendi çevirimizi gösteriyoruz
-        if (res.status === 409) {
-          setError(t('settings.error.username_taken'));
-        } else {
-          setError(t('settings.error.generic'));
-        }
+        setError(await extractErrorMessage(res, t));
         setSubmitting(false);
         return;
       }
@@ -132,7 +129,7 @@ export default function Settings() {
       setSuccess(t('settings.success'));
       setSubmitting(false);
     } catch {
-      setError(t('settings.error.network'));
+      setError(t('errors.server_error'));
       setSubmitting(false);
     }
   };
@@ -208,31 +205,34 @@ export default function Settings() {
             <label htmlFor="username" className="block text-xs font-medium text-text mb-1.5">
               {t('settings.username_label')}
             </label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') {
-                  setUsername('');
+            <div className="relative">
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setUsername('');
+                    setWarnings((prev) => ({ ...prev, username: '' }));
+                    return;
+                  }
+                  if (!USERNAME_REGEX.test(value)) {
+                    const bad = findInvalidChar(value, USERNAME_REGEX);
+                    if (bad) showWarning('username', bad);
+                    return;
+                  }
+                  if (charCount(value) > limits.username.max) return;
+                  setUsername(value);
                   setWarnings((prev) => ({ ...prev, username: '' }));
-                  return;
-                }
-                if (!USERNAME_REGEX.test(value)) {
-                  const bad = findInvalidChar(value, USERNAME_REGEX);
-                  if (bad) showWarning('username', bad);
-                  return;
-                }
-                if (charCount(value) > PROFILE_LIMITS.username) return;
-                setUsername(value);
-                setWarnings((prev) => ({ ...prev, username: '' }));
-              }}
-              disabled={submitting}
-              className="w-full px-3.5 py-2.5 text-sm bg-bg border border-accent/15 rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/40 transition-all disabled:opacity-50 font-mono"
-            />
+                }}
+                disabled={submitting}
+                className="w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border border-accent/15 rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/40 transition-all disabled:opacity-50 font-mono"
+              />
+              <InputClearButton visible={!!username} onClick={() => clearField('username')} />
+            </div>
             <p className="mt-1 text-[11px] text-text-muted font-mono">
-              {charCount(username)} / {PROFILE_LIMITS.username}
+              {charCount(username)} / {limits.username.max}
             </p>
             <CharWarning char={warnings.username} />
           </div>
@@ -260,32 +260,39 @@ export default function Settings() {
             <label htmlFor="bio" className="block text-xs font-medium text-text mb-1.5">
               {t('settings.bio_label')}
             </label>
-            <textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === '') {
-                  setBio('');
+            <div className="relative">
+              <textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setBio('');
+                    setWarnings((prev) => ({ ...prev, bio: '' }));
+                    return;
+                  }
+                  if (!BIO_REGEX.test(value)) {
+                    const bad = findInvalidChar(value, BIO_REGEX);
+                    if (bad) showWarning('bio', bad);
+                    return;
+                  }
+                  if (charCount(value) > limits.bio.max) return;
+                  setBio(value);
                   setWarnings((prev) => ({ ...prev, bio: '' }));
-                  return;
-                }
-                if (!BIO_REGEX.test(value)) {
-                  const bad = findInvalidChar(value, BIO_REGEX);
-                  if (bad) showWarning('bio', bad);
-                  return;
-                }
-                if (charCount(value) > PROFILE_LIMITS.bio) return;
-                setBio(value);
-                setWarnings((prev) => ({ ...prev, bio: '' }));
-              }}
-              placeholder={t('settings.bio_placeholder')}
-              rows={4}
-              disabled={submitting}
-              className="w-full px-3.5 py-2.5 text-sm bg-bg border border-accent/15 rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/40 transition-all resize-y disabled:opacity-50"
-            />
+                }}
+                placeholder={t('settings.bio_placeholder')}
+                rows={4}
+                disabled={submitting}
+                className="w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border border-accent/15 rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/40 transition-all resize-y disabled:opacity-50"
+              />
+              <InputClearButton
+                visible={!!bio}
+                onClick={() => clearField('bio')}
+                className="top-4 translate-y-0"
+              />
+            </div>
             <p className="mt-1 text-[11px] text-text-muted font-mono">
-              {charCount(bio)} / {PROFILE_LIMITS.bio}
+              {charCount(bio)} / {limits.bio.max}
             </p>
             <CharWarning char={warnings.bio} />
           </div>

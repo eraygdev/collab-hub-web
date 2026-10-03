@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useToast } from '../../components/ui/Toast';
+import { extractErrorMessage } from '../../utils/errors';
 import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
-import { useToast } from '../../components/ui/Toast';
 import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -122,11 +123,14 @@ export default function Dashboard() {
         }
       );
 
-      if (!res.ok) throw new Error('action_failed');
+      if (!res.ok) {
+        toast.error(await extractErrorMessage(res, t));
+        return;
+      }
 
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
     } catch {
-      toast.error(t('common.action_failed'));
+      toast.error(t('errors.server_error'));
     } finally {
       setRequestActionId(null);
     }

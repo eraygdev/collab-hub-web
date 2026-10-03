@@ -403,6 +403,14 @@ export const en = {
     submitting: "saving...",
     submit: "publish project",
     cancel: "cancel",
+    limit: {
+      title: "Project Limit",
+      active: "active",
+      full: "full",
+      remaining: "You can create {{count}} more projects.",
+      reached:
+        "You've reached the maximum number of projects. Delete an existing project to create a new one.",
+    },
     success: "Project created! Redirecting...",
     error: {
       title_required: "Title and short description are required.",
@@ -512,6 +520,76 @@ export const en = {
   scroll_hint: {
     label: "scroll to explore",
     aria: "Scroll down to explore",
+  },
+
+  // ─── ERRORS (backend error code → mesaj) ───
+  errors: {
+    generic: "Something went wrong",
+    server_error: "Server error, please try again",
+
+    // auth
+    missing_token: "Missing session info",
+    invalid_token: "Invalid session",
+    invalid_claims: "Invalid session data",
+    invalid_user_id: "Invalid user ID",
+    google_no_email: "Google did not return an email",
+
+    // user / profile
+    user_not_found: "User not found",
+    invalid_data: "Invalid data",
+    username_empty: "Username cannot be empty",
+    username_required: "Username is required",
+    username_taken: "This username is already taken",
+
+    // project
+    project_not_found: "Project not found",
+    invalid_project_id: "Invalid project ID",
+    title_and_description_required: "Title and description are required",
+    github_url_too_long: "GitHub URL is too long",
+    demo_url_too_long: "Demo URL is too long",
+    image_url_too_long: "Image URL is too long",
+    invalid_github_url: "GitHub URL is invalid",
+    invalid_demo_url: "Demo URL is invalid",
+    invalid_image_url: "Image URL is invalid",
+    cannot_star_own_project: "You can't star your own project",
+    project_limit_reached: "Project limit reached",
+
+    // category
+    invalid_category_id: "Invalid category",
+    too_many_categories: "Too many categories selected",
+
+    // contributor
+    cannot_join_own_project: "You can't join your own project",
+    message_too_long: "Message is too long",
+    already_pending: "Your application is already pending",
+    already_contributor: "You're already a contributor to this project",
+    owner_cannot_leave: "Owner cannot leave the project",
+    not_a_contributor: "You're not a contributor to this project",
+    invalid_request_id: "Invalid request ID",
+    request_not_found: "Request not found",
+
+    // permission
+    forbidden: "You don't have permission for this action",
+
+    // validation
+    username_too_long: "Username is too long",
+    username_invalid_char: "Username contains invalid characters",
+    bio_too_long: "About section is too long",
+    bio_invalid_char: "About section contains invalid characters",
+    title_too_long: "Title is too long",
+    title_invalid_char: "Title contains invalid characters",
+    description_too_long: "Description is too long",
+    description_invalid_char: "Description contains invalid characters",
+    longDescription_too_long: "Long description is too long",
+    longDescription_invalid_char:
+      "Long description contains invalid characters",
+    search_too_long: "Search text is too long",
+    search_invalid_char: "Search text contains invalid characters",
+
+    // min-length
+    title_too_short: "Title is too short (min 3 characters)",
+    description_too_short: "Description is too short (min 20 characters)",
+    username_too_short: "Username is too short (min 3 characters)",
   },
 
   // ─── COMMON ───

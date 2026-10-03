@@ -29,10 +29,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const initializedRef = useRef(false);
   const abortRef = useRef(null);
+  const refreshingRef = useRef(false);  // ✅ YENİ
 
   const refreshUser = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) return null;
+
+    // ✅ Guard: Aynı anda 2. çağrı gelirse hemen çık
+    if (refreshingRef.current) return null;
+    refreshingRef.current = true;
 
     if (abortRef.current) {
       abortRef.current.abort();
@@ -51,16 +56,35 @@ export function AuthProvider({ children }) {
       clearTimeout(timeoutId);
       if (!res.ok) return null;
       const data = await res.json();
-      setUser((prev) => ({ ...prev, ...data }));
+
+      // ✅ Guard: veri değişmediyse state'i güncelleme (referans sabit kalsın)
+      setUser((prev) => {
+        if (!prev) return data;
+
+        const isSame =
+          prev.user_id === data.user_id &&
+          prev.username === data.username &&
+          prev.email === data.email &&
+          prev.avatar_url === data.avatar_url &&
+          prev.bio === data.bio &&
+          prev.is_premium === data.is_premium &&
+          prev.projectCount === data.projectCount &&
+          prev.maxProjects === data.maxProjects;
+
+        return isSame ? prev : { ...prev, ...data };
+      });
+
       return data;
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === 'AbortError') return null;
-      // Sadece development'ta logla — production'da sessiz
       if (import.meta.env.DEV) {
         console.warn('[AuthContext] refreshUser failed:', err.message);
       }
       return null;
+    } finally {
+      // ✅ Her durumda flag'i sıfırla
+      refreshingRef.current = false;
     }
   }, []);
 
@@ -112,6 +136,10 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const setProjectCount = useCallback((count) => {
+    setUser((prev) => (prev ? { ...prev, projectCount: count } : prev));
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     setUser(null);
@@ -119,7 +147,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, logout, refreshUser, setProjectCount }}
+    >
       {children}
     </AuthContext.Provider>
   );

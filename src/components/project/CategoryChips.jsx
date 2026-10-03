@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import CategoryModal from './CategoryPick';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useConfig } from '../../context/ConfigContext';
 import * as Icon from '../ui/Icons';
-import { PROJECT_LIMITS } from '../../constants/limits';
 
 export default function CategoryChips({ categories, selected, onChange, disabled }) {
   const { t } = useLanguage();
+  const { limits } = useConfig();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const MAX_SELECTION = PROJECT_LIMITS.maxCategories;
-  const VISIBLE_LIMIT = PROJECT_LIMITS.visibleCategories;
+  const MAX_SELECTION = limits.maxCategories;
+  const VISIBLE_LIMIT = limits.visibleCategories;
 
   const visibleCategories = categories.slice(0, VISIBLE_LIMIT);
 

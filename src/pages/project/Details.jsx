@@ -2,19 +2,19 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useToast } from '../../components/ui/Toast';
+import { extractErrorMessage } from '../../utils/errors';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import JoinRequestModal from '../../components/project/JoinRequestModal';
 import ContributorCard from '../../components/project/ContributorCard';
 import LeaveConfirmModal from '../../components/project/LeaveConfirmModal';
 import * as Icon from '../../components/ui/Icons';
-import { useToast } from '../../components/ui/Toast';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function ProjectDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
-  const { t, lang } = useLanguage();
+  const { user, setProjectCount } = useAuth();  const { t, lang } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -132,14 +132,23 @@ export default function ProjectDetail() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (!res.ok) {
-        toast.error(t('details.delete_failed'));
+        toast.error(await extractErrorMessage(res, t));
         setDeleting(false);
         return;
       }
+
+      const data = await res.json();
+
+      // Proje sayısını güncelle
+      if (data.projectCount !== undefined) {
+        setProjectCount(data.projectCount);
+      }
+
       navigate('/');
     } catch {
-      toast.error(t('common.error_generic'));
+      toast.error(t('errors.server_error'));
       setDeleting(false);
     }
   };
@@ -159,7 +168,7 @@ export default function ProjectDetail() {
       });
 
       if (!res.ok) {
-        toast.error(t('common.error_generic'));
+        toast.error(await extractErrorMessage(res, t));
         setJoinSubmitting(false);
         return;
       }
@@ -168,13 +177,12 @@ export default function ProjectDetail() {
       setIsJoinModalOpen(false);
       setJoinSubmitting(false);
     } catch {
-      toast.error(t('common.error_generic'));
+      toast.error(t('errors.server_error'));
       setJoinSubmitting(false);
     }
   };
-
+  
   const handleLeaveConfirm = async () => {
-    // Guard — user veya user_id yoksa hiç deneme
     if (!user?.user_id) {
       setLeaveSubmitting(false);
       setIsLeaveModalOpen(false);
@@ -191,7 +199,7 @@ export default function ProjectDetail() {
       });
 
       if (!res.ok) {
-        toast.error(t('common.error_generic'));
+        toast.error(await extractErrorMessage(res, t));
         setLeaveSubmitting(false);
         setIsLeaveModalOpen(false);
         return;
@@ -207,7 +215,7 @@ export default function ProjectDetail() {
       setIsLeaveModalOpen(false);
       setLeaveSubmitting(false);
     } catch {
-      toast.error(t('common.error_generic'));
+      toast.error(t('errors.server_error'));
       setLeaveSubmitting(false);
       setIsLeaveModalOpen(false);
     }

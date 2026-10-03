@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ConfigProvider } from './context/ConfigContext';
 import { LanguageProvider } from './i18n/LanguageContext';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
@@ -89,14 +90,16 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <LanguageProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <ScrollToTop />
-            <AppContent />
-          </ToastProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <ConfigProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <ScrollToTop />
+              <AppContent />
+            </ToastProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ConfigProvider>
     </BrowserRouter>
   );
 }

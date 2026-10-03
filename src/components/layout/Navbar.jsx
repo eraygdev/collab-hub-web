@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useConfig } from "../../context/ConfigContext";
 import { useLanguage } from '../../i18n/LanguageContext';
 import UserDropdown from './UserDropdown';
 import UserSearch from './UserSearch';
@@ -9,12 +10,12 @@ import * as Icon from '../ui/Icons';
 import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
-import { SEARCH_LIMITS, PAGINATION_LIMITS } from '../../constants/limits';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
+  const { limits } = useConfig();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -55,7 +56,7 @@ export default function Navbar({ onOpenSidebar }) {
       setMobileLoading(true);
       try {
         const res = await fetch(
-          `${API}/api/users/search?q=${encodeURIComponent(mobileDebouncedQuery)}&limit=${PAGINATION_LIMITS.usersPerSearch}`,
+          `${API}/api/users/search?q=${encodeURIComponent(mobileDebouncedQuery)}&limit=${limits.maxUsersPerSearch}`,
           { signal: controller.signal }
         );
         if (!res.ok) throw new Error('search_failed');
@@ -112,7 +113,7 @@ export default function Navbar({ onOpenSidebar }) {
       }
       return;
     }
-    if (value.length > SEARCH_LIMITS.userSearchMaxLength) return;
+    if (value.length > limits.username.max) return;
     setMobileQuery(value);
     setMobileWarning('');
   };
@@ -212,7 +213,7 @@ export default function Navbar({ onOpenSidebar }) {
                   onChange={handleMobileChange}
                   placeholder={t('navbar.mobile_search.placeholder')}
                   autoFocus
-                  maxLength={SEARCH_LIMITS.userSearchMaxLength}
+                  maxLength={limits.username.max}
                   className={`w-full pl-9 pr-9 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all ${
                     mobileWarning ? 'border-amber-400/60' : 'border-accent/15 focus:border-accent/40'
                   }`}

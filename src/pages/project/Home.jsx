@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useConfig } from "../../context/ConfigContext";
+import { useLanguage } from '../../i18n/LanguageContext';
 import ScrollHint from '../../components/ui/ScrollHint';
 import ProjectCard from '../../components/project/ProjectCard';
 import CategoryModal from '../../components/project/CategoryPick';
 import * as Icon from '../../components/ui/Icons';
-import { useLanguage } from '../../i18n/LanguageContext';
-import { SEARCH_LIMITS } from '../../constants/limits';
 import { TEXT_REGEX, findInvalidChar } from '../../utils/validators';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { useProjectView } from '../../hooks/useProjectView';
@@ -16,6 +16,7 @@ const VISIBLE_LIMIT = 12;
 
 export default function Home() {
   const { t } = useLanguage();
+  const { limits } = useConfig();
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,7 +198,7 @@ export default function Home() {
       if (bad) showSearchWarning(bad);
       return;
     }
-    if (value.length > SEARCH_LIMITS.maxLength) return;
+    if (value.length > limits.maxSearchLen) return;
     setSearchInput(value);
     setSearchWarning('');
   };
@@ -265,7 +266,7 @@ export default function Home() {
       ═══════════════════════════════════════════ */}
       <section className="relative z-20 border-b border-accent/10">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-accent opacity-[0.08] blur-[120px] rounded-full" />
+          <div className="absolute -top-50 left-1/2 -translate-x-1/2 w-175 h-100 bg-accent opacity-[0.08] blur-[120px] rounded-full" />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 text-center">
@@ -314,7 +315,7 @@ export default function Home() {
                 }}
                 onBlur={() => setIsSearchFocused(false)}
                 placeholder={t('home.search.placeholder')}
-                maxLength={SEARCH_LIMITS.maxLength}
+                maxLength={limits.maxSearchLen}
                 className="flex-1 bg-transparent pl-11 pr-32 py-3.5 text-sm text-text placeholder-text-muted/60 focus:outline-none font-mono"
               />
 
@@ -357,7 +358,7 @@ export default function Home() {
 
             {/* History dropdown */}
             {showHistoryDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown-center">                <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-100 animate-dropdown-center">                <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
                   <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
                     {t('home.search.history_label')}
                   </span>
