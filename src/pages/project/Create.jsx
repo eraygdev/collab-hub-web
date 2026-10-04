@@ -148,13 +148,11 @@ export default function CreateProject() {
     setError('');
     setSuccess(false);
 
-    // Zorunlu alanlar
     if (!form.title.trim() || !form.description.trim()) {
       setError(t('errors.title_and_description_required'));
       return;
     }
 
-    // Min uzunluk kontrolleri
     if (charCount(form.title.trim()) < limits.title.min) {
       setError(t('errors.title_too_short'));
       return;
@@ -164,7 +162,6 @@ export default function CreateProject() {
       return;
     }
 
-    // Max uzunluk kontrolleri
     const maxLimits = {
       title: limits.title.max,
       description: limits.description.max,
@@ -243,7 +240,7 @@ export default function CreateProject() {
   if (loading) {
     return (
       <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
+        <p className="text-body-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
       </div>
     );
   }
@@ -257,7 +254,7 @@ export default function CreateProject() {
 
   return (
     <div className="w-full bg-bg min-h-screen">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-narrow mx-auto px-4 sm:px-6 lg:px-8 py-page">
 
         <PageBreadcrumb
           items={[
@@ -268,34 +265,34 @@ export default function CreateProject() {
         />
 
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
+          <h1 className="text-h3 font-extrabold text-text mb-2 tracking-tight">
             {t('create.title')}
           </h1>
-          <p className="text-sm text-text-muted">
+          <p className="text-body-sm text-text-muted">
             {t('create.subtitle')}
           </p>
         </div>
 
         {/* Proje limiti kartı */}
-        <div className="mb-6 relative bg-surface border border-accent/10 rounded-2xl p-5 overflow-hidden">
+        <div className="mb-6 relative bg-surface border border-accent/10 rounded-card p-5 overflow-hidden">
           {isLimitReached && (
-            <div className="absolute -top-20 -right-20 w-60 h-60 bg-red-400 opacity-[0.08] blur-[80px] rounded-full pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-60 h-60 bg-red-400 opacity-[0.08] blur-[80px] rounded-pill pointer-events-none" />
           )}
 
           <div className="relative">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-mono uppercase tracking-wider text-text-muted">
+              <p className="text-caption font-mono uppercase tracking-wider text-text-muted">
                 {t('create.limit.title')}
               </p>
               <span
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider rounded-full border ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-mono-sm font-mono uppercase tracking-wider rounded-pill border ${
                   isLimitReached
                     ? 'text-red-400 bg-red-400/10 border-red-400/30'
                     : 'text-accent bg-accent/10 border-accent/20'
                 }`}
               >
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
+                  className={`w-1.5 h-1.5 rounded-pill ${
                     isLimitReached ? 'bg-red-400' : 'bg-accent animate-pulse'
                   }`}
                 />
@@ -305,18 +302,18 @@ export default function CreateProject() {
 
             <div className="flex items-baseline gap-2 mb-3">
               <span
-                className={`text-4xl font-extrabold font-mono tabular-nums leading-none ${
+                className={`text-h2 font-extrabold font-mono tabular-nums leading-none ${
                   isLimitReached ? 'text-red-400' : 'text-text'
                 }`}
               >
                 {projectCount}
               </span>
-              <span className="text-base text-text-muted font-mono">/ {maxProjects}</span>
+              <span className="text-body text-text-muted font-mono">/ {maxProjects}</span>
             </div>
 
-            <div className="h-1.5 bg-bg rounded-full overflow-hidden">
+            <div className="h-1.5 bg-bg rounded-pill overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
+                className={`h-full rounded-pill transition-all duration-500 ${
                   isLimitReached ? 'bg-red-400' : 'bg-accent'
                 }`}
                 style={{ width: `${percent}%` }}
@@ -324,7 +321,7 @@ export default function CreateProject() {
             </div>
 
             <p
-              className={`mt-3 text-xs font-mono ${
+              className={`mt-3 text-caption font-mono ${
                 isLimitReached ? 'text-red-400' : 'text-text-muted'
               }`}
             >
@@ -337,12 +334,12 @@ export default function CreateProject() {
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-5 bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8"
+          className="space-y-5 bg-surface border border-accent/10 rounded-card p-6 sm:p-8"
         >
           {/* Title */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="title" className="block text-xs font-medium text-text">
+              <label htmlFor="title" className="block text-caption font-medium text-text">
                 {t('create.title_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.title} max={limits.title.max} id="title-counter" />
@@ -357,7 +354,7 @@ export default function CreateProject() {
                 placeholder={t('create.title_placeholder')}
                 required
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('title') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -369,7 +366,7 @@ export default function CreateProject() {
           {/* Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="description" className="block text-xs font-medium text-text">
+              <label htmlFor="description" className="block text-caption font-medium text-text">
                 {t('create.description_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.description} max={limits.description.max} id="description-counter" />
@@ -384,7 +381,7 @@ export default function CreateProject() {
                 required
                 rows={3}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
                   overLimit('description') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -400,7 +397,7 @@ export default function CreateProject() {
           {/* Long Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="longDescription" className="block text-xs font-medium text-text">
+              <label htmlFor="longDescription" className="block text-caption font-medium text-text">
                 {t('create.long_description_label')}
               </label>
               <CharCounter value={form.longDescription} max={limits.longDescription.max} id="long-description-counter" />
@@ -414,7 +411,7 @@ export default function CreateProject() {
                 placeholder={t('create.long_description_placeholder')}
                 rows={6}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
                   overLimit('longDescription') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -437,7 +434,7 @@ export default function CreateProject() {
           {/* GitHub URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="githubUrl" className="block text-xs font-medium text-text">
+              <label htmlFor="githubUrl" className="block text-caption font-medium text-text">
                 {t('create.github_label')}
               </label>
               <CharCounter value={form.githubUrl} max={limits.githubUrl.max} id="github-url-counter" />
@@ -451,7 +448,7 @@ export default function CreateProject() {
                 onChange={handleUrlChange}
                 placeholder={t('create.github_placeholder')}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -462,7 +459,7 @@ export default function CreateProject() {
           {/* Demo URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="demoUrl" className="block text-xs font-medium text-text">
+              <label htmlFor="demoUrl" className="block text-caption font-medium text-text">
                 {t('create.demo_label')}
               </label>
               <CharCounter value={form.demoUrl} max={limits.demoUrl.max} id="demo-url-counter" />
@@ -476,7 +473,7 @@ export default function CreateProject() {
                 onChange={handleUrlChange}
                 placeholder={t('create.demo_placeholder')}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('demoUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -487,7 +484,7 @@ export default function CreateProject() {
           {/* Image URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="imageUrl" className="block text-xs font-medium text-text">
+              <label htmlFor="imageUrl" className="block text-caption font-medium text-text">
                 {t('create.image_label')}
               </label>
               <CharCounter value={form.imageUrl} max={limits.imageUrl.max} id="image-url-counter" />
@@ -501,13 +498,13 @@ export default function CreateProject() {
                 onChange={handleUrlChange}
                 placeholder={t('create.image_placeholder')}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('imageUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
               <InputClearButton visible={!!form.imageUrl} onClick={() => clearField('imageUrl')} />
             </div>
-            <p className="mt-1 text-[11px] text-text-muted font-mono">
+            <p className="mt-1 text-mono-sm text-text-muted font-mono">
               {t('create.image_hint')}
             </p>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
@@ -516,7 +513,7 @@ export default function CreateProject() {
           {error && (
             <div
               role="alert"
-              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
+              className="text-body-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
               <Icon.Warning className="w-4 h-4 shrink-0" />
               {error}
@@ -526,7 +523,7 @@ export default function CreateProject() {
           {success && (
             <div
               role="status"
-              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
+              className="text-body-sm text-accent bg-accent/10 border border-accent/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
               <Icon.Check className="w-4 h-4 shrink-0" />
               {t('create.success')}
@@ -538,14 +535,14 @@ export default function CreateProject() {
               type="button"
               onClick={handleCancel}
               disabled={submitting}
-              className="flex-1 px-5 py-3 bg-transparent text-text text-sm font-semibold rounded-lg border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
+              className="flex-1 px-5 py-3 bg-transparent text-text text-body-sm font-semibold rounded-button border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
               {t('create.cancel')}
             </button>
             <button
               type="submit"
               disabled={submitting || isLimitReached}
-              className="flex-1 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
+              className="flex-1 px-5 py-3 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
               {submitting ? t('create.submitting') : t('create.submit')}
             </button>

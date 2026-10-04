@@ -135,7 +135,7 @@ export default function Navbar({ onOpenSidebar }) {
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onOpenSidebar}
-              className="p-1.5 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
+              className="p-1.5 rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
               aria-label={t('navbar.aria.open_menu')}
             >
               <Icon.Menu className="w-5 h-5" />
@@ -144,7 +144,7 @@ export default function Navbar({ onOpenSidebar }) {
             <Link
               to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="font-display text-[20px] leading-none text-text hover:text-accent transition-colors shrink-0"
+              className="font-display text-h5 leading-none text-text hover:text-accent transition-colors shrink-0"
               aria-label={t('navbar.aria.logo')}
             >
               Collab-Hub
@@ -164,7 +164,7 @@ export default function Navbar({ onOpenSidebar }) {
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
               onMouseDown={(e) => e.stopPropagation()}
-              className="md:hidden p-2 rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
+              className="md:hidden p-2 rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
               aria-label={t('navbar.aria.search_users')}
             >
               <Icon.Search className="w-4 h-4" />
@@ -177,7 +177,7 @@ export default function Navbar({ onOpenSidebar }) {
                 <NavLink
                   to="/login"
                   className={({ isActive }) =>
-                    `hidden sm:inline-flex items-center justify-center px-3 py-1.5 text-[13px] font-medium rounded-lg transition-all cursor-pointer ${
+                    `hidden sm:inline-flex items-center justify-center px-3 py-1.5 text-body-sm font-medium rounded-button transition-all cursor-pointer ${
                       isActive
                         ? 'bg-surface text-text'
                         : 'text-text-muted hover:text-text hover:bg-surface'
@@ -188,7 +188,7 @@ export default function Navbar({ onOpenSidebar }) {
                 </NavLink>
                 <NavLink
                   to="/register"
-                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-[13px] font-semibold rounded-lg bg-accent text-bg border border-accent hover:bg-accent/90 transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-body-sm font-semibold rounded-button bg-accent text-bg border border-accent hover:bg-accent/90 transition-all cursor-pointer"
                 >
                   {t('navbar.auth.register')}
                 </NavLink>
@@ -215,7 +215,7 @@ export default function Navbar({ onOpenSidebar }) {
                   placeholder={t('navbar.mobile_search.placeholder')}
                   autoFocus
                   maxLength={limits.username.max}
-                  className={`w-full pl-9 pr-9 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all ${
+                  className={`w-full pl-9 pr-9 py-2.5 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all ${
                     mobileWarning ? 'border-amber-400/60' : 'border-accent/15 focus:border-accent/40'
                   }`}
                 />
@@ -234,7 +234,7 @@ export default function Navbar({ onOpenSidebar }) {
               </div>
 
               {mobileWarning && (
-                <p className="mt-1.5 text-[11px] text-amber-400 font-mono inline-flex items-center gap-1">
+                <p className="mt-1.5 text-mono-sm text-amber-400 font-mono inline-flex items-center gap-1">
                   <Icon.Warning className="w-3 h-3" />
                   {t('navbar.mobile_search.warning_prefix')} "{mobileWarning}"
                 </p>
@@ -246,9 +246,9 @@ export default function Navbar({ onOpenSidebar }) {
                     <li key={u.user_id}>
                       <button
                         onClick={() => handleMobileSelect(u.username)}
-                        className="w-full flex items-center gap-3 px-2 py-2.5 hover:bg-bg/60 rounded-lg transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 px-2 py-2.5 hover:bg-bg/60 rounded-button transition-colors cursor-pointer text-left"
                       >
-                        <div className="w-8 h-8 rounded-full bg-bg border border-accent/15 overflow-hidden shrink-0">
+                        <div className="w-8 h-8 rounded-pill bg-bg border border-accent/15 overflow-hidden shrink-0">
                           {u.avatar_url ? (
                             <img
                               src={u.avatar_url}
@@ -269,11 +269,11 @@ export default function Navbar({ onOpenSidebar }) {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text truncate font-mono">
+                          <p className="text-body-sm font-medium text-text truncate font-mono">
                             {u.username}
                           </p>
                           {u.bio && (
-                            <p className="text-xs text-text-muted truncate">{u.bio}</p>
+                            <p className="text-caption text-text-muted truncate">{u.bio}</p>
                           )}
                         </div>
                       </button>
@@ -285,12 +285,12 @@ export default function Navbar({ onOpenSidebar }) {
               {mobileQuery.trim() === '' && mobileHasHistory && (
                 <>
                   <div className="flex items-center justify-between mt-3 mb-1 px-1">
-                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
+                    <span className="text-mono-sm font-bold text-text-muted uppercase tracking-wider font-mono">
                       {t('navbar.mobile_search.history_label')}
                     </span>
                     <button
                       onClick={mobileClearHistory}
-                      className="text-[10px] text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
+                      className="text-mono-sm text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
                     >
                       {t('navbar.mobile_search.history_clear')}
                     </button>
@@ -301,7 +301,7 @@ export default function Navbar({ onOpenSidebar }) {
                         <div className="flex items-center group">
                           <button
                             onClick={() => handleMobileSelect(username)}
-                            className="flex-1 flex items-center gap-2.5 px-2 py-2 text-sm text-text/80 hover:bg-bg/60 hover:text-text rounded-lg transition-colors cursor-pointer text-left font-mono"
+                            className="flex-1 flex items-center gap-2.5 px-2 py-2 text-body-sm text-text/80 hover:bg-bg/60 hover:text-text rounded-button transition-colors cursor-pointer text-left font-mono"
                           >
                             <Icon.Clock className="w-3.5 h-3.5 text-text-muted shrink-0" />
                             <span className="truncate">{username}</span>
@@ -321,7 +321,7 @@ export default function Navbar({ onOpenSidebar }) {
               )}
 
               {mobileQuery.trim() !== '' && !mobileLoading && mobileResults.length === 0 && (
-                <p className="mt-2 px-2 py-3 text-xs text-text-muted text-center font-mono">
+                <p className="mt-2 px-2 py-3 text-caption text-text-muted text-center font-mono">
                   {t('navbar.mobile_search.no_results')}
                 </p>
               )}

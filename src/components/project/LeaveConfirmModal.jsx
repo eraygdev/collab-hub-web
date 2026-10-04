@@ -58,13 +58,13 @@ export default function LeaveConfirmModal({
       aria-modal="true"
     >
       <div
-        className="w-full max-w-md bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden animate-modal-in"
+        className="w-full max-w-md bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-accent/10 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text">{t('leave_confirm.title')}</h2>
-            <p className="text-xs text-text-muted mt-0.5 truncate max-w-[280px] font-mono">
+            <h2 className="text-h5 font-bold text-text">{t('leave_confirm.title')}</h2>
+            <p className="text-caption text-text-muted mt-0.5 truncate max-w-[280px] font-mono">
               {projectTitle}
             </p>
           </div>
@@ -72,7 +72,7 @@ export default function LeaveConfirmModal({
             type="button"
             onClick={handleCancel}
             disabled={submitting}
-            className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
+            className="p-2 rounded-button text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
             aria-label={t('category_picker.close')}
           >
             <Icon.Close className="w-5 h-5" />
@@ -80,9 +80,9 @@ export default function LeaveConfirmModal({
         </div>
 
         <div className="px-6 py-5">
-          <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg mb-4">
+          <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/20 rounded-button mb-4">
             <Icon.Warning className="w-4 h-4 text-red-300 shrink-0 mt-0.5" />
-            <div className="text-xs text-red-200/90 leading-relaxed">
+            <div className="text-caption text-red-200/90 leading-relaxed">
               <p className="font-semibold mb-1 text-red-200">
                 {t('leave_confirm.warning_title')}
               </p>
@@ -90,7 +90,7 @@ export default function LeaveConfirmModal({
             </div>
           </div>
 
-          <p className="text-sm text-text-muted leading-relaxed">
+          <p className="text-body-sm text-text-muted leading-relaxed">
             {t('leave_confirm.confirm_desc')}
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function LeaveConfirmModal({
             type="button"
             onClick={handleCancel}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 text-body-sm font-semibold text-text bg-transparent border border-accent/20 rounded-button hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
           >
             {t('leave_confirm.cancel')}
           </button>
@@ -108,7 +108,7 @@ export default function LeaveConfirmModal({
             type="button"
             onClick={handleConfirm}
             disabled={!canConfirm || submitting}
-            className="px-4 py-2 text-sm font-semibold text-bg bg-red-400 rounded-lg hover:bg-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
+            className="px-4 py-2 text-body-sm font-semibold text-bg bg-red-400 rounded-button hover:bg-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
           >
             {submitting
               ? t('leave_confirm.submitting')

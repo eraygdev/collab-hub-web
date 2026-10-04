@@ -23,7 +23,7 @@ export default function AuthCallback() {
 
   return (
     <div className="w-full flex-1 flex items-center justify-center bg-bg relative overflow-hidden min-h-[60vh]">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.06] blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.06] blur-[100px] rounded-pill pointer-events-none" />
 
       <div className="relative flex flex-col items-center gap-4 text-center px-4">
         <svg
@@ -46,7 +46,7 @@ export default function AuthCallback() {
           />
         </svg>
 
-        <p className="text-sm text-text-muted font-mono">
+        <p className="text-body-sm text-text-muted font-mono">
           {t('callback.loading')}<span className="animate-pulse">...</span>
         </p>
       </div>

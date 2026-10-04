@@ -178,7 +178,7 @@ export default function UserSearch() {
           onFocus={handleFocus}
           placeholder={t('user_search.placeholder')}
           maxLength={limits.username.max}
-          className={`w-full pl-9 pr-8 py-2 text-[13px] bg-surface border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/30 transition-all ${
+          className={`w-full pl-9 pr-8 py-2 text-body-sm bg-surface border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/30 transition-all ${
             warning ? 'border-amber-400/60' : 'border-accent/10'
           }`}
         />
@@ -197,7 +197,7 @@ export default function UserSearch() {
       />
 
       {isDropdownOpen && !warning && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-100 animate-dropdown-center">          {showResults && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden z-100 animate-dropdown-center">          {showResults && (
             <ul className="max-h-80 overflow-y-auto">
               {results.map((user) => (
                 <li key={user.user_id}>
@@ -205,7 +205,7 @@ export default function UserSearch() {
                     onClick={() => handleSelect(user.username)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-bg/60 transition-colors cursor-pointer text-left"
                   >
-                    <div className="w-8 h-8 rounded-full bg-bg border border-accent/15 overflow-hidden shrink-0">
+                    <div className="w-8 h-8 rounded-pill bg-bg border border-accent/15 overflow-hidden shrink-0">
                       {user.avatar_url ? (
                         <img
                           src={user.avatar_url}
@@ -226,11 +226,11 @@ export default function UserSearch() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text truncate font-mono">
+                      <p className="text-body-sm font-medium text-text truncate font-mono">
                         {user.username}
                       </p>
                       {user.bio && (
-                        <p className="text-xs text-text-muted truncate">
+                        <p className="text-caption text-text-muted truncate">
                           {user.bio}
                         </p>
                       )}
@@ -244,13 +244,13 @@ export default function UserSearch() {
           {showHistory && (
             <>
               <div className="flex items-center justify-between px-3 py-2 border-b border-accent/10">
-                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider font-mono">
+                <span className="text-mono-sm font-bold text-text-muted uppercase tracking-wider font-mono">
                   {t('user_search.history_label')}
                 </span>
                 <button
                   type="button"
                   onClick={clearHistory}
-                  className="text-[10px] text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
+                  className="text-mono-sm text-text-muted hover:text-text transition-colors cursor-pointer font-mono"
                 >
                   {t('user_search.history_clear')}
                 </button>
@@ -262,7 +262,7 @@ export default function UserSearch() {
                       <button
                         type="button"
                         onClick={() => handleSelectHistory(username)}
-                        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-sm text-text/80 hover:bg-bg/60 hover:text-text transition-colors cursor-pointer text-left font-mono"
+                        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 text-body-sm text-text/80 hover:bg-bg/60 hover:text-text transition-colors cursor-pointer text-left font-mono"
                       >
                         <Icon.Clock className="w-3.5 h-3.5 text-text-muted shrink-0" />
                         <span className="truncate">{username}</span>
@@ -283,7 +283,7 @@ export default function UserSearch() {
           )}
 
           {showEmpty && (
-            <div className="px-4 py-3 text-xs text-text-muted text-center font-mono">
+            <div className="px-4 py-3 text-caption text-text-muted text-center font-mono">
               {t('user_search.no_results')}
             </div>
           )}

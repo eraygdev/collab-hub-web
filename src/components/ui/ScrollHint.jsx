@@ -55,7 +55,7 @@ export default function ScrollHint({
       } ${disabled ? 'cursor-default' : 'cursor-pointer'}`}
     >
       <span
-        className={`text-[10px] font-mono tracking-wider uppercase transition-colors ${
+        className={`text-mono-sm font-mono tracking-wider uppercase transition-colors ${
           disabled
             ? 'text-text-muted/70'
             : 'text-text-muted/70 group-hover:text-text-muted'

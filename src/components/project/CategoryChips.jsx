@@ -27,16 +27,16 @@ export default function CategoryChips({ categories, selected, onChange, disabled
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <label className="block text-xs font-medium text-text">
+        <label className="block text-caption font-medium text-text">
           {t('category_chips.label')}
         </label>
-        <span className="text-[11px] text-text-muted tabular-nums font-mono">
+        <span className="text-mono-sm text-text-muted tabular-nums font-mono">
           {t('category_chips.counter', { count: selected.length, max: MAX_SELECTION })}
         </span>
       </div>
 
       {categories.length === 0 ? (
-        <p className="text-[11px] text-text-muted font-mono">{t('category_chips.loading')}</p>
+        <p className="text-mono-sm text-text-muted font-mono">{t('category_chips.loading')}</p>
       ) : (
         <div className="flex flex-wrap gap-2">
           {visibleCategories.map((cat, index) => {
@@ -50,7 +50,7 @@ export default function CategoryChips({ categories, selected, onChange, disabled
                 onClick={() => toggle(cat.id)}
                 disabled={disabled || isDisabled}
                 style={{ animationDelay: `${index * 30}ms` }}
-                className={`animate-chip px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
+                className={`animate-chip px-3 py-1.5 text-caption font-medium rounded-pill border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
                   isSelected
                     ? 'bg-accent text-bg border-accent'
                     : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
@@ -67,7 +67,7 @@ export default function CategoryChips({ categories, selected, onChange, disabled
               onClick={() => setIsModalOpen(true)}
               disabled={disabled}
               style={{ animationDelay: `${Math.min(VISIBLE_LIMIT, 12) * 30}ms` }}
-              className="animate-chip inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
+              className="animate-chip inline-flex items-center gap-1 px-3 py-1.5 text-caption font-medium rounded-pill border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
             >
               <Icon.Plus className="w-3 h-3" />
               {t('category_chips.more', { count: categories.length - VISIBLE_LIMIT })}
@@ -76,7 +76,7 @@ export default function CategoryChips({ categories, selected, onChange, disabled
         </div>
       )}
 
-      <p className="mt-1.5 text-[11px] text-text-muted/70 font-mono">
+      <p className="mt-1.5 text-mono-sm text-text-muted/70 font-mono">
         {t('category_chips.hint', { max: MAX_SELECTION })}
       </p>
 

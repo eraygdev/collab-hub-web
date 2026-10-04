@@ -22,7 +22,7 @@ export const tr = {
       history_remove: '"{{query}}" aramasını sil',
       no_results: "Sonuç bulunamadı",
       searching_hint: "aranıyor...",
-      results_hint: "{{count}} proje bulundu · aşağıda",
+      results_hint: "{{count}} proje bulundu · kaydır",
       no_results_hint: "sonuç bulunamadı",
     },
     quick: {
@@ -278,34 +278,89 @@ export const tr = {
   settings: {
     title: "Ayarlar.",
     subtitle: "Hesap bilgilerini ve tercihlerini yönet.",
-    section: {
-      profile: "/profil bilgileri",
+
+    // Sidebar navigasyon
+    nav: {
+      account: "Hesap",
+      appearance: "Görünüm",
+      notifications: "Bildirimler",
+      danger: "Tehlikeli Bölge",
     },
-    avatar_label: "Profil fotoğrafı",
-    avatar_hint: "GitHub hesabından otomatik geliyor.",
-    username_label: "Kullanıcı Adı",
-    email_label: "E-posta",
-    email_hint: "GitHub hesabından geliyor, değiştirilemez.",
-    bio_label: "Hakkımda",
-    bio_placeholder: "Kendinden kısaca bahset...",
-    submitting: "kaydediliyor...",
-    submit: "değişiklikleri kaydet",
-    success: "Profil başarıyla güncellendi.",
-    error: {
-      empty_username: "Kullanıcı adı boş olamaz.",
-      username_too_long: "Kullanıcı adı en fazla {{max}} karakter olabilir.",
-      bio_too_long: "Hakkımda en fazla {{max}} karakter olabilir.",
-      username_taken: "Bu kullanıcı adı zaten alınmış",
-      generic: "Bir hata oluştu",
-      network: "Sunucuya bağlanılamadı",
+
+    // Account sayfası
+    account: {
+      title: "Hesap",
+      subtitle: "Profil bilgilerini yönet.",
+      section: {
+        profile: "/profil bilgileri",
+      },
+      avatar_label: "Profil fotoğrafı",
+      avatar_hint: "GitHub hesabından otomatik geliyor.",
+      username_label: "Kullanıcı Adı",
+      email_label: "E-posta",
+      email_hint: "GitHub hesabından geliyor, değiştirilemez.",
+      bio_label: "Hakkımda",
+      bio_placeholder: "Kendinden kısaca bahset...",
+      submitting: "kaydediliyor...",
+      submit: "değişiklikleri kaydet",
+      success: "Profil başarıyla güncellendi.",
+      error: {
+        empty_username: "Kullanıcı adı boş olamaz.",
+        username_too_long: "Kullanıcı adı en fazla {{max}} karakter olabilir.",
+        bio_too_long: "Hakkımda en fazla {{max}} karakter olabilir.",
+        username_taken: "Bu kullanıcı adı zaten alınmış",
+        generic: "Bir hata oluştu",
+        network: "Sunucuya bağlanılamadı",
+      },
     },
+
+    // Appearance sayfası
+    appearance: {
+      title: "Görünüm",
+      subtitle: "Collab-Hub'un görünümünü özelleştir.",
+      language_section: "/dil",
+      language_label: "Arayüz dili",
+      language_hint: "Arayüz için dili seç.",
+      scale_section: "/yazı boyutu",
+      scale_label: "Yazı boyutu",
+      scale_hint: "Uygulamadaki metin ve boşlukların boyutunu ayarla.",
+      scale_small: "Küçük",
+      scale_medium: "Orta",
+      scale_large: "Büyük",
+      theme_section: "/tema",
+      theme_label: "Tema",
+      theme_hint: "Collab-Hub şu an sadece koyu temayı destekliyor.",
+      theme_locked: "koyu (kilitli)",
+    },
+
+    // Notifications sayfası
+    notifications: {
+      title: "Bildirimler",
+      subtitle: "Nelerden haberdar olmak istediğini seç.",
+      coming_soon_title: "yakında",
+      coming_soon_desc: "Bildirim tercihleri yakında kullanılabilir olacak.",
+    },
+
+    // Danger sayfası
     danger: {
-      title: "/tehlikeli bölge",
+      title: "Tehlikeli Bölge",
+      subtitle: "Geri alınamaz ve yıkıcı işlemler.",
+      section: "/hesabı sil",
       desc: "Hesabını sildiğinde tüm projelerin ve verilerin kalıcı olarak silinir.",
       button: "hesabı sil (yakında)",
     },
-  },
 
+    // Sidebar navigasyon
+    nav: {
+      account: "Hesap",
+      appearance: "Görünüm",
+      notifications: "Bildirimler",
+      danger: "Tehlikeli Bölge",
+    },
+
+    // Mobil menü butonu
+    menu_aria: "Ayarlar menüsünü aç",
+  },
   // ─── AUTH ───
   auth: {
     loading: "Yükleniyor...",

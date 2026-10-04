@@ -8,7 +8,7 @@ const SidebarLink = ({ to, label, onClose, children }) => (
   <Link
     to={to}
     onClick={onClose}
-    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-text-muted hover:text-text hover:bg-surface border border-transparent hover:border-accent/10 rounded-xl transition-all"
+    className="flex items-center gap-3 px-4 py-3 text-body-sm font-medium text-text-muted hover:text-text hover:bg-surface border border-transparent hover:border-accent/10 rounded-card transition-all"
   >
     <span className="text-text-muted">{children}</span>
     {label}
@@ -49,12 +49,12 @@ export default function Sidebar({ isOpen, onClose }) {
       >
         {/* Header — navbar ile aynı yükseklik */}
         <div className="h-14 px-5 flex items-center justify-between border-b border-accent/10 shrink-0">
-          <span className="font-sans text-sm font-semibold text-text tracking-tight">
+          <span className="font-sans text-body-sm font-semibold text-text tracking-tight">
             {t('sidebar.title')}
           </span>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
+            className="p-2 rounded-button text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
             aria-label={t('sidebar.aria.close')}
           >
             <Icon.Close className="w-5 h-5" />
@@ -100,7 +100,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Alt bant */}
         <div className="px-5 py-4 border-t border-accent/10 shrink-0">
-          <p className="text-[10px] text-text-muted font-mono uppercase tracking-wider">
+          <p className="text-mono-sm text-text-muted font-mono uppercase tracking-wider">
             {t('sidebar.brand')}
           </p>
         </div>

@@ -27,7 +27,7 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && navigate(`/project/${project.id}`)}
-      className="group/card bg-surface border border-accent/10 rounded-2xl overflow-hidden hover:border-accent/40 hover:shadow-[0_0_30px_-8px_rgba(239,228,206,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="group/card bg-surface border border-accent/10 rounded-card overflow-hidden hover:border-accent/40 hover:shadow-[0_0_30px_-8px_rgba(239,228,206,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       {/* Kapak görseli */}
       <div
@@ -51,29 +51,29 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
         )}
 
         {/* Yıldız badge */}
-{project.stars !== undefined && (
-  <div
-    className={`absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono font-semibold rounded-full border backdrop-blur-md transition-all ${
-      project.starred
-        ? 'text-accent bg-bg/75 border-accent/60 shadow-[0_0_12px_-2px_rgba(239,228,206,0.35)]'
-        : 'text-text-muted bg-bg/75 border-accent/25'
-    }`}
-  >
-    {project.starred ? (
-      <Icon.StarFilled className="w-3 h-3 text-accent drop-shadow-[0_0_4px_rgba(239,228,206,0.7)]" />
-    ) : (
-      <Icon.Star className="w-3 h-3" />
-    )}
-    <span className="tabular-nums">{project.stars}</span>
-  </div>
-)}
+        {project.stars !== undefined && (
+          <div
+            className={`absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 text-mono-sm font-mono font-semibold rounded-pill border backdrop-blur-md transition-all ${
+              project.starred
+                ? 'text-accent bg-bg/75 border-accent/60 shadow-[0_0_12px_-2px_rgba(239,228,206,0.35)]'
+                : 'text-text-muted bg-bg/75 border-accent/25'
+            }`}
+          >
+            {project.starred ? (
+              <Icon.StarFilled className="w-3 h-3 text-accent drop-shadow-[0_0_4px_rgba(239,228,206,0.7)]" />
+            ) : (
+              <Icon.Star className="w-3 h-3" />
+            )}
+            <span className="tabular-nums">{project.stars}</span>
+          </div>
+        )}
       </div>
 
       <div className={`${compact ? 'p-3' : 'p-4'} flex flex-col flex-1`}>
         {/* Yazar */}
         {!compact && showAuthor && project.author && (
           <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-4 h-4 rounded-full bg-bg border border-accent/20 overflow-hidden shrink-0">
+            <div className="w-4 h-4 rounded-pill bg-bg border border-accent/20 overflow-hidden shrink-0">
               {project.authorAvatar ? (
                 <img
                   src={project.authorAvatar}
@@ -98,7 +98,7 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
                 e.stopPropagation();
                 navigate(`/profile/${project.author}`);
               }}
-              className="text-xs text-text-muted hover:text-text transition-colors truncate cursor-pointer font-mono"
+              className="text-caption text-text-muted hover:text-text transition-colors truncate cursor-pointer font-mono"
             >
               {project.author}
             </span>
@@ -109,8 +109,8 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
         <h3
           className={`font-bold text-text tracking-tight ${
             compact
-              ? 'text-sm line-clamp-2 min-h-[2.5rem] mb-2'
-              : 'text-base line-clamp-2 min-h-[3rem] mb-2'
+              ? 'text-body-sm line-clamp-2 min-h-[2.5rem] mb-2'
+              : 'text-body line-clamp-2 min-h-[3rem] mb-2'
           }`}
         >
           {project.title}
@@ -118,7 +118,7 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
 
         {/* Açıklama */}
         {!compact && (
-          <p className="text-sm text-text-muted line-clamp-2 leading-relaxed mb-4">
+          <p className="text-body-sm text-text-muted line-clamp-2 leading-relaxed mb-4">
             {project.description}
           </p>
         )}
@@ -133,8 +133,8 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
             <span
               key={index}
               className={`${
-                compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
-              } font-mono text-text-muted bg-bg/60 border border-accent/15 rounded-full shrink-0`}
+                compact ? 'px-1.5 py-0.5 text-mono-sm' : 'px-2.5 py-1 text-caption'
+              } font-mono text-text-muted bg-bg/60 border border-accent/15 rounded-pill shrink-0`}
             >
               {cat}
             </span>
@@ -143,8 +143,8 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
           {hiddenCount > 0 && (
             <span
               className={`${
-                compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'
-              } font-mono font-semibold text-text bg-bg border border-accent/20 rounded-full shrink-0`}
+                compact ? 'px-1.5 py-0.5 text-mono-sm' : 'px-2 py-1 text-caption'
+              } font-mono font-semibold text-text bg-bg border border-accent/20 rounded-pill shrink-0`}
             >
               +{hiddenCount}
             </span>

@@ -39,13 +39,13 @@ export default function JoinRequestModal({
       aria-modal="true"
     >
       <div
-        className="w-full max-w-md bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden animate-modal-in"
+        className="w-full max-w-md bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-accent/10 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text">{t('join_request.title')}</h2>
-            <p className="text-xs text-text-muted mt-0.5 truncate max-w-[280px] font-mono">
+            <h2 className="text-h5 font-bold text-text">{t('join_request.title')}</h2>
+            <p className="text-caption text-text-muted mt-0.5 truncate max-w-[280px] font-mono">
               {projectTitle}
             </p>
           </div>
@@ -53,7 +53,7 @@ export default function JoinRequestModal({
             type="button"
             onClick={handleCancel}
             disabled={submitting}
-            className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
+            className="p-2 rounded-button text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
             aria-label={t('category_picker.close')}
           >
             <Icon.Close className="w-5 h-5" />
@@ -61,21 +61,21 @@ export default function JoinRequestModal({
         </div>
 
         <div className="px-6 py-5">
-          <p className="text-sm text-text leading-relaxed mb-4">
+          <p className="text-body-sm text-text leading-relaxed mb-4">
             {t('join_request.desc')}
           </p>
 
           {isPremium ? (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="join-message" className="block text-xs font-medium text-text">
+                <label htmlFor="join-message" className="block text-caption font-medium text-text">
                   {t('join_request.premium_label')}{' '}
                   <span className="text-accent font-semibold">
                     {t('join_request.premium_badge')}
                   </span>
                 </label>
                 <span
-                  className={`text-[11px] tabular-nums font-mono ${
+                  className={`text-mono-sm tabular-nums font-mono ${
                     isOverLimit ? 'text-red-400 font-semibold' : 'text-text-muted'
                   }`}
                 >
@@ -90,18 +90,18 @@ export default function JoinRequestModal({
                 rows={4}
                 maxLength={MAX_MESSAGE + 50}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                className={`w-full px-3.5 py-2.5 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
                   isOverLimit ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
-              <p className="mt-1 text-[11px] text-text-muted">
+              <p className="mt-1 text-mono-sm text-text-muted">
                 {t('join_request.message_hint')}
               </p>
             </div>
           ) : (
-            <div className="flex items-start gap-2.5 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <div className="flex items-start gap-2.5 p-3 bg-amber-500/10 border border-amber-500/20 rounded-button">
               <Icon.Sparkles className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-200/90 leading-relaxed">
+              <p className="text-caption text-amber-200/90 leading-relaxed">
                 <strong className="text-amber-200">
                   {t('join_request.premium_warning_strong')}
                 </strong>{' '}
@@ -116,7 +116,7 @@ export default function JoinRequestModal({
             type="button"
             onClick={handleCancel}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 text-body-sm font-semibold text-text bg-transparent border border-accent/20 rounded-button hover:bg-bg transition-colors cursor-pointer disabled:opacity-50"
           >
             {t('join_request.cancel')}
           </button>
@@ -124,7 +124,7 @@ export default function JoinRequestModal({
             type="button"
             onClick={handleConfirm}
             disabled={submitting || isOverLimit}
-            className="px-4 py-2 text-sm font-semibold text-bg bg-accent rounded-lg hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-body-sm font-semibold text-bg bg-accent rounded-button hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? t('join_request.submitting') : t('join_request.submit')}
           </button>

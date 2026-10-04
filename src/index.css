@@ -9,10 +9,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Carter+One&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 /* ─────────────────────────────────────────────────────────
+   ROOT — Runtime değişkenleri
+───────────────────────────────────────────────────────── */
+:root {
+  --scale-factor: 1;
+
+  color-scheme: dark;
+}
+
+/* ─────────────────────────────────────────────────────────
    DESIGN TOKENS (Tailwind v4 @theme)
 ───────────────────────────────────────────────────────── */
 @theme {
-  /* Renkler */
+  /* ═══════════════ RENKLER ═══════════════ */
   --color-bg: #161a22;
   --color-surface: #252a33;
   --color-surface-hover: #2e3440;
@@ -27,19 +36,57 @@
   --color-danger: #e57373;
   --color-success: #81c784;
 
-  /* Fontlar */
+  /* ═══════════════ FONTLAR ═══════════════ */
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --font-display: "Carter One", "Inter", system-ui, sans-serif;
-}
 
-/* ─────────────────────────────────────────────────────────
-   COLOR SCHEME — Dark only
-   Tarayıcı ve eklentilerin (Dark Reader vs) site rengini
-   otomatik değiştirmesini engeller.
-───────────────────────────────────────────────────────── */
-:root {
-  color-scheme: dark;
+  /* ═══════════════ TİPOGRAFİ ═══════════════ */
+  --text-h1: calc(3rem * var(--scale-factor));
+  --text-h1--line-height: 1.05;
+
+  --text-h2: calc(2.25rem * var(--scale-factor));
+  --text-h2--line-height: 1.1;
+
+  --text-h3: calc(1.875rem * var(--scale-factor));
+  --text-h3--line-height: 1.15;
+
+  --text-h4: calc(1.5rem * var(--scale-factor));
+  --text-h4--line-height: 1.2;
+
+  --text-h5: calc(1.25rem * var(--scale-factor));
+  --text-h5--line-height: 1.3;
+
+  --text-body-lg: calc(1.125rem * var(--scale-factor));
+  --text-body-lg--line-height: 1.6;
+
+  --text-body: calc(1rem * var(--scale-factor));
+  --text-body--line-height: 1.6;
+
+  --text-body-sm: calc(0.875rem * var(--scale-factor));
+  --text-body-sm--line-height: 1.5;
+
+  --text-caption: calc(0.75rem * var(--scale-factor));
+  --text-caption--line-height: 1.4;
+
+  --text-mono-sm: calc(0.6875rem * var(--scale-factor));
+  --text-mono-sm--line-height: 1.4;
+
+  /* ═══════════════ SPACING ═══════════════ */
+  --spacing-page: calc(2.5rem * var(--scale-factor));
+  --spacing-hero: calc(5rem * var(--scale-factor));
+  --spacing-section: calc(3rem * var(--scale-factor));
+  --spacing-block: calc(2rem * var(--scale-factor));
+
+  /* ═══════════════ RADIUS ═══════════════ */
+  --radius-button: 0.5rem;
+  --radius-card: 1rem;
+  --radius-pill: 9999px;
+
+  /* ═══════════════ CONTAINER GENİŞLİĞİ ═══════════════ */
+  --container-narrow: 42rem;
+  --container-default: 64rem;
+  --container-wide: 80rem;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -87,7 +134,6 @@ body {
   animation: page-enter 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* prefers-reduced-motion → animasyonu kapat (a11y) */
 @media (prefers-reduced-motion: reduce) {
   .animate-page-enter {
     animation: none;
@@ -113,7 +159,6 @@ body {
   animation: bounce-slow 2s ease-in-out infinite;
 }
 
-/* prefers-reduced-motion → animasyon kapat */
 @media (prefers-reduced-motion: reduce) {
   .animate-bounce-slow {
     animation: none;
@@ -189,10 +234,8 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────
-   MODAL ANIMASYONLARI
+   MODAL ANİMASYONLARI
 ───────────────────────────────────────────────────────── */
-
-/* Overlay — fade in */
 @keyframes overlay-in {
   from {
     opacity: 0;
@@ -206,7 +249,6 @@ body {
   animation: overlay-in 180ms ease-out;
 }
 
-/* Modal kartı — fade + scale (merkezden) */
 @keyframes modal-in {
   from {
     opacity: 0;
@@ -223,7 +265,6 @@ body {
   transform-origin: center center;
 }
 
-/* prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-overlay-in,
   .animate-modal-in {

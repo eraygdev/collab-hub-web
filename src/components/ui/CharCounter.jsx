@@ -17,7 +17,7 @@ export default function CharCounter({ value = '', max, id }) {
   return (
     <span
       id={id}
-      className={`text-[11px] tabular-nums font-mono transition-colors ${
+      className={`text-mono-sm tabular-nums font-mono transition-colors ${
         isOverLimit
           ? 'text-red-400 font-semibold'
           : isNearLimit

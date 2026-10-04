@@ -16,7 +16,7 @@ export default function PageBreadcrumb({ items = [] }) {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex items-center gap-2 text-sm mb-6 font-mono flex-wrap"
+      className="flex items-center gap-2 text-body-sm mb-6 font-mono flex-wrap"
     >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
@@ -24,13 +24,11 @@ export default function PageBreadcrumb({ items = [] }) {
         return (
           <div key={index} className="flex items-center gap-2">
             {isLast ? (
-              // Aktif sayfa — pulse nokta + tıklanamaz
               <span className="inline-flex items-center gap-2 text-text font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
                 {item.label}
               </span>
             ) : (
-              // Tıklanabilir link
               <Link
                 to={item.to}
                 className="text-text-muted hover:text-text transition-colors underline-offset-4 hover:underline"
@@ -39,7 +37,6 @@ export default function PageBreadcrumb({ items = [] }) {
               </Link>
             )}
 
-            {/* Ayraç */}
             {!isLast && <span className="text-accent/30 select-none">/</span>}
           </div>
         );

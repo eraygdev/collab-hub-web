@@ -18,7 +18,7 @@ export default function InputClearButton({
       type="button"
       onClick={onClick}
       tabIndex={-1}
-      className={`absolute right-2.5 top-1/2 -translate-y-1/2 ${padding} rounded-md text-text-muted hover:text-text hover:bg-bg/60 transition-colors cursor-pointer z-10 ${className}`}
+      className={`absolute right-2.5 top-1/2 -translate-y-1/2 ${padding} rounded-button text-text-muted hover:text-text hover:bg-bg/60 transition-colors cursor-pointer z-10 ${className}`}
       aria-label={ariaLabel}
     >
       <Icon.Close className={iconSize} />

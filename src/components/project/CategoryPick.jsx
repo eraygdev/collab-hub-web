@@ -126,15 +126,15 @@ export default function CategoryPick({
       aria-modal="true"
     >
       <div
-        className="w-full max-w-lg bg-surface border border-accent/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-modal-in"
+        className="w-full max-w-lg bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-accent/10 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-text">{t('category_picker.title')}</h2>
+            <h2 className="text-h5 font-bold text-text">{t('category_picker.title')}</h2>
             {maxSelection && (
-              <p className="text-xs text-text-muted mt-0.5 font-mono">
+              <p className="text-caption text-text-muted mt-0.5 font-mono">
                 {t('category_picker.max_info', { max: maxSelection, count: tempSelection.length })}
               </p>
             )}
@@ -142,7 +142,7 @@ export default function CategoryPick({
           <button
             type="button"
             onClick={handleCancel}
-            className="p-2 rounded-lg text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
+            className="p-2 rounded-button text-text-muted hover:text-text hover:bg-bg transition-colors cursor-pointer"
             aria-label={t('category_picker.close')}
           >
             <Icon.Close className="w-5 h-5" />
@@ -152,7 +152,7 @@ export default function CategoryPick({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {loading && (
-            <div className="text-center py-10 text-sm text-text-muted font-mono">
+            <div className="text-center py-10 text-body-sm text-text-muted font-mono">
               {t('category_picker.loading')}
             </div>
           )}
@@ -160,45 +160,45 @@ export default function CategoryPick({
           {error && !loading && (
             <div className="text-center py-10">
               <Icon.Warning className="w-10 h-10 text-text-muted mx-auto mb-2" />
-              <p className="text-sm text-red-400 mb-1">{error}</p>
-              <p className="text-xs text-text-muted">
+              <p className="text-body-sm text-red-400 mb-1">{error}</p>
+              <p className="text-caption text-text-muted">
                 {t('category_picker.error_hint')}
               </p>
             </div>
           )}
 
           {!loading && !error && categories.length === 0 && (
-            <div className="text-center py-10 text-sm text-text-muted">
+            <div className="text-center py-10 text-body-sm text-text-muted">
               {t('category_picker.empty')}
             </div>
           )}
 
           {!loading && !error && categories.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat, index) => {
-              const isSelected = tempSelection.includes(cat.id);
-              const isDisabled =
-                !isSelected && maxSelection && tempSelection.length >= maxSelection;
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat, index) => {
+                const isSelected = tempSelection.includes(cat.id);
+                const isDisabled =
+                  !isSelected && maxSelection && tempSelection.length >= maxSelection;
 
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => toggle(cat.id)}
-                  disabled={isDisabled}
-                  style={{ animationDelay: `${Math.min(index, 15) * 25}ms` }}
-                  className={`animate-chip px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
-                    isSelected
-                      ? 'bg-accent text-bg border-accent'
-                      : 'bg-bg text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
-          </div>
-        )}
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => toggle(cat.id)}
+                    disabled={isDisabled}
+                    style={{ animationDelay: `${Math.min(index, 15) * 25}ms` }}
+                    className={`animate-chip px-3 py-1.5 text-caption font-medium rounded-pill border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
+                      isSelected
+                        ? 'bg-accent text-bg border-accent'
+                        : 'bg-bg text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -206,7 +206,7 @@ export default function CategoryPick({
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 text-sm font-semibold text-text bg-transparent border border-accent/20 rounded-lg hover:bg-bg transition-colors cursor-pointer"
+            className="px-4 py-2 text-body-sm font-semibold text-text bg-transparent border border-accent/20 rounded-button hover:bg-bg transition-colors cursor-pointer"
           >
             {t('category_picker.cancel')}
           </button>
@@ -214,7 +214,7 @@ export default function CategoryPick({
             type="button"
             onClick={handleConfirm}
             disabled={loading}
-            className="px-4 py-2 text-sm font-semibold text-bg bg-accent rounded-lg hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-body-sm font-semibold text-bg bg-accent rounded-button hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('category_picker.confirm', { count: tempSelection.length })}
           </button>

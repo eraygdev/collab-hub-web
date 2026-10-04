@@ -60,7 +60,7 @@ function ToastItem({ toast, onClose }) {
     <div
       onClick={() => onClose(toast.id)}
       role="alert"
-      className={`animate-toast-in group flex items-start gap-3 w-full sm:w-80 px-4 py-3 bg-surface border ${styles.border} rounded-xl shadow-2xl cursor-pointer hover:shadow-[0_0_30px_-8px_rgba(239,228,206,0.2)] transition-all`}
+      className={`animate-toast-in group flex items-start gap-3 w-full sm:w-80 px-4 py-3 bg-surface border ${styles.border} rounded-card shadow-2xl cursor-pointer hover:shadow-[0_0_30px_-8px_rgba(239,228,206,0.2)] transition-all`}
     >
       {/* İkon */}
       <span className={`shrink-0 mt-0.5 ${styles.icon}`}>
@@ -68,7 +68,7 @@ function ToastItem({ toast, onClose }) {
       </span>
 
       {/* Mesaj */}
-      <p className="flex-1 text-sm text-text leading-snug font-mono break-words">
+      <p className="flex-1 text-body-sm text-text leading-snug font-mono break-words">
         {toast.message}
       </p>
 
@@ -135,7 +135,7 @@ export function ToastProvider({ children }) {
     []
   );
 
-  // Cleanup — component unmount olunca tüm timer'ları temizle
+  // Cleanup
   useEffect(() => {
     return () => {
       timersRef.current.forEach((timer) => clearTimeout(timer));

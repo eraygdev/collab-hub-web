@@ -42,13 +42,13 @@ export default function ImagePreview({ url, debouncedUrl }) {
 
   if (status === 'loading') {
     return (
-      <div className="mt-2 w-full h-40 bg-surface border border-accent/10 rounded-lg animate-pulse" />
+      <div className="mt-2 w-full h-40 bg-surface border border-accent/10 rounded-button animate-pulse" />
     );
   }
 
   if (status === 'error') {
     return (
-      <p className="mt-2 text-xs text-red-400 font-mono inline-flex items-center gap-1.5">
+      <p className="mt-2 text-caption text-red-400 font-mono inline-flex items-center gap-1.5">
         <Icon.Warning className="w-3 h-3" />
         {t('image_preview.error')}
       </p>
@@ -63,7 +63,7 @@ export default function ImagePreview({ url, debouncedUrl }) {
       decoding="async"
       width="800"
       height="450"
-      className="mt-2 w-full max-h-56 object-cover rounded-lg border border-accent/15"
+      className="mt-2 w-full max-h-56 object-cover rounded-button border border-accent/15"
     />
   );
 }

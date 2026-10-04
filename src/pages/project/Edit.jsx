@@ -242,7 +242,7 @@ export default function EditProject() {
   if (authLoading || loading) {
     return (
       <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
+        <p className="text-body-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
       </div>
     );
   }
@@ -252,7 +252,7 @@ export default function EditProject() {
   if (error && !form.title) {
     return (
       <div className="w-full bg-bg min-h-screen">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="max-w-narrow mx-auto px-4 sm:px-6 lg:px-8 py-hero">
           <PageBreadcrumb
             items={[
               { label: t('breadcrumb.home'), to: '/' },
@@ -260,14 +260,14 @@ export default function EditProject() {
               { label: t('breadcrumb.edit') },
             ]}
           />
-          <div className="text-center py-16 rounded-2xl bg-surface/30 border border-dashed border-accent/20">
+          <div className="text-center py-16 rounded-card bg-surface/30 border border-dashed border-accent/20">
             <Icon.Warning className="w-12 h-12 text-text-muted mx-auto mb-3" />
-            <h2 className="text-lg font-bold text-text mb-1 font-mono">
+            <h2 className="text-h5 font-bold text-text mb-1 font-mono">
               {t('edit.not_found_title')}
             </h2>
             <Link
               to="/"
-              className="inline-block mt-5 px-5 py-2.5 text-sm font-bold bg-accent text-bg rounded-lg hover:bg-accent/90 transition-all font-mono"
+              className="inline-block mt-5 px-5 py-2.5 text-body-sm font-bold bg-accent text-bg rounded-button hover:bg-accent/90 transition-all font-mono"
             >
               {t('edit.back_home')}
             </Link>
@@ -279,7 +279,7 @@ export default function EditProject() {
 
   return (
     <div className="w-full bg-bg min-h-screen">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-narrow mx-auto px-4 sm:px-6 lg:px-8 py-page">
 
         <PageBreadcrumb
           items={[
@@ -290,22 +290,22 @@ export default function EditProject() {
         />
 
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text mb-2 tracking-tight">
+          <h1 className="text-h3 font-extrabold text-text mb-2 tracking-tight">
             {t('edit.title')}
           </h1>
-          <p className="text-sm text-text-muted">
+          <p className="text-body-sm text-text-muted">
             {t('edit.subtitle')}
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-5 bg-surface border border-accent/10 rounded-2xl p-6 sm:p-8"
+          className="space-y-5 bg-surface border border-accent/10 rounded-card p-6 sm:p-8"
         >
           {/* Title */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="title" className="block text-xs font-medium text-text">
+              <label htmlFor="title" className="block text-caption font-medium text-text">
                 {t('create.title_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.title} max={limits.title.max} id="title-counter" />
@@ -319,7 +319,7 @@ export default function EditProject() {
                 onChange={handleTitleChange}
                 required
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('title') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -331,7 +331,7 @@ export default function EditProject() {
           {/* Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="description" className="block text-xs font-medium text-text">
+              <label htmlFor="description" className="block text-caption font-medium text-text">
                 {t('create.description_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.description} max={limits.description.max} id="description-counter" />
@@ -345,7 +345,7 @@ export default function EditProject() {
                 required
                 rows={3}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
                   overLimit('description') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -361,7 +361,7 @@ export default function EditProject() {
           {/* Long Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="longDescription" className="block text-xs font-medium text-text">
+              <label htmlFor="longDescription" className="block text-caption font-medium text-text">
                 {t('create.long_description_label')}
               </label>
               <CharCounter value={form.longDescription} max={limits.longDescription.max} id="long-description-counter" />
@@ -374,7 +374,7 @@ export default function EditProject() {
                 onChange={handleTextChange}
                 rows={6}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all resize-y disabled:opacity-50 ${
                   overLimit('longDescription') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -397,7 +397,7 @@ export default function EditProject() {
           {/* GitHub URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="githubUrl" className="block text-xs font-medium text-text">
+              <label htmlFor="githubUrl" className="block text-caption font-medium text-text">
                 {t('create.github_label')}
               </label>
               <CharCounter value={form.githubUrl} max={limits.githubUrl.max} id="github-url-counter" />
@@ -410,7 +410,7 @@ export default function EditProject() {
                 value={form.githubUrl}
                 onChange={handleUrlChange}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -421,7 +421,7 @@ export default function EditProject() {
           {/* Demo URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="demoUrl" className="block text-xs font-medium text-text">
+              <label htmlFor="demoUrl" className="block text-caption font-medium text-text">
                 {t('create.demo_label')}
               </label>
               <CharCounter value={form.demoUrl} max={limits.demoUrl.max} id="demo-url-counter" />
@@ -434,7 +434,7 @@ export default function EditProject() {
                 value={form.demoUrl}
                 onChange={handleUrlChange}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('demoUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -445,7 +445,7 @@ export default function EditProject() {
           {/* Image URL */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="imageUrl" className="block text-xs font-medium text-text">
+              <label htmlFor="imageUrl" className="block text-caption font-medium text-text">
                 {t('create.image_label')}
               </label>
               <CharCounter value={form.imageUrl} max={limits.imageUrl.max} id="image-url-counter" />
@@ -458,7 +458,7 @@ export default function EditProject() {
                 value={form.imageUrl}
                 onChange={handleUrlChange}
                 disabled={submitting}
-                className={`w-full px-3.5 py-2.5 pr-10 text-sm bg-bg border rounded-lg text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
+                className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('imageUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
@@ -470,7 +470,7 @@ export default function EditProject() {
           {error && (
             <div
               role="alert"
-              className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
+              className="text-body-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
               <Icon.Warning className="w-4 h-4 shrink-0" />
               {error}
@@ -480,7 +480,7 @@ export default function EditProject() {
           {success && (
             <div
               role="status"
-              className="text-sm text-accent bg-accent/10 border border-accent/20 rounded-lg px-4 py-2.5 font-mono inline-flex items-center gap-2"
+              className="text-body-sm text-accent bg-accent/10 border border-accent/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
             >
               <Icon.Check className="w-4 h-4 shrink-0" />
               {t('edit.success')}
@@ -492,14 +492,14 @@ export default function EditProject() {
               type="button"
               onClick={() => navigate(`/project/${id}`)}
               disabled={submitting}
-              className="flex-1 px-5 py-3 bg-transparent text-text text-sm font-semibold rounded-lg border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 font-mono"
+              className="flex-1 px-5 py-3 bg-transparent text-text text-body-sm font-semibold rounded-button border border-accent/20 hover:bg-bg hover:border-accent/40 transition-all cursor-pointer disabled:opacity-50 font-mono"
             >
               {t('edit.cancel')}
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-5 py-3 bg-accent text-bg text-sm font-bold rounded-lg border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
+              className="flex-1 px-5 py-3 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
               {submitting ? t('edit.submitting') : t('edit.submit')}
             </button>

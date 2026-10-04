@@ -279,29 +279,77 @@ export const en = {
   settings: {
     title: "Settings.",
     subtitle: "Manage your account information and preferences.",
-    section: {
-      profile: "/profile information",
+
+    // Sidebar navigasyon
+    nav: {
+      account: "Account",
+      appearance: "Appearance",
+      notifications: "Notifications",
+      danger: "Danger Zone",
     },
-    avatar_label: "Profile picture",
-    avatar_hint: "Automatically from your GitHub account.",
-    username_label: "Username",
-    email_label: "Email",
-    email_hint: "Comes from your GitHub account, cannot be changed.",
-    bio_label: "About",
-    bio_placeholder: "Tell us a bit about yourself...",
-    submitting: "saving...",
-    submit: "save changes",
-    success: "Profile updated successfully.",
-    error: {
-      empty_username: "Username cannot be empty.",
-      username_too_long: "Username can be at most {{max}} characters.",
-      bio_too_long: "About section can be at most {{max}} characters.",
-      username_taken: "This username is already taken.",
-      generic: "Something went wrong",
-      network: "Couldn't connect to server",
+
+    // Mobil menü butonu
+    menu_aria: "Open settings menu",
+
+    // Account sayfası
+    account: {
+      title: "Account",
+      subtitle: "Manage your profile information.",
+      section: {
+        profile: "/profile information",
+      },
+      avatar_label: "Profile picture",
+      avatar_hint: "Automatically from your GitHub account.",
+      username_label: "Username",
+      email_label: "Email",
+      email_hint: "Comes from your GitHub account, cannot be changed.",
+      bio_label: "About",
+      bio_placeholder: "Tell us a bit about yourself...",
+      submitting: "saving...",
+      submit: "save changes",
+      success: "Profile updated successfully.",
+      error: {
+        empty_username: "Username cannot be empty.",
+        username_too_long: "Username can be at most {{max}} characters.",
+        bio_too_long: "About section can be at most {{max}} characters.",
+        username_taken: "This username is already taken.",
+        generic: "Something went wrong",
+        network: "Couldn't connect to server",
+      },
     },
+
+    // Appearance sayfası
+    appearance: {
+      title: "Appearance",
+      subtitle: "Customize how Collab-Hub looks and feels.",
+      language_section: "/language",
+      language_label: "Interface language",
+      language_hint: "Choose the language for the interface.",
+      scale_section: "/text size",
+      scale_label: "Text size",
+      scale_hint: "Adjust the size of text and spacing across the app.",
+      scale_small: "Small",
+      scale_medium: "Medium",
+      scale_large: "Large",
+      theme_section: "/theme",
+      theme_label: "Theme",
+      theme_hint: "Collab-Hub currently only supports dark mode.",
+      theme_locked: "dark (locked)",
+    },
+
+    // Notifications sayfası
+    notifications: {
+      title: "Notifications",
+      subtitle: "Choose what you want to be notified about.",
+      coming_soon_title: "coming soon",
+      coming_soon_desc: "Notification preferences will be available soon.",
+    },
+
+    // Danger sayfası
     danger: {
-      title: "/danger zone",
+      title: "Danger Zone",
+      subtitle: "Irreversible and destructive actions.",
+      section: "/delete account",
       desc: "When you delete your account, all your projects and data are permanently deleted.",
       button: "delete account (coming soon)",
     },

@@ -29,7 +29,7 @@ export default function CharWarning({
   const text = message || t('errors.invalid_char', { char });
 
   return (
-    <p role="alert" className={`text-[11px] ${styles[type]} ${className} font-mono`}>
+    <p role="alert" className={`text-mono-sm ${styles[type]} ${className} font-mono`}>
       {icons[type]} {text}
     </p>
   );

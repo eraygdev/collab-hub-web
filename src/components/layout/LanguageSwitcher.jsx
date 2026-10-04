@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer font-mono"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-caption font-medium rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer font-mono"
         aria-label={t('language_switcher.aria')}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -48,7 +48,7 @@ export default function LanguageSwitcher() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-40 bg-surface border border-accent/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-dropdown"
+          className="absolute right-0 mt-2 w-40 bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden z-[100] animate-dropdown"
         >
           {LANGS.map((l) => {
             const isActive = l.code === lang;
@@ -60,14 +60,14 @@ export default function LanguageSwitcher() {
                   setLang(l.code);
                   setOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-sm transition-colors cursor-pointer font-mono ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-body-sm transition-colors cursor-pointer font-mono ${
                   isActive
                     ? 'text-accent bg-accent/5'
                     : 'text-text-muted hover:text-text hover:bg-bg/60'
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold tracking-wider opacity-60">
+                  <span className="text-mono-sm font-bold tracking-wider opacity-60">
                     {l.short}
                   </span>
                   <span>{l.label}</span>
