@@ -20,6 +20,8 @@ const FALLBACK_LIMITS = {
   maxProjectsPerPage: 20,
   maxUsersPerSearch: 5,
   visibleCategories: 12,  // frontend-specific
+  allowedContributorLimits: [5, 10, 20, 50],
+  defaultContributorLimit: 10,
 };
 
 export function ConfigProvider({ children }) {

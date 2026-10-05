@@ -21,7 +21,6 @@ export const en = {
       history_clear: "clear all",
       history_remove: 'Remove "{{query}}" search',
       no_results: "No results found",
-      searching_hint: "searching...",
       results_hint: "{{count}} projects found · scroll down",
       no_results_hint: "no results found",
     },
@@ -201,6 +200,7 @@ export const en = {
   dashboard: {
     greeting: "Hello, {{username}}",
     subtitle: "Manage your projects, review applications, publish new ideas.",
+    view_profile: "My Profile",
     stat: {
       projects: "projects",
       stars: "stars",
@@ -235,9 +235,10 @@ export const en = {
   // ─── PROFILE ───
   profile: {
     loading: "Loading profile...",
+    not_found_eyebrow: "profile · not found",
     not_found_title: "user not found",
     not_found_desc: "@{{username}} doesn't exist in the system.",
-    back_home: "← back to home",
+    back_home: "Back to Home",
     title_self: "My Profile",
     settings: "settings",
     empty_bio: "no bio added yet.",
@@ -392,9 +393,10 @@ export const en = {
   // ─── DETAILS ───
   details: {
     loading: "Loading project...",
+    not_found_eyebrow: "project · not found",
     not_found_title: "project not found",
     not_found_desc: "The project you're looking for has been deleted or moved.",
-    back_home: "← back to home",
+    back_home: "Back to Home",
     edit: "edit",
     deleting: "deleting...",
     delete: "delete",
@@ -403,7 +405,7 @@ export const en = {
     delete_failed: "Delete failed",
     section: {
       links: "/links",
-      contributors: "/contributors ({{count}})",
+      contributors: "/contributors ({{count}} / {{max}})",
       about: "/about this project",
       info: "/project info",
       share: "/share",
@@ -483,8 +485,11 @@ export const en = {
     submit: "save changes",
     cancel: "cancel",
     success: "Updated! Redirecting...",
+    not_found_eyebrow: "edit · not found",
     not_found_title: "project not found",
-    back_home: "← back to home",
+    not_found_desc:
+      "The project you're trying to edit doesn't exist or you don't have permission.",
+    back_home: "Back to Home",
   },
 
   // ─── LEGAL ───
@@ -522,6 +527,12 @@ export const en = {
     cancel: "Cancel",
     confirm: "Confirm ({{count}})",
     close: "Close",
+  },
+
+  contributor_limit: {
+    label: "Contributor Limit",
+    selected: "{{count}} selected",
+    locked_hint: "Cannot be changed after creation.",
   },
 
   category_chips: {
@@ -567,6 +578,18 @@ export const en = {
     label: "contributor",
   },
 
+  remove_contributor: {
+    title: "Remove Contributor",
+    aria: "Remove {{username}} from project",
+    desc: "Do you want to remove {{username}} from this project?",
+    warning_title: "This action cannot be undone.",
+    warning_desc:
+      "{{username}} will lose contributor status on this project. They can reapply anytime.",
+    cancel: "Cancel",
+    confirm: "Remove",
+    submitting: "Removing...",
+  },
+
   // ─── SCROLL HINT ───
   scroll_hint: {
     label: "scroll to explore",
@@ -597,7 +620,7 @@ export const en = {
     username_taken: "This username is already taken",
 
     // project
-    project_not_found: "Project not found",
+    project_not_found: "project not found",
     invalid_project_id: "Invalid project ID",
     title_and_description_required: "Title and description are required",
     github_url_too_long: "GitHub URL is too long",
@@ -612,6 +635,10 @@ export const en = {
     // category
     invalid_category_id: "Invalid category",
     too_many_categories: "Too many categories selected",
+
+    // contributor limit
+    invalid_contributor_limit: "Invalid contributor limit",
+    contributor_limit_reached: "This project has reached its contributor limit",
 
     // contributor
     cannot_join_own_project: "You can't join your own project",
@@ -653,6 +680,9 @@ export const en = {
 
   // ─── COMMON ───
   common: {
+    cancel: "Cancel",
+    confirm: "Confirm",
+    wait: "Wait ({{count}}s)",
     error_generic: "Something went wrong",
     optional: "(optional)",
     required: "*",

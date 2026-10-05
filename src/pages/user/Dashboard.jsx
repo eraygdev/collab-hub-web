@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -10,6 +10,17 @@ import * as Icon from '../../components/ui/Icons';
 import { useProjectView } from '../../hooks/useProjectView';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+// Username'den deterministik renk üret (Profile.jsx ile aynı)
+function getHueFromUsername(username) {
+  if (!username) return 40;
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash = username.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hues = [40, 215];
+  return hues[Math.abs(hash) % hues.length];
+}
 
 export default function Dashboard() {
   const { user, loading } = useAuth();
@@ -30,8 +41,12 @@ export default function Dashboard() {
   const [requestActionId, setRequestActionId] = useState(null);
 
   const userId = user?.user_id;
-
   const locale = lang === 'tr' ? 'tr-TR' : 'en-US';
+
+  const hue = useMemo(
+    () => getHueFromUsername(user?.username),
+    [user?.username]
+  );
 
   useEffect(() => {
     if (!loading && !user) {
@@ -163,96 +178,123 @@ export default function Dashboard() {
           ]}
         />
 
-        {/* HEADER */}
-        <div className="mb-10">
-          <h1 className="text-h2 font-extrabold text-text mb-2 tracking-tight">
-            {t('dashboard.greeting', { username: user.username })}
-          </h1>
-          <p className="text-body-sm text-text-muted max-w-lg">
-            {t('dashboard.subtitle')}
-          </p>
-        </div>
+        {/* ═══════════════════════════════════════════
+            BENTO HERO — Başlık + Stats tek kartta
+        ═══════════════════════════════════════════ */}
+        <div className="relative bg-surface border border-accent/10 rounded-card mb-8 overflow-hidden">
 
-        {/* STATS */}
-        <div className="mb-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          {/* Glow blob — kullanıcıya özel hue */}
+          <div
+            className="absolute -top-30 -left-15 w-100 h-75 opacity-[0.12] blur-[100px] rounded-pill pointer-events-none"
+            style={{ backgroundColor: `hsl(${hue} 55% 55%)` }}
+          />
 
-            {/* Proje */}
-            <div className="group relative bg-surface border border-accent/10 rounded-button p-4 hover:border-accent/30 transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon.Folder className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
-                <span className="text-mono-sm font-mono uppercase tracking-wider text-text-muted">
-                  {t('dashboard.stat.projects')}
-                </span>
+          {/* Noktalı pattern — sağ üst */}
+          <div
+            className="absolute top-0 right-0 w-72 h-full opacity-[0.15] pointer-events-none"
+            style={{
+              backgroundImage: 'radial-gradient(circle, var(--color-text-muted) 1px, transparent 1px)',
+              backgroundSize: '18px 18px',
+              maskImage: 'radial-gradient(ellipse at top right, black 0%, transparent 70%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at top right, black 0%, transparent 70%)',
+            }}
+          />
+
+          <div className="relative p-6 sm:p-8">
+
+            {/* ÜST SATIR — Başlık + Profil butonu */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+              <div className="min-w-0">
+                <h1 className="text-h3 font-extrabold text-text tracking-tight mb-1">
+                  {t('dashboard.greeting', { username: user.username })}
+                </h1>
+                <p className="text-body-sm text-text-muted max-w-lg leading-relaxed">
+                  {t('dashboard.subtitle')}
+                </p>
               </div>
-              <p className="text-h4 font-extrabold text-text font-mono tabular-nums leading-none">
-                {stats.projects}
-              </p>
+
+              <Link
+                to={`/profile/${user.username}`}
+                className="inline-flex items-center gap-2 px-3.5 py-2 text-caption font-semibold text-text-muted bg-bg/60 border border-accent/20 rounded-button hover:border-accent hover:text-text transition-all font-mono shrink-0 self-start"
+              >
+                <Icon.User className="w-3.5 h-3.5" />
+                {t('dashboard.view_profile')}
+              </Link>
             </div>
 
-            {/* Yıldız */}
-            <div className="group relative bg-surface border border-accent/10 rounded-button p-4 hover:border-accent/30 transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon.Star className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
-                <span className="text-mono-sm font-mono uppercase tracking-wider text-text-muted">
-                  {t('dashboard.stat.stars')}
-                </span>
+            {/* AYRAÇ */}
+            <div className="mb-5 h-px bg-linear-to-r from-accent/15 via-accent/10 to-transparent" />
+
+            {/* ALT SATIR — 4 Stat */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-8">
+
+              {/* Proje */}
+              <div className="flex items-center gap-3">
+                <Icon.Folder className="w-4 h-4 text-text-muted shrink-0" />
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
+                    {stats.projects}
+                  </span>
+                  <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
+                    {t('dashboard.stat.projects')}
+                  </span>
+                </div>
               </div>
-              <p className="text-h4 font-extrabold text-text font-mono tabular-nums leading-none">
-                {stats.stars}
-              </p>
-            </div>
 
-            {/* Katkıcı */}
-            <div className="group relative bg-surface border border-accent/10 rounded-button p-4 hover:border-accent/30 transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon.Users className="w-4 h-4 text-text-muted group-hover:text-accent transition-colors" />
-                <span className="text-mono-sm font-mono uppercase tracking-wider text-text-muted">
-                  {t('dashboard.stat.contributors')}
-                </span>
+              {/* Yıldız */}
+              <div className="flex items-center gap-3">
+                <Icon.Star className="w-4 h-4 text-text-muted shrink-0" />
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
+                    {stats.stars}
+                  </span>
+                  <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
+                    {t('dashboard.stat.stars')}
+                  </span>
+                </div>
               </div>
-              <p className="text-h4 font-extrabold text-text font-mono tabular-nums leading-none">
-                {stats.contributors}
-              </p>
-            </div>
 
-            {/* Bekleyen */}
-            <div
-              className={`group relative bg-surface border rounded-button p-4 transition-all overflow-hidden ${
-                pendingCount > 0
-                  ? 'border-accent/40 shadow-[0_0_20px_-8px_rgba(239,228,206,0.3)]'
-                  : 'border-accent/10 hover:border-accent/30'
-              }`}
-            >
-              {pendingCount > 0 && (
-                <div className="absolute top-[-30px] right-[-30px] w-[100px] h-[100px] bg-accent opacity-[0.1] blur-[40px] rounded-pill pointer-events-none" />
-              )}
+              {/* Katkıcı */}
+              <div className="flex items-center gap-3">
+                <Icon.Users className="w-4 h-4 text-text-muted shrink-0" />
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
+                    {stats.contributors}
+                  </span>
+                  <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
+                    {t('dashboard.stat.contributors')}
+                  </span>
+                </div>
+              </div>
 
-              <div className="relative flex items-center gap-2 mb-2">
+              {/* Bekleyen — özel vurgu */}
+              <div className="flex items-center gap-3">
                 <Icon.Mail
-                  className={`w-4 h-4 transition-colors ${
+                  className={`w-4 h-4 shrink-0 transition-colors ${
                     pendingCount > 0
                       ? 'text-accent animate-pulse'
-                      : 'text-text-muted group-hover:text-accent'
+                      : 'text-text-muted'
                   }`}
                 />
-                <span
-                  className={`text-mono-sm font-mono uppercase tracking-wider ${
-                    pendingCount > 0 ? 'text-accent' : 'text-text-muted'
-                  }`}
-                >
-                  {t('dashboard.stat.pending')}
-                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span
+                    className={`text-h5 font-bold font-mono tabular-nums leading-none ${
+                      pendingCount > 0 ? 'text-accent' : 'text-text'
+                    }`}
+                  >
+                    {pendingCount}
+                  </span>
+                  <span
+                    className={`text-caption font-mono uppercase tracking-wider ${
+                      pendingCount > 0 ? 'text-accent' : 'text-text-muted'
+                    }`}
+                  >
+                    {t('dashboard.stat.pending')}
+                  </span>
+                </div>
               </div>
-              <p
-                className={`relative text-h4 font-extrabold font-mono tabular-nums leading-none ${
-                  pendingCount > 0 ? 'text-accent' : 'text-text'
-                }`}
-              >
-                {pendingCount}
-              </p>
-            </div>
 
+            </div>
           </div>
         </div>
 

@@ -251,27 +251,40 @@ export default function EditProject() {
 
   if (error && !form.title) {
     return (
-      <div className="w-full bg-bg min-h-screen">
-        <div className="max-w-narrow mx-auto px-4 sm:px-6 lg:px-8 py-hero">
-          <PageBreadcrumb
-            items={[
-              { label: t('breadcrumb.home'), to: '/' },
-              { label: t('breadcrumb.project', { id }), to: `/project/${id}` },
-              { label: t('breadcrumb.edit') },
-            ]}
-          />
-          <div className="text-center py-16 rounded-card bg-surface/30 border border-dashed border-accent/20">
-            <Icon.Warning className="w-12 h-12 text-text-muted mx-auto mb-3" />
-            <h2 className="text-h5 font-bold text-text mb-1 font-mono">
-              {t('edit.not_found_title')}
-            </h2>
-            <Link
-              to="/"
-              className="inline-block mt-5 px-5 py-2.5 text-body-sm font-bold bg-accent text-bg rounded-button hover:bg-accent/90 transition-all font-mono"
-            >
-              {t('edit.back_home')}
-            </Link>
+      <div className="w-full bg-bg px-4 sm:px-6 lg:px-8 py-page min-h-[70vh] flex items-center justify-center relative overflow-hidden">
+        {/* Glow blob */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.05] blur-[120px] rounded-pill pointer-events-none" />
+
+        <div className="relative max-w-3xl mx-auto text-center">
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-pill border border-accent/15 bg-surface/50">
+            <span className="w-1.5 h-1.5 rounded-pill bg-accent animate-pulse" />
+            <span className="text-mono-sm font-mono tracking-wider text-text-muted uppercase">
+              {t('edit.not_found_eyebrow')}
+            </span>
           </div>
+
+          {/* #id — büyük mono */}
+          <h1 className="text-h1 font-extrabold text-text tracking-tight mb-4 font-mono">
+            #{id}
+          </h1>
+
+          {/* Açıklama */}
+          <h2 className="text-h5 font-bold text-text mb-2">
+            {t('edit.not_found_title')}
+          </h2>
+          <p className="text-body-sm text-text-muted mb-8 max-w-md mx-auto leading-relaxed">
+            {t('edit.not_found_desc')}
+          </p>
+
+          {/* Buton */}
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer font-mono"
+          >
+            <Icon.ArrowLeft className="w-4 h-4" />
+            {t('edit.back_home')}
+          </Link>
         </div>
       </div>
     );

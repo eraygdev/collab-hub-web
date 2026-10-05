@@ -8,6 +8,8 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import JoinRequestModal from '../../components/project/JoinRequestModal';
 import ContributorCard from '../../components/project/ContributorCard';
 import LeaveConfirmModal from '../../components/project/LeaveConfirmModal';
+import RemoveContributorModal from '../../components/project/RemoveContributorModal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 import * as Icon from '../../components/ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -24,6 +26,7 @@ export default function ProjectDetail() {
   const [error, setError] = useState('');
   const [starLoading, setStarLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const [joinStatus, setJoinStatus] = useState('none');
@@ -32,6 +35,10 @@ export default function ProjectDetail() {
 
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [leaveSubmitting, setLeaveSubmitting] = useState(false);
+
+  const [removeTarget, setRemoveTarget] = useState(null);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [removeSubmitting, setRemoveSubmitting] = useState(false);
 
   const locale = lang === 'tr' ? 'tr-TR' : 'en-US';
 
@@ -121,10 +128,21 @@ export default function ProjectDetail() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm(t('details.delete_confirm'))) {
-      return;
-    }
+  // [DEĞİŞTİ] Delete — modal aç
+  const handleDeleteClick = () => {
+    if (deleting) return;
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (deleting) return;
+    setIsDeleteModalOpen(false);
+  };
+
+  // [DEĞİŞTİ] Asıl silme işlemi — modal içinden çağrılır
+  const handleConfirmDelete = async () => {
+    if (deleting) return;
+
     setDeleting(true);
     const token = localStorage.getItem('token');
 
@@ -146,6 +164,7 @@ export default function ProjectDetail() {
         setProjectCount(data.projectCount);
       }
 
+      setIsDeleteModalOpen(false);
       navigate('/');
     } catch {
       toast.error(t('errors.server_error'));
@@ -221,6 +240,54 @@ export default function ProjectDetail() {
     }
   };
 
+  const handleOpenRemoveModal = (contributor) => {
+    setRemoveTarget(contributor);
+    setIsRemoveModalOpen(true);
+  };
+
+  const handleCloseRemoveModal = () => {
+    if (removeSubmitting) return;
+    setIsRemoveModalOpen(false);
+    setRemoveTarget(null);
+  };
+
+  const handleRemoveContributor = async () => {
+    if (!removeTarget || removeSubmitting) return;
+
+    setRemoveSubmitting(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(
+        `${API}/api/projects/${id}/contributors/${removeTarget.user_id}`,
+        {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!res.ok) {
+        toast.error(await extractErrorMessage(res, t));
+        setRemoveSubmitting(false);
+        return;
+      }
+
+      setProject((prev) => ({
+        ...prev,
+        contributorsList: (prev.contributorsList || []).filter(
+          (c) => c.user_id !== removeTarget.user_id
+        ),
+      }));
+
+      setIsRemoveModalOpen(false);
+      setRemoveTarget(null);
+      setRemoveSubmitting(false);
+    } catch {
+      toast.error(t('errors.server_error'));
+      setRemoveSubmitting(false);
+    }
+  };
+
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -254,29 +321,40 @@ export default function ProjectDetail() {
 
   if (error || !project) {
     return (
-      <div className="w-full bg-bg min-h-screen">
-        <div className="max-w-default mx-auto px-4 sm:px-6 lg:px-8 py-hero">
-          <PageBreadcrumb
-            items={[
-              { label: t('breadcrumb.home'), to: '/' },
-              { label: t('breadcrumb.project', { id }) },
-            ]}
-          />
-          <div className="text-center py-16 rounded-card bg-surface/30 border border-dashed border-accent/20">
-            <Icon.Search className="w-12 h-12 text-text-muted mx-auto mb-3" />
-            <h2 className="text-h5 font-bold text-text mb-1 font-mono">
-              {t('details.not_found_title')}
-            </h2>
-            <p className="text-body-sm text-text-muted mb-5">
-              {t('details.not_found_desc')}
-            </p>
-            <Link
-              to="/"
-              className="inline-block px-5 py-2.5 text-body-sm font-bold bg-accent text-bg rounded-button hover:bg-accent/90 transition-all font-mono"
-            >
-              {t('details.back_home')}
-            </Link>
+      <div className="w-full bg-bg px-4 sm:px-6 lg:px-8 py-page min-h-[70vh] flex items-center justify-center relative overflow-hidden">
+        {/* Glow blob */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.05] blur-[120px] rounded-pill pointer-events-none" />
+
+        <div className="relative max-w-3xl mx-auto text-center">
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-pill border border-accent/15 bg-surface/50">
+            <span className="w-1.5 h-1.5 rounded-pill bg-accent animate-pulse" />
+            <span className="text-mono-sm font-mono tracking-wider text-text-muted uppercase">
+              {t('details.not_found_eyebrow')}
+            </span>
           </div>
+
+          {/* #id — büyük mono */}
+          <h1 className="text-h1 font-extrabold text-text tracking-tight mb-4 font-mono">
+            #{id}
+          </h1>
+
+          {/* Açıklama */}
+          <h2 className="text-h5 font-bold text-text mb-2">
+            {t('details.not_found_title')}
+          </h2>
+          <p className="text-body-sm text-text-muted mb-8 max-w-md mx-auto leading-relaxed">
+            {t('details.not_found_desc')}
+          </p>
+
+          {/* Buton */}
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer font-mono"
+          >
+            <Icon.ArrowLeft className="w-4 h-4" />
+            {t('details.back_home')}
+          </Link>
         </div>
       </div>
     );
@@ -337,7 +415,7 @@ export default function ProjectDetail() {
             </Link>
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={handleDeleteClick}
               disabled={deleting}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-caption font-medium text-red-400 bg-transparent border border-red-400/30 rounded-button hover:bg-red-400/10 hover:border-red-400/60 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-mono"
             >
@@ -351,7 +429,6 @@ export default function ProjectDetail() {
         <div className="bg-surface border border-accent/10 rounded-card overflow-hidden mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2">
 
-            {/* SOL — Kapak Görseli */}
             <div className="relative bg-bg border-b lg:border-b-0 lg:border-r border-accent/10 min-h-[224px] lg:min-h-[280px] flex items-center justify-center">
               {project.imageUrl ? (
                 <img
@@ -368,10 +445,8 @@ export default function ProjectDetail() {
               )}
             </div>
 
-            {/* SAĞ — Bilgi & Aksiyonlar */}
             <div className="p-6 sm:p-8 flex flex-col">
 
-              {/* Status badge */}
               <div className="mb-4">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-caption font-semibold text-accent bg-accent/10 border border-accent/20 rounded-pill font-mono">
                   <span className="w-1.5 h-1.5 bg-accent rounded-pill animate-pulse"></span>
@@ -379,17 +454,14 @@ export default function ProjectDetail() {
                 </span>
               </div>
 
-              {/* Başlık */}
               <h1 className="text-h3 font-extrabold text-text tracking-tight mb-3 leading-tight">
                 {project.title}
               </h1>
 
-              {/* Kısa Açıklama */}
               <p className="text-body-sm text-text-muted leading-relaxed mb-5">
                 {project.description}
               </p>
 
-              {/* Meta */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 pb-5 border-b border-accent/10">
                 <span className="inline-flex items-center gap-1.5 text-caption text-text-muted font-mono">
                   <Icon.Calendar className="w-3.5 h-3.5" />
@@ -425,7 +497,6 @@ export default function ProjectDetail() {
                 )}
               </div>
 
-              {/* Kategoriler */}
               {project.categories && project.categories.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-6">
                   {project.categories.slice(0, 6).map((cat, i) => (
@@ -444,7 +515,6 @@ export default function ProjectDetail() {
                 </div>
               )}
 
-              {/* CTA */}
               <div className="mt-auto space-y-2">
                 {isAuthor ? (
                   <div className="w-full px-4 py-2.5 bg-bg/60 text-text-muted text-body-sm font-medium rounded-button text-center border border-accent/10 font-mono inline-flex items-center justify-center gap-2">
@@ -509,10 +579,8 @@ export default function ProjectDetail() {
         {/* ALT İÇERİK */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* SOL — Ana İçerik */}
           <div className="lg:col-span-2 space-y-8">
 
-            {/* Bağlantılar */}
             {(project.githubUrl || project.demoUrl) && (
               <div>
                 <h2 className="text-caption font-bold text-text uppercase tracking-wider mb-3 font-mono">
@@ -545,7 +613,6 @@ export default function ProjectDetail() {
               </div>
             )}
 
-            {/* Katkıcılar */}
             {project.contributorsList && project.contributorsList.length > 0 && (
               <div>
                 <h2 className="text-caption font-bold text-text uppercase tracking-wider mb-3 font-mono">
@@ -556,13 +623,17 @@ export default function ProjectDetail() {
                     <ContributorCard
                       key={contributor.user_id}
                       contributor={contributor}
+                      onRemove={
+                        isAuthor
+                          ? () => handleOpenRemoveModal(contributor)
+                          : undefined
+                      }
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Proje Hakkında */}
             <div>
               <h2 className="text-caption font-bold text-text uppercase tracking-wider mb-3 font-mono">
                 {t('details.section.about')}
@@ -573,11 +644,9 @@ export default function ProjectDetail() {
             </div>
           </div>
 
-          {/* SAĞ — Sidebar */}
           <aside className="lg:col-span-1">
             <div className="lg:sticky lg:top-20 space-y-4">
 
-              {/* Bilgi Kartı */}
               <div className="bg-surface/50 border border-accent/10 rounded-card p-5">
                 <h3 className="text-caption font-bold text-text uppercase tracking-wider mb-3 font-mono">
                   {t('details.section.info')}
@@ -595,6 +664,7 @@ export default function ProjectDetail() {
                     <dd className="font-medium text-text font-mono tabular-nums inline-flex items-center gap-1">
                       <Icon.Users className="w-3.5 h-3.5 text-text-muted" />
                       {project.contributorsList?.length || 0}
+                      <span className="text-text-muted">/ {project.maxContributors}</span>
                     </dd>
                   </div>
                   <div className="flex items-center justify-between pt-2.5 border-t border-accent/10">
@@ -604,7 +674,6 @@ export default function ProjectDetail() {
                 </dl>
               </div>
 
-              {/* Paylaş — İkon-only Toolbar */}
               <div className="bg-surface/50 border border-accent/10 rounded-card p-5">
                 <h3 className="text-caption font-bold text-text uppercase tracking-wider mb-3 font-mono">
                   {t('details.section.share')}
@@ -667,6 +736,29 @@ export default function ProjectDetail() {
         onConfirm={handleLeaveConfirm}
         projectTitle={project.title}
         submitting={leaveSubmitting}
+      />
+
+      <RemoveContributorModal
+        isOpen={isRemoveModalOpen}
+        onClose={handleCloseRemoveModal}
+        onConfirm={handleRemoveContributor}
+        username={removeTarget?.username || ''}
+        submitting={removeSubmitting}
+      />
+
+      {/* [YENİ] Proje silme onay modalı — native confirm() yerine */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title={t('details.delete')}
+        description={t('details.delete_confirm')}
+        confirmLabel={t('details.delete')}
+        submittingLabel={t('details.deleting')}
+        submitting={deleting}
+        variant="danger"
+        icon="trash"
+        countdown={3}
       />
     </div>
   );

@@ -21,7 +21,6 @@ export const tr = {
       history_clear: "tümünü temizle",
       history_remove: '"{{query}}" aramasını sil',
       no_results: "Sonuç bulunamadı",
-      searching_hint: "aranıyor...",
       results_hint: "{{count}} proje bulundu · kaydır",
       no_results_hint: "sonuç bulunamadı",
     },
@@ -201,6 +200,7 @@ export const tr = {
     greeting: "Merhaba, {{username}}",
     subtitle:
       "Projelerini yönet, başvuruları değerlendir, yeni fikirler yayınla.",
+    view_profile: "Profilim",
     stat: {
       projects: "proje",
       stars: "yıldız",
@@ -235,9 +235,10 @@ export const tr = {
   // ─── PROFILE ───
   profile: {
     loading: "Profil yükleniyor...",
+    not_found_eyebrow: "profil · bulunamadı",
     not_found_title: "kullanıcı bulunamadı",
     not_found_desc: "@{{username}} adlı kullanıcı sistemde yok.",
-    back_home: "← ana sayfaya dön",
+    back_home: "Ana Sayfaya Dön",
     title_self: "Profilim",
     settings: "ayarlar",
     empty_bio: "henüz bir bio eklenmemiş.",
@@ -398,9 +399,10 @@ export const tr = {
   // ─── DETAILS ───
   details: {
     loading: "Proje yükleniyor...",
+    not_found_eyebrow: "proje · bulunamadı",
     not_found_title: "proje bulunamadı",
     not_found_desc: "Aradığın proje silinmiş veya taşınmış olabilir.",
-    back_home: "← ana sayfaya dön",
+    back_home: "Ana Sayfaya Dön",
     edit: "düzenle",
     deleting: "siliniyor...",
     delete: "sil",
@@ -409,7 +411,7 @@ export const tr = {
     delete_failed: "Silme başarısız oldu",
     section: {
       links: "/bağlantılar",
-      contributors: "/katkıcılar ({{count}})",
+      contributors: "/katkıcılar ({{count}} / {{max}})",
       about: "/proje hakkında",
       info: "/proje bilgileri",
       share: "/paylaş",
@@ -489,8 +491,11 @@ export const tr = {
     submit: "değişiklikleri kaydet",
     cancel: "iptal",
     success: "Güncellendi! Yönlendiriliyorsun...",
+    not_found_eyebrow: "düzenle · bulunamadı",
     not_found_title: "proje bulunamadı",
-    back_home: "← ana sayfaya dön",
+    not_found_desc:
+      "Düzenlemeye çalıştığın proje yok veya düzenleme yetkin yok.",
+    back_home: "Ana Sayfaya Dön",
   },
 
   // ─── LEGAL ───
@@ -528,6 +533,12 @@ export const tr = {
     cancel: "İptal",
     confirm: "Onayla ({{count}})",
     close: "Kapat",
+  },
+
+  contributor_limit: {
+    label: "Katkıcı Sınırı",
+    selected: "{{count}} seçili",
+    locked_hint: "Oluşturduktan sonra değiştirilemez.",
   },
 
   category_chips: {
@@ -574,6 +585,18 @@ export const tr = {
     label: "katkıcı",
   },
 
+  remove_contributor: {
+    title: "Katkıcıyı Çıkar",
+    aria: "{{username}} adlı katkıcıyı projeden çıkar",
+    desc: "{{username}} adlı katkıcıyı bu projeden çıkarmak istiyor musun?",
+    warning_title: "Bu işlem geri alınamaz.",
+    warning_desc:
+      "{{username}} bu projedeki katkıcı statüsünü kaybedecek. İstediği zaman tekrar başvurabilir.",
+    cancel: "Vazgeç",
+    confirm: "Çıkar",
+    submitting: "Çıkarılıyor...",
+  },
+
   // ─── SCROLL HINT ───
   scroll_hint: {
     label: "kaydır ve keşfet",
@@ -604,7 +627,7 @@ export const tr = {
     username_taken: "Bu kullanıcı adı zaten alınmış",
 
     // proje
-    project_not_found: "Proje bulunamadı",
+    project_not_found: "proje bulunamadı",
     invalid_project_id: "Geçersiz proje kimliği",
     title_and_description_required: "Başlık ve açıklama zorunlu",
     github_url_too_long: "GitHub URL çok uzun",
@@ -619,6 +642,10 @@ export const tr = {
     // kategori
     invalid_category_id: "Geçersiz kategori",
     too_many_categories: "Çok fazla kategori seçildi",
+
+    // katkıcı limiti
+    invalid_contributor_limit: "Geçersiz katkıcı limiti",
+    contributor_limit_reached: "Bu proje katkıcı limitine ulaştı",
 
     // katkıcı
     cannot_join_own_project: "Kendi projene katılamazsın",
@@ -659,6 +686,9 @@ export const tr = {
 
   // ─── COMMON ───
   common: {
+    cancel: "Vazgeç",
+    confirm: "Onayla",
+    wait: "Bekle ({{count}}s)",
     error_generic: "Bir hata oluştu",
     optional: "(opsiyonel)",
     required: "*",

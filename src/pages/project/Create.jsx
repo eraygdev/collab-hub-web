@@ -10,6 +10,7 @@ import CharWarning from '../../components/ui/CharWarning';
 import InputClearButton from '../../components/ui/InputClearButton';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
+import ContributorLimitPicker from '../../components/project/ContributorLimitPicker';
 import * as Icon from '../../components/ui/Icons';
 import { extractErrorMessage } from '../../utils/errors';
 import {
@@ -40,6 +41,8 @@ export default function CreateProject() {
 
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  // [YENİ] Katkıcı limiti
+  const [maxContributors, setMaxContributors] = useState(limits.defaultContributorLimit);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -64,15 +67,22 @@ export default function CreateProject() {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        const { _selectedCategories, ...formData } = parsed;
+        // [YENİ] _maxContributors da draft'tan geliyor
+        const { _selectedCategories, _maxContributors, ...formData } = parsed;
         setForm((prev) => ({ ...prev, ...formData }));
         if (Array.isArray(_selectedCategories)) {
           setSelectedCategories(_selectedCategories);
         }
+        if (
+          typeof _maxContributors === 'number' &&
+          limits.allowedContributorLimits.includes(_maxContributors)
+        ) {
+          setMaxContributors(_maxContributors);
+        }
       }
     } catch {}
     setDraftLoaded(true);
-  }, []);
+  }, [limits.allowedContributorLimits]);
 
   useEffect(() => {
     if (!draftLoaded) return;
@@ -80,12 +90,16 @@ export default function CreateProject() {
       try {
         localStorage.setItem(
           DRAFT_KEY,
-          JSON.stringify({ ...form, _selectedCategories: selectedCategories })
+          JSON.stringify({
+            ...form,
+            _selectedCategories: selectedCategories,
+            _maxContributors: maxContributors, // [YENİ]
+          })
         );
       } catch {}
     }, 800);
     return () => clearTimeout(t2);
-  }, [form, selectedCategories, draftLoaded]);
+  }, [form, selectedCategories, maxContributors, draftLoaded]);
 
   const debouncedImageUrl = useDebounced(form.imageUrl, 400);
 
@@ -201,7 +215,11 @@ export default function CreateProject() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...form, categoryIds: selectedCategories }),
+        body: JSON.stringify({
+          ...form,
+          categoryIds: selectedCategories,
+          maxContributors, // [YENİ]
+        }),
       });
 
       if (!res.ok) {
@@ -429,6 +447,14 @@ export default function CreateProject() {
             selected={selectedCategories}
             onChange={setSelectedCategories}
             disabled={submitting}
+          />
+
+          {/* [YENİ] Katkıcı Limiti */}
+          <ContributorLimitPicker
+            value={maxContributors}
+            onChange={setMaxContributors}
+            disabled={submitting}
+            options={limits.allowedContributorLimits}
           />
 
           {/* GitHub URL */}

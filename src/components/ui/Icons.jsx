@@ -295,3 +295,10 @@ export const Globe = ({ className, ...p }) => (
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
   </Svg>
 );
+
+export const Lock = ({ className, ...p }) => (
+  <Svg className={className} {...p}>
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 118 0v4" />
+  </Svg>
+);
