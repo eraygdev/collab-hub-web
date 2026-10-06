@@ -269,7 +269,7 @@ export default function Home() {
           <div className="absolute -top-50 left-1/2 -translate-x-1/2 w-175 h-100 bg-accent opacity-[0.08] blur-[120px] rounded-pill" />
         </div>
 
-        <div className="relative max-w-default mx-auto px-4 sm:px-6 lg:px-8 py-hero text-center">
+        <div className="relative max-w-default mx-auto px-5 sm:px-6 lg:px-8 pt-[calc(var(--spacing-hero)*1.4)] pb-hero text-center">
 
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-pill border border-accent/15 bg-surface/60">
