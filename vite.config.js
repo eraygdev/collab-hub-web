@@ -1,8 +1,13 @@
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import react from "@vitejs/plugin-react";
+import geo from "vite-plugin-geo";
+import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-})
-
+  plugins: [
+    react(),
+    geo({
+      domain: "https://collabhub-one.vercel.app",
+    }),
+  ],
+});
