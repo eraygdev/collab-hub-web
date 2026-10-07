@@ -129,10 +129,8 @@ export default function Navbar({ onOpenSidebar }) {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-bg/80 backdrop-blur-md border-b border-accent/10">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-7">
-
-          {/* SOL: Sidebar toggle + Logo */}
-          <div className="flex items-center gap-5 shrink-0">
+        <div className="w-full px-2 sm:px-6 lg:px-8 h-14 flex items-center gap-1.5 sm:gap-5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={onOpenSidebar}
               className="p-1.5 rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
@@ -144,7 +142,7 @@ export default function Navbar({ onOpenSidebar }) {
             <Link
               to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center gap-1 font-display text-h5 leading-none text-text hover:text-accent transition-colors shrink-0"
+              className="flex items-center gap-1 font-display text-body sm:text-h5 leading-none text-text hover:text-accent transition-colors shrink-0"
               aria-label={t('navbar.aria.logo')}
             >
               <img
@@ -164,7 +162,7 @@ export default function Navbar({ onOpenSidebar }) {
           </div>
 
           {/* SAĞ: Mobil arama + Dil + Auth */}
-          <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="ml-auto flex items-center gap-1 sm:gap-3 shrink-0">
 
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
@@ -195,7 +193,7 @@ export default function Navbar({ onOpenSidebar }) {
                 </NavLink>
                 <NavLink
                   to="/register"
-                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-body-sm font-semibold rounded-button bg-accent text-bg border border-accent hover:bg-accent/90 transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center px-2.5 sm:px-3.5 py-1.5 text-body-sm font-semibold rounded-button bg-accent text-bg border border-accent hover:bg-accent/90 transition-all cursor-pointer whitespace-nowrap"
                 >
                   {t('navbar.auth.register')}
                 </NavLink>
