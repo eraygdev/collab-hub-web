@@ -129,10 +129,10 @@ export default function Navbar({ onOpenSidebar }) {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-bg/80 backdrop-blur-md border-b border-accent/10">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3 sm:gap-6 lg:gap-10">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-7">
 
           {/* SOL: Sidebar toggle + Logo */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-5 shrink-0">
             <button
               onClick={onOpenSidebar}
               className="p-1.5 rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
@@ -144,10 +144,17 @@ export default function Navbar({ onOpenSidebar }) {
             <Link
               to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="font-display text-h5 leading-none text-text hover:text-accent transition-colors shrink-0"
+              className="flex items-center gap-1 font-display text-h5 leading-none text-text hover:text-accent transition-colors shrink-0"
               aria-label={t('navbar.aria.logo')}
             >
-              RepoReef
+              <img
+                src="/logo.svg"
+                alt=""
+                className="w-7 h-7 shrink-0"
+                width="28"
+                height="28"
+              />
+              <span>RepoReef</span>
             </Link>
           </div>
 
@@ -156,10 +163,8 @@ export default function Navbar({ onOpenSidebar }) {
             <UserSearch />
           </div>
 
-          {/* SAĞ: Dil + Mobil arama + Auth */}
+          {/* SAĞ: Mobil arama + Dil + Auth */}
           <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
-
-            <LanguageSwitcher />
 
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
@@ -169,6 +174,8 @@ export default function Navbar({ onOpenSidebar }) {
             >
               <Icon.Search className="w-4 h-4" />
             </button>
+
+            <LanguageSwitcher />
 
             {user ? (
               <UserDropdown />

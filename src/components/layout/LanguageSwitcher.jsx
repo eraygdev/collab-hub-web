@@ -43,6 +43,11 @@ export default function LanguageSwitcher() {
       >
         <Icon.Globe className="w-3.5 h-3.5" />
         <span>{current.short}</span>
+        {open ? (
+          <Icon.ChevronUp className="w-3 h-3" />
+        ) : (
+          <Icon.ChevronDown className="w-3 h-3" />
+        )}
       </button>
 
       {open && (
