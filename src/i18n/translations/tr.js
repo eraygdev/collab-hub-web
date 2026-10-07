@@ -70,7 +70,7 @@ export const tr = {
       open_menu: "Menüyü Aç",
       close_menu: "Menüyü Kapat",
       search_users: "Kullanıcı ara",
-      logo: "Collab-Hub ana sayfa",
+      logo: "RepoReef ana sayfa",
     },
     auth: {
       login: "Giriş Yap",
@@ -127,7 +127,7 @@ export const tr = {
     settings: "Ayarlar",
     login: "Giriş Yap",
     register: "Kayıt Ol",
-    brand: "Collab-Hub · by Reta",
+    brand: "RepoReef · by Reta",
   },
 
   // ─── FOOTER ───
@@ -161,7 +161,7 @@ export const tr = {
       privacy: "Gizlilik",
       terms: "Kullanım Şartları",
     },
-    copyright: "© {{year}} Collab-Hub · by Reta",
+    copyright: "© {{year}} RepoReef · by Reta",
     links: {
       privacy: "gizlilik",
       terms: "şartlar",
@@ -318,7 +318,7 @@ export const tr = {
     // Appearance sayfası
     appearance: {
       title: "Görünüm",
-      subtitle: "Collab-Hub'un görünümünü özelleştir.",
+      subtitle: "RepoReef'un görünümünü özelleştir.",
       language_section: "/dil",
       language_label: "Arayüz dili",
       language_hint: "Arayüz için dili seç.",
@@ -330,7 +330,7 @@ export const tr = {
       scale_large: "Büyük",
       theme_section: "/tema",
       theme_label: "Tema",
-      theme_hint: "Collab-Hub şu an sadece koyu temayı destekliyor.",
+      theme_hint: "RepoReef şu an sadece koyu temayı destekliyor.",
       theme_locked: "koyu (kilitli)",
     },
 
@@ -366,7 +366,7 @@ export const tr = {
   auth: {
     loading: "Yükleniyor...",
     github_oauth_note:
-      "Collab-Hub, kimlik doğrulama için GitHub OAuth kullanır. Şifre saklanmaz.",
+      "RepoReef, kimlik doğrulama için GitHub OAuth kullanır. Şifre saklanmaz.",
   },
 
   login: {
@@ -454,11 +454,17 @@ export const tr = {
       "Projenin detayları, kullanılan teknolojiler, hedef kitlesi... (opsiyonel)",
     github_label: "GitHub URL",
     github_placeholder: "https://github.com/kullanici/proje (opsiyonel)",
+    github_hint: "Repo public olmalı. Örnek: github.com/kullanici/repo",
     demo_label: "Demo URL",
     demo_placeholder: "https://proje-demo.com (opsiyonel)",
     image_label: "Kapak Görseli URL",
     image_placeholder: "https://... (opsiyonel)",
-    image_hint: "URL yapıştır, önizleme otomatik görünür.",
+    image_hint: "Görseli bir GitHub reposuna yükle, sonra linkini yapıştır.",
+    image_hint_examples: [
+      "github.com/.../.../blob/...?raw=true",
+      "github.com/.../blob/...",
+      "raw.githubusercontent.com/...",
+    ],
     submitting: "kaydediliyor...",
     submit: "projeyi yayınla",
     cancel: "iptal",
@@ -579,6 +585,7 @@ export const tr = {
 
   image_preview: {
     error: "Görsel yüklenemedi. URL'yi kontrol et.",
+    too_large: "Görsel çok büyük (en fazla 2MB). Daha küçük bir görsel kullan.",
   },
 
   contributor_card: {
@@ -617,7 +624,6 @@ export const tr = {
     invalid_token: "Geçersiz oturum",
     invalid_claims: "Oturum bilgisi bozuk",
     invalid_user_id: "Kullanıcı kimliği geçersiz",
-    google_no_email: "Google e-posta döndürmedi",
 
     // kullanıcı / profil
     user_not_found: "Kullanıcı bulunamadı",
@@ -634,8 +640,14 @@ export const tr = {
     demo_url_too_long: "Demo URL çok uzun",
     image_url_too_long: "Görsel URL çok uzun",
     invalid_github_url: "GitHub URL geçersiz",
+    github_url_required: "GitHub repo URL'si zorunlu",
+    github_repo_not_accessible:
+      "Repo bulunamadı veya private. Public olduğundan emin ol.",
     invalid_demo_url: "Demo URL geçersiz",
     invalid_image_url: "Görsel URL geçersiz",
+    image_url_must_be_github:
+      "Görsel URL'i GitHub linki olmalı (github.com/.../blob/... veya raw.githubusercontent.com/...)",
+    image_too_large: "Görsel çok büyük (en fazla 2MB)",
     cannot_star_own_project: "Kendi projeni yıldızlayamazsın",
     project_limit_reached: "Proje limitine ulaştın",
 

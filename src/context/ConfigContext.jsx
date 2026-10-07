@@ -22,6 +22,7 @@ const FALLBACK_LIMITS = {
   visibleCategories: 12,  // frontend-specific
   allowedContributorLimits: [5, 10, 20, 50],
   defaultContributorLimit: 10,
+  maxImageSizeBytes: 2 * 1024 * 1024,
 };
 
 export function ConfigProvider({ children }) {

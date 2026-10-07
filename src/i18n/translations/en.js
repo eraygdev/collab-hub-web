@@ -70,7 +70,7 @@ export const en = {
       open_menu: "Open menu",
       close_menu: "Close menu",
       search_users: "Search users",
-      logo: "Collab-Hub home",
+      logo: "RepoReef home",
     },
     auth: {
       login: "Sign In",
@@ -127,7 +127,7 @@ export const en = {
     settings: "Settings",
     login: "Sign In",
     register: "Sign Up",
-    brand: "Collab-Hub · by Reta",
+    brand: "RepoReef · by Reta",
   },
 
   // ─── FOOTER ───
@@ -162,7 +162,7 @@ export const en = {
       privacy: "Privacy",
       terms: "Terms",
     },
-    copyright: "© {{year}} Collab-Hub · by Reta",
+    copyright: "© {{year}} RepoReef · by Reta",
     links: {
       privacy: "privacy",
       terms: "terms",
@@ -322,7 +322,7 @@ export const en = {
     // Appearance sayfası
     appearance: {
       title: "Appearance",
-      subtitle: "Customize how Collab-Hub looks and feels.",
+      subtitle: "Customize how RepoReef looks and feels.",
       language_section: "/language",
       language_label: "Interface language",
       language_hint: "Choose the language for the interface.",
@@ -334,7 +334,7 @@ export const en = {
       scale_large: "Large",
       theme_section: "/theme",
       theme_label: "Theme",
-      theme_hint: "Collab-Hub currently only supports dark mode.",
+      theme_hint: "RepoReef currently only supports dark mode.",
       theme_locked: "dark (locked)",
     },
 
@@ -360,7 +360,7 @@ export const en = {
   auth: {
     loading: "Loading...",
     github_oauth_note:
-      "Collab-Hub uses GitHub OAuth for authentication. Passwords are never stored.",
+      "RepoReef uses GitHub OAuth for authentication. Passwords are never stored.",
   },
 
   login: {
@@ -448,11 +448,17 @@ export const en = {
       "Project details, tech stack, target audience... (optional)",
     github_label: "GitHub URL",
     github_placeholder: "https://github.com/user/project (optional)",
+    github_hint: "The repository must be public. Example: github.com/user/repo",
     demo_label: "Demo URL",
     demo_placeholder: "https://project-demo.com (optional)",
     image_label: "Cover Image URL",
     image_placeholder: "https://... (optional)",
-    image_hint: "Paste a URL, preview appears automatically.",
+    image_hint: "Upload the image to a GitHub repo, then paste the link.",
+    image_hint_examples: [
+      "github.com/.../.../blob/...?raw=true",
+      "github.com/.../blob/...",
+      "raw.githubusercontent.com/...",
+    ],
     submitting: "saving...",
     submit: "publish project",
     cancel: "cancel",
@@ -572,6 +578,7 @@ export const en = {
 
   image_preview: {
     error: "Couldn't load image. Check the URL.",
+    too_large: "Image is too large (max 2MB). Please use a smaller one.",
   },
 
   contributor_card: {
@@ -610,7 +617,6 @@ export const en = {
     invalid_token: "Invalid session",
     invalid_claims: "Invalid session data",
     invalid_user_id: "Invalid user ID",
-    google_no_email: "Google did not return an email",
 
     // user / profile
     user_not_found: "User not found",
@@ -627,8 +633,14 @@ export const en = {
     demo_url_too_long: "Demo URL is too long",
     image_url_too_long: "Image URL is too long",
     invalid_github_url: "GitHub URL is invalid",
+    github_url_required: "GitHub repository URL is required",
+    github_repo_not_accessible:
+      "Repository not found or is private. Make sure it's public.",
     invalid_demo_url: "Demo URL is invalid",
     invalid_image_url: "Image URL is invalid",
+    image_url_must_be_github:
+      "Image URL must be a GitHub link (github.com/.../blob/... or raw.githubusercontent.com/...)",
+    image_too_large: "Image is too large (max 2MB)",
     cannot_star_own_project: "You can't star your own project",
     project_limit_reached: "Project limit reached",
 

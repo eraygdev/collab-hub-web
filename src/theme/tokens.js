@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────
-// Collab-Hub Design Tokens
+// RepoReef Design Tokens
 // Tek kaynaktan tüm tasarım kararları
 // ─────────────────────────────────────────────────────────
 

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     geo({
-      domain: "https://collabhub-one.vercel.app",
+      domain: "https://reporeef.com",
     }),
   ],
 });

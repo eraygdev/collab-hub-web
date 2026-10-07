@@ -147,7 +147,7 @@ export default function Navbar({ onOpenSidebar }) {
               className="font-display text-h5 leading-none text-text hover:text-accent transition-colors shrink-0"
               aria-label={t('navbar.aria.logo')}
             >
-              Collab-Hub
+              RepoReef
             </Link>
           </div>
 

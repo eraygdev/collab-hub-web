@@ -3,7 +3,7 @@ import { translations, getNestedValue, interpolate } from './translations/index'
 
 const LanguageContext = createContext(null);
 
-const STORAGE_KEY = 'collab-hub:lang';
+const STORAGE_KEY = 'reporeef:lang';
 const SUPPORTED = ['en', 'tr'];
 const DEFAULT_LANG = 'en';
 

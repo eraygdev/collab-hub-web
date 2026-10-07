@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════
-// ICONS — Collab-Hub SVG İkon Seti
+// ICONS — RepoReef SVG İkon Seti
 // ═══════════════════════════════════════════════════════════
 //
 // Tüm ikonlar `currentColor` kullanır → parent'tan renk alır.

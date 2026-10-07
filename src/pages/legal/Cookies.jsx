@@ -21,7 +21,7 @@ export default function Cookies() {
       title: 'Cookies We Use',
       content: (
         <>
-          <p>Collab-Hub uses the following cookies:</p>
+          <p>RepoReef uses the following cookies:</p>
           <ul>
             <li>
               <strong>Essential cookies:</strong> Required for session management and
@@ -41,7 +41,7 @@ export default function Cookies() {
       content: (
         <>
           <p>
-            In addition to cookies, Collab-Hub uses your browser's{' '}
+            In addition to cookies, RepoReef uses your browser's{' '}
             <strong>localStorage</strong> feature:
           </p>
           <ul>
@@ -64,7 +64,7 @@ export default function Cookies() {
       title: 'Third-Party Cookies',
       content: (
         <p>
-          Collab-Hub currently does not use third-party advertising or analytics cookies.
+          RepoReef currently does not use third-party advertising or analytics cookies.
           If they are added in the future, this page will be updated.
         </p>
       ),

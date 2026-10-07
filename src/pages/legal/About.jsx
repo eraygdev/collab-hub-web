@@ -11,7 +11,7 @@ export default function About() {
       content: (
         <>
           <p>
-            Collab-Hub is a platform where developers can share their open source projects,
+            RepoReef is a platform where developers can share their open source projects,
             discover others, and collaborate together. Our goal is to help ideas come to
             life quickly and connect with the right people.
           </p>
@@ -26,7 +26,7 @@ export default function About() {
       title: 'How It Works',
       content: (
         <>
-          <p>Collab-Hub consists of three simple steps:</p>
+          <p>RepoReef consists of three simple steps:</p>
           <ul>
             <li>
               <strong>Discover:</strong> Filter by categories, search, and star the projects you like.
@@ -47,7 +47,7 @@ export default function About() {
       content: (
         <>
           <p>
-            Collab-Hub is an <strong>open source project platform</strong>.
+            RepoReef is an <strong>open source project platform</strong>.
             The project itself is also developed as open source. We are always open to
             code, suggestions, and feedback.
           </p>

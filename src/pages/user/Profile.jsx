@@ -6,20 +6,10 @@ import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
 import { useProjectView } from '../../hooks/useProjectView';
+import { getHueFromUsername } from '../../utils/color';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const LIMIT = 20;
-
-// ─── Username'den deterministik renk üret ───
-function getHueFromUsername(username) {
-  if (!username) return 40;
-  let hash = 0;
-  for (let i = 0; i < username.length; i++) {
-    hash = username.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const hues = [40, 215];
-  return hues[Math.abs(hash) % hues.length];
-}
 
 export default function UserProfile() {
   const { username } = useParams();

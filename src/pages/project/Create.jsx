@@ -8,17 +8,23 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharCounter from '../../components/ui/CharCounter';
 import CharWarning from '../../components/ui/CharWarning';
 import InputClearButton from '../../components/ui/InputClearButton';
+import FieldError from '../../components/ui/FieldError';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import ContributorLimitPicker from '../../components/project/ContributorLimitPicker';
 import * as Icon from '../../components/ui/Icons';
-import { extractErrorMessage } from '../../utils/errors';
+import { extractErrorMessage, extractError } from '../../utils/errors';
 import {
   TITLE_REGEX,
   TEXT_REGEX,
   charCount,
   findInvalidChar,
   isValidUrl,
+  normalizeGithubImageUrl,
+  isValidGithubImageUrl,
+  checkGithubImageSize,
+  normalizeGithubRepoUrl,
+  isValidGithubRepoUrl,
 } from '../../utils/validators';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -41,12 +47,12 @@ export default function CreateProject() {
 
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  // [YENİ] Katkıcı limiti
   const [maxContributors, setMaxContributors] = useState(limits.defaultContributorLimit);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [warnings, setWarnings] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     if (!loading && !user) {
@@ -67,7 +73,6 @@ export default function CreateProject() {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        // [YENİ] _maxContributors da draft'tan geliyor
         const { _selectedCategories, _maxContributors, ...formData } = parsed;
         setForm((prev) => ({ ...prev, ...formData }));
         if (Array.isArray(_selectedCategories)) {
@@ -93,7 +98,7 @@ export default function CreateProject() {
           JSON.stringify({
             ...form,
             _selectedCategories: selectedCategories,
-            _maxContributors: maxContributors, // [YENİ]
+            _maxContributors: maxContributors,
           })
         );
       } catch {}
@@ -113,9 +118,20 @@ export default function CreateProject() {
   const clearField = (name) => {
     setForm((prev) => ({ ...prev, [name]: '' }));
     setWarnings((prev) => ({ ...prev, [name]: '' }));
+    clearFieldError(name);
+  };
+
+  const clearFieldError = (fieldId) => {
+    if (!fieldErrors[fieldId]) return;
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      delete next[fieldId];
+      return next;
+    });
   };
 
   const handleTitleChange = (e) => {
+    clearFieldError('title');
     const value = e.target.value;
     if (value === '') {
       setForm({ ...form, title: '' });
@@ -134,6 +150,7 @@ export default function CreateProject() {
 
   const handleTextChange = (e) => {
     const { name, value } = e.target;
+    clearFieldError(name);
     if (value === '') {
       setForm({ ...form, [name]: '' });
       setWarnings((prev) => ({ ...prev, [name]: '' }));
@@ -151,28 +168,56 @@ export default function CreateProject() {
 
   const handleUrlChange = (e) => {
     const { name, value } = e.target;
+    clearFieldError(name);
     if (limits[name]?.max && charCount(value) > limits[name].max) return;
     setForm({ ...form, [name]: value });
   };
 
   const overLimit = (key) => charCount(form[key]) > (limits[key]?.max || 0);
 
+  const showFieldError = (fieldId, message) => {
+    setFieldErrors({ [fieldId]: message });
+
+    setTimeout(() => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      setTimeout(() => {
+        try {
+          el.focus({ preventScroll: true });
+        } catch {}
+      }, 300);
+
+      el.classList.remove('input-error-flash');
+      void el.offsetWidth;
+      el.classList.add('input-error-flash');
+      setTimeout(() => el.classList.remove('input-error-flash'), 1100);
+    }, 50);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setSuccess(false);
 
-    if (!form.title.trim() || !form.description.trim()) {
-      setError(t('errors.title_and_description_required'));
+    if (!form.title.trim()) {
+      showFieldError('title', t('errors.title_and_description_required'));
+      return;
+    }
+    if (!form.description.trim()) {
+      showFieldError('description', t('errors.title_and_description_required'));
       return;
     }
 
     if (charCount(form.title.trim()) < limits.title.min) {
-      setError(t('errors.title_too_short'));
+      showFieldError('title', t('errors.title_too_short'));
       return;
     }
     if (charCount(form.description.trim()) < limits.description.min) {
-      setError(t('errors.description_too_short'));
+      showFieldError('description', t('errors.description_too_short'));
       return;
     }
 
@@ -187,22 +232,39 @@ export default function CreateProject() {
 
     for (const [key, max] of Object.entries(maxLimits)) {
       if (form[key] && charCount(form[key]) > max) {
-        setError(t('errors.generic'));
+        showFieldError(key, t('errors.generic'));
         return;
       }
     }
 
-    if (!isValidUrl(form.githubUrl)) {
-      setError(t('errors.invalid_github_url'));
+    if (!form.githubUrl || !form.githubUrl.trim()) {
+      showFieldError('githubUrl', t('errors.github_url_required'));
       return;
     }
+    if (!isValidGithubRepoUrl(form.githubUrl)) {
+      showFieldError('githubUrl', t('errors.invalid_github_url'));
+      return;
+    }
+
     if (!isValidUrl(form.demoUrl)) {
-      setError(t('errors.invalid_demo_url'));
+      showFieldError('demoUrl', t('errors.invalid_demo_url'));
       return;
     }
-    if (!isValidUrl(form.imageUrl)) {
-      setError(t('errors.invalid_image_url'));
+
+    if (form.imageUrl && !isValidGithubImageUrl(form.imageUrl)) {
+      showFieldError('imageUrl', t('errors.image_url_must_be_github'));
       return;
+    }
+
+    if (form.imageUrl) {
+      const normalized = normalizeGithubImageUrl(form.imageUrl);
+      if (normalized) {
+        const sizeCheck = await checkGithubImageSize(normalized);
+        if (!sizeCheck.ok) {
+          showFieldError('imageUrl', t('errors.image_too_large'));
+          return;
+        }
+      }
     }
 
     setSubmitting(true);
@@ -217,13 +279,40 @@ export default function CreateProject() {
         },
         body: JSON.stringify({
           ...form,
+          githubUrl: normalizeGithubRepoUrl(form.githubUrl),
+          imageUrl: form.imageUrl ? normalizeGithubImageUrl(form.imageUrl) : '',
           categoryIds: selectedCategories,
-          maxContributors, // [YENİ]
+          maxContributors,
         }),
       });
 
       if (!res.ok) {
-        setError(await extractErrorMessage(res, t));
+        const { code, message } = await extractError(res, t);
+
+        // Field'a özel hata kodları → input altında göster
+        const githubFields = [
+          'github_url_required',
+          'invalid_github_url',
+          'github_repo_not_accessible',
+        ];
+        const imageFields = ['image_url_must_be_github', 'image_too_large'];
+        const demoFields = ['invalid_demo_url', 'demo_url_too_long'];
+        const titleFields = ['title_too_short', 'title_too_long', 'title_invalid_char'];
+        const descFields = ['description_too_short', 'description_too_long', 'description_invalid_char'];
+
+        if (githubFields.includes(code)) {
+          showFieldError('githubUrl', message);
+        } else if (imageFields.includes(code)) {
+          showFieldError('imageUrl', message);
+        } else if (demoFields.includes(code)) {
+          showFieldError('demoUrl', message);
+        } else if (titleFields.includes(code)) {
+          showFieldError('title', message);
+        } else if (descFields.includes(code)) {
+          showFieldError('description', message);
+        } else {
+          setError(message);
+        }
         setSubmitting(false);
         return;
       }
@@ -291,7 +380,6 @@ export default function CreateProject() {
           </p>
         </div>
 
-        {/* Proje limiti kartı */}
         <div className="mb-6 relative bg-surface border border-accent/10 rounded-card p-5 overflow-hidden">
           {isLimitReached && (
             <div className="absolute -top-20 -right-20 w-60 h-60 bg-red-400 opacity-[0.08] blur-[80px] rounded-pill pointer-events-none" />
@@ -378,6 +466,7 @@ export default function CreateProject() {
               />
               <InputClearButton visible={!!form.title} onClick={() => clearField('title')} />
             </div>
+            <FieldError message={fieldErrors.title} />
             <CharWarning char={warnings.title} />
           </div>
 
@@ -409,6 +498,7 @@ export default function CreateProject() {
                 className="top-4 translate-y-0"
               />
             </div>
+            <FieldError message={fieldErrors.description} />
             <CharWarning char={warnings.description} />
           </div>
 
@@ -439,6 +529,7 @@ export default function CreateProject() {
                 className="top-4 translate-y-0"
               />
             </div>
+            <FieldError message={fieldErrors.longDescription} />
             <CharWarning char={warnings.longDescription} />
           </div>
 
@@ -449,7 +540,6 @@ export default function CreateProject() {
             disabled={submitting}
           />
 
-          {/* [YENİ] Katkıcı Limiti */}
           <ContributorLimitPicker
             value={maxContributors}
             onChange={setMaxContributors}
@@ -461,7 +551,7 @@ export default function CreateProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="githubUrl" className="block text-caption font-medium text-text">
-                {t('create.github_label')}
+                {t('create.github_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.githubUrl} max={limits.githubUrl.max} id="github-url-counter" />
             </div>
@@ -469,10 +559,11 @@ export default function CreateProject() {
               <input
                 id="githubUrl"
                 name="githubUrl"
-                type="url"
+                type="text"
                 value={form.githubUrl}
                 onChange={handleUrlChange}
                 placeholder={t('create.github_placeholder')}
+                required
                 disabled={submitting}
                 className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
@@ -480,6 +571,10 @@ export default function CreateProject() {
               />
               <InputClearButton visible={!!form.githubUrl} onClick={() => clearField('githubUrl')} />
             </div>
+            <FieldError message={fieldErrors.githubUrl} />
+            <p className="mt-1 text-mono-sm text-text-muted font-mono">
+              {t('create.github_hint')}
+            </p>
           </div>
 
           {/* Demo URL */}
@@ -505,6 +600,7 @@ export default function CreateProject() {
               />
               <InputClearButton visible={!!form.demoUrl} onClick={() => clearField('demoUrl')} />
             </div>
+            <FieldError message={fieldErrors.demoUrl} />
           </div>
 
           {/* Image URL */}
@@ -530,9 +626,16 @@ export default function CreateProject() {
               />
               <InputClearButton visible={!!form.imageUrl} onClick={() => clearField('imageUrl')} />
             </div>
-            <p className="mt-1 text-mono-sm text-text-muted font-mono">
-              {t('create.image_hint')}
-            </p>
+            <FieldError message={fieldErrors.imageUrl} />
+            <div className="mt-1 text-mono-sm text-text-muted font-mono space-y-0.5">
+              <p>{t('create.image_hint')}</p>
+              {t('create.image_hint_examples')?.map?.((line, i) => (
+                <div key={i} className="flex items-start gap-1.5">
+                  <span className="text-accent shrink-0">✔</span>
+                  <span>{line}</span>
+                </div>
+              ))}
+            </div>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 

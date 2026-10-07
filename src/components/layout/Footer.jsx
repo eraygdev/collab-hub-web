@@ -89,7 +89,7 @@ export default function Footer() {
                 to="/"
                 className="font-display text-h4 text-text hover:text-accent transition-colors inline-block mb-3"
               >
-                Collab-Hub
+                RepoReef
               </Link>
               <p className="text-body-sm text-text-muted leading-relaxed mb-4">
                 {t('footer.brand.tagline')}

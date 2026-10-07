@@ -10,7 +10,7 @@ export default function Terms() {
       title: 'Acceptance of Terms',
       content: (
         <p>
-          By accessing and using Collab-Hub, you are deemed to have accepted these terms of use.
+          By accessing and using RepoReef, you are deemed to have accepted these terms of use.
           If you do not accept the terms, please do not use the platform.
         </p>
       ),
@@ -61,7 +61,7 @@ export default function Terms() {
             to display your content to other users.
           </p>
           <p>
-            The Collab-Hub name, logo, and design belong to us; they cannot be used
+            The RepoReef name, logo, and design belong to us; they cannot be used
             without permission.
           </p>
         </>
@@ -73,12 +73,12 @@ export default function Terms() {
       content: (
         <>
           <p>
-            Collab-Hub is provided "as is". No guarantee of uninterrupted or error-free
+            RepoReef is provided "as is". No guarantee of uninterrupted or error-free
             operation is given.
           </p>
           <p>
             No responsibility is accepted for the accuracy, security, or legality of
-            projects shared on the platform. Collab-Hub cannot be held responsible for
+            projects shared on the platform. RepoReef cannot be held responsible for
             issues arising from interactions between users.
           </p>
         </>

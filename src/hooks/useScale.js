@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 
-const STORAGE_KEY = "collab-hub:scale";
+const STORAGE_KEY = "reporeef:scale";
 const DEFAULT_SCALE = "md";
 
 // Desteklenen ölçek seviyeleri: --scale-factor değerleri

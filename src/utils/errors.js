@@ -28,3 +28,15 @@ export async function extractErrorMessage(res, t) {
     return t("errors.generic");
   }
 }
+
+// Backend response'undan hem error code hem mesaj döner.
+export async function extractError(res, t) {
+  try {
+    const data = await res.json();
+    const code = data?.error || null;
+    const message = getErrorMessage(code, t);
+    return { code, message };
+  } catch {
+    return { code: null, message: t("errors.generic") };
+  }
+}

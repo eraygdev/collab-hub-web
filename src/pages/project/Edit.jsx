@@ -8,16 +8,22 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharCounter from '../../components/ui/CharCounter';
 import CharWarning from '../../components/ui/CharWarning';
 import InputClearButton from '../../components/ui/InputClearButton';
+import FieldError from '../../components/ui/FieldError';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import * as Icon from '../../components/ui/Icons';
-import { extractErrorMessage } from '../../utils/errors';
+import { extractErrorMessage, extractError } from '../../utils/errors';
 import {
   TITLE_REGEX,
   TEXT_REGEX,
   charCount,
   findInvalidChar,
   isValidUrl,
+  normalizeGithubImageUrl,
+  isValidGithubImageUrl,
+  checkGithubImageSize,
+  normalizeGithubRepoUrl,
+  isValidGithubRepoUrl,
 } from '../../utils/validators';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -46,6 +52,7 @@ export default function EditProject() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [warnings, setWarnings] = useState({});
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     fetch(`${API}/api/categories`)
@@ -110,12 +117,23 @@ export default function EditProject() {
     }, 3000);
   };
 
+  const clearFieldError = (fieldId) => {
+    if (!fieldErrors[fieldId]) return;
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      delete next[fieldId];
+      return next;
+    });
+  };
+
   const clearField = (name) => {
     setForm((prev) => ({ ...prev, [name]: '' }));
     setWarnings((prev) => ({ ...prev, [name]: '' }));
+    clearFieldError(name);
   };
 
   const handleTitleChange = (e) => {
+    clearFieldError('title');
     const value = e.target.value;
     if (value === '') {
       setForm({ ...form, title: '' });
@@ -134,6 +152,7 @@ export default function EditProject() {
 
   const handleTextChange = (e) => {
     const { name, value } = e.target;
+    clearFieldError(name);
     if (value === '') {
       setForm({ ...form, [name]: '' });
       setWarnings((prev) => ({ ...prev, [name]: '' }));
@@ -151,28 +170,56 @@ export default function EditProject() {
 
   const handleUrlChange = (e) => {
     const { name, value } = e.target;
+    clearFieldError(name);
     if (limits[name]?.max && charCount(value) > limits[name].max) return;
     setForm({ ...form, [name]: value });
   };
 
   const overLimit = (key) => charCount(form[key]) > (limits[key]?.max || 0);
 
+  const showFieldError = (fieldId, message) => {
+    setFieldErrors({ [fieldId]: message });
+
+    setTimeout(() => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      setTimeout(() => {
+        try {
+          el.focus({ preventScroll: true });
+        } catch {}
+      }, 300);
+
+      el.classList.remove('input-error-flash');
+      void el.offsetWidth;
+      el.classList.add('input-error-flash');
+      setTimeout(() => el.classList.remove('input-error-flash'), 1100);
+    }, 50);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setSuccess(false);
 
-    if (!form.title.trim() || !form.description.trim()) {
-      setError(t('errors.title_and_description_required'));
+    if (!form.title.trim()) {
+      showFieldError('title', t('errors.title_and_description_required'));
+      return;
+    }
+    if (!form.description.trim()) {
+      showFieldError('description', t('errors.title_and_description_required'));
       return;
     }
 
     if (charCount(form.title.trim()) < limits.title.min) {
-      setError(t('errors.title_too_short'));
+      showFieldError('title', t('errors.title_too_short'));
       return;
     }
     if (charCount(form.description.trim()) < limits.description.min) {
-      setError(t('errors.description_too_short'));
+      showFieldError('description', t('errors.description_too_short'));
       return;
     }
 
@@ -187,22 +234,39 @@ export default function EditProject() {
 
     for (const [key, max] of Object.entries(maxLimits)) {
       if (form[key] && charCount(form[key]) > max) {
-        setError(t('errors.generic'));
+        showFieldError(key, t('errors.generic'));
         return;
       }
     }
 
-    if (!isValidUrl(form.githubUrl)) {
-      setError(t('errors.invalid_github_url'));
+    if (!form.githubUrl || !form.githubUrl.trim()) {
+      showFieldError('githubUrl', t('errors.github_url_required'));
       return;
     }
+    if (!isValidGithubRepoUrl(form.githubUrl)) {
+      showFieldError('githubUrl', t('errors.invalid_github_url'));
+      return;
+    }
+
     if (!isValidUrl(form.demoUrl)) {
-      setError(t('errors.invalid_demo_url'));
+      showFieldError('demoUrl', t('errors.invalid_demo_url'));
       return;
     }
-    if (!isValidUrl(form.imageUrl)) {
-      setError(t('errors.invalid_image_url'));
+
+    if (form.imageUrl && !isValidGithubImageUrl(form.imageUrl)) {
+      showFieldError('imageUrl', t('errors.image_url_must_be_github'));
       return;
+    }
+
+    if (form.imageUrl) {
+      const normalized = normalizeGithubImageUrl(form.imageUrl);
+      if (normalized) {
+        const sizeCheck = await checkGithubImageSize(normalized);
+        if (!sizeCheck.ok) {
+          showFieldError('imageUrl', t('errors.image_too_large'));
+          return;
+        }
+      }
     }
 
     setSubmitting(true);
@@ -217,12 +281,39 @@ export default function EditProject() {
         },
         body: JSON.stringify({
           ...form,
+          githubUrl: normalizeGithubRepoUrl(form.githubUrl),
+          imageUrl: form.imageUrl ? normalizeGithubImageUrl(form.imageUrl) : '',
           categoryIds: selectedCategories,
         }),
       });
 
       if (!res.ok) {
-        setError(await extractErrorMessage(res, t));
+        const { code, message } = await extractError(res, t);
+
+        // Field'a özel hata kodları → input altında göster
+        const githubFields = [
+          'github_url_required',
+          'invalid_github_url',
+          'github_repo_not_accessible',
+        ];
+        const imageFields = ['image_url_must_be_github', 'image_too_large'];
+        const demoFields = ['invalid_demo_url', 'demo_url_too_long'];
+        const titleFields = ['title_too_short', 'title_too_long', 'title_invalid_char'];
+        const descFields = ['description_too_short', 'description_too_long', 'description_invalid_char'];
+
+        if (githubFields.includes(code)) {
+          showFieldError('githubUrl', message);
+        } else if (imageFields.includes(code)) {
+          showFieldError('imageUrl', message);
+        } else if (demoFields.includes(code)) {
+          showFieldError('demoUrl', message);
+        } else if (titleFields.includes(code)) {
+          showFieldError('title', message);
+        } else if (descFields.includes(code)) {
+          showFieldError('description', message);
+        } else {
+          setError(message);
+        }
         setSubmitting(false);
         return;
       }
@@ -252,11 +343,9 @@ export default function EditProject() {
   if (error && !form.title) {
     return (
       <div className="w-full bg-bg px-4 sm:px-6 lg:px-8 py-page min-h-[70vh] flex items-center justify-center relative overflow-hidden">
-        {/* Glow blob */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.05] blur-[120px] rounded-pill pointer-events-none" />
 
         <div className="relative max-w-3xl mx-auto text-center">
-          {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-pill border border-accent/15 bg-surface/50">
             <span className="w-1.5 h-1.5 rounded-pill bg-accent animate-pulse" />
             <span className="text-mono-sm font-mono tracking-wider text-text-muted uppercase">
@@ -264,12 +353,10 @@ export default function EditProject() {
             </span>
           </div>
 
-          {/* #id — büyük mono */}
           <h1 className="text-h1 font-extrabold text-text tracking-tight mb-4 font-mono">
             #{id}
           </h1>
 
-          {/* Açıklama */}
           <h2 className="text-h5 font-bold text-text mb-2">
             {t('edit.not_found_title')}
           </h2>
@@ -277,7 +364,6 @@ export default function EditProject() {
             {t('edit.not_found_desc')}
           </p>
 
-          {/* Buton */}
           <Link
             to="/"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer font-mono"
@@ -338,6 +424,7 @@ export default function EditProject() {
               />
               <InputClearButton visible={!!form.title} onClick={() => clearField('title')} />
             </div>
+            <FieldError message={fieldErrors.title} />
             <CharWarning char={warnings.title} />
           </div>
 
@@ -368,6 +455,7 @@ export default function EditProject() {
                 className="top-4 translate-y-0"
               />
             </div>
+            <FieldError message={fieldErrors.description} />
             <CharWarning char={warnings.description} />
           </div>
 
@@ -397,6 +485,7 @@ export default function EditProject() {
                 className="top-4 translate-y-0"
               />
             </div>
+            <FieldError message={fieldErrors.longDescription} />
             <CharWarning char={warnings.longDescription} />
           </div>
 
@@ -411,7 +500,7 @@ export default function EditProject() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label htmlFor="githubUrl" className="block text-caption font-medium text-text">
-                {t('create.github_label')}
+                {t('create.github_label')} <span className="text-red-400">{t('common.required')}</span>
               </label>
               <CharCounter value={form.githubUrl} max={limits.githubUrl.max} id="github-url-counter" />
             </div>
@@ -419,16 +508,21 @@ export default function EditProject() {
               <input
                 id="githubUrl"
                 name="githubUrl"
-                type="url"
+                type="text"
                 value={form.githubUrl}
                 onChange={handleUrlChange}
                 disabled={submitting}
+                required
                 className={`w-full px-3.5 py-2.5 pr-10 text-body-sm bg-bg border rounded-button text-text placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/10 transition-all disabled:opacity-50 font-mono ${
                   overLimit('githubUrl') ? 'border-red-400' : 'border-accent/15 focus:border-accent/40'
                 }`}
               />
               <InputClearButton visible={!!form.githubUrl} onClick={() => clearField('githubUrl')} />
             </div>
+            <FieldError message={fieldErrors.githubUrl} />
+            <p className="mt-1 text-mono-sm text-text-muted font-mono">
+              {t('create.github_hint')}
+            </p>
           </div>
 
           {/* Demo URL */}
@@ -453,6 +547,7 @@ export default function EditProject() {
               />
               <InputClearButton visible={!!form.demoUrl} onClick={() => clearField('demoUrl')} />
             </div>
+            <FieldError message={fieldErrors.demoUrl} />
           </div>
 
           {/* Image URL */}
@@ -476,6 +571,16 @@ export default function EditProject() {
                 }`}
               />
               <InputClearButton visible={!!form.imageUrl} onClick={() => clearField('imageUrl')} />
+            </div>
+            <FieldError message={fieldErrors.imageUrl} />
+            <div className="mt-1 text-mono-sm text-text-muted font-mono space-y-0.5">
+              <p>{t('create.image_hint')}</p>
+              {t('create.image_hint_examples')?.map?.((line, i) => (
+                <div key={i} className="flex items-start gap-1.5">
+                  <span className="text-accent shrink-0">✔</span>
+                  <span>{line}</span>
+                </div>
+              ))}
             </div>
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>

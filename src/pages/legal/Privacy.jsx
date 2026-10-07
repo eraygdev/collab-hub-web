@@ -12,7 +12,7 @@ export default function Privacy() {
         <>
           <p>
             This privacy policy explains what data is collected when you use
-            the Collab-Hub platform, how it is used, and your rights.
+            the RepoReef platform, how it is used, and your rights.
           </p>
           <p>
             By using the platform, you are deemed to have accepted this policy.
@@ -69,7 +69,7 @@ export default function Privacy() {
       title: 'Third-Party Services',
       content: (
         <>
-          <p>Collab-Hub uses the following third-party services:</p>
+          <p>RepoReef uses the following third-party services:</p>
           <ul>
             <li>
               <strong>GitHub OAuth:</strong> For authentication. GitHub's privacy
