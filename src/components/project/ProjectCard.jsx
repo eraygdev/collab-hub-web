@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatCount } from '../../utils/format';
 import * as Icon from '../ui/Icons';
 
 const MAX_VISIBLE = 3;
@@ -64,7 +65,7 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
             ) : (
               <Icon.Star className="w-3 h-3" />
             )}
-            <span className="tabular-nums">{project.stars}</span>
+            <span className="tabular-nums">{formatCount(project.stars)}</span>
           </div>
         )}
       </div>

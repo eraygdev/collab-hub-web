@@ -519,7 +519,7 @@ export default function ProjectDetail() {
                 {isAuthor ? (
                   <div className="w-full px-4 py-2.5 bg-bg/60 text-text-muted text-body-sm font-medium rounded-button text-center border border-accent/10 font-mono inline-flex items-center justify-center gap-2">
                     <Icon.StarFilled className="w-4 h-4" />
-                    {t('details.cta.your_project', { count: project.stars })}
+                    {t('details.cta.your_project', { count: formatCount(project.stars) })}
                   </div>
                 ) : (
                   <button
@@ -659,7 +659,7 @@ export default function ProjectDetail() {
                     <dt className="text-text-muted font-mono">{t('details.meta.stars')}</dt>
                     <dd className="font-medium text-text font-mono tabular-nums inline-flex items-center gap-1">
                       <Icon.StarFilled className="w-3.5 h-3.5 text-text-muted" />
-                      {project.stars}
+                      {formatCount(project.stars)}
                     </dd>
                   </div>
                   <div className="flex items-center justify-between">

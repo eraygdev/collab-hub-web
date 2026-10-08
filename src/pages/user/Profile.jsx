@@ -319,7 +319,7 @@ export default function UserProfile() {
                 <Icon.Star className="w-4 h-4 text-text-muted shrink-0" />
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
-                    {profile.stats.totalStars}
+                    {formatCount(profile.stats.totalStars)}
                   </span>
                   <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
                     {t('profile.stat.stars')}
@@ -334,7 +334,7 @@ export default function UserProfile() {
                 <Icon.Users className="w-4 h-4 text-text-muted shrink-0" />
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
-                    {profile.stats.totalContributors}
+                    {formatCount(profile.stats.totalContributors)}
                   </span>
                   <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
                     {t('profile.stat.contributors')}

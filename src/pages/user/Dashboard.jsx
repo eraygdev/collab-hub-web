@@ -236,7 +236,7 @@ export default function Dashboard() {
                 <Icon.Star className="w-4 h-4 text-text-muted shrink-0" />
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
-                    {stats.stars}
+                    {formatCount(stats.stars)}
                   </span>
                   <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
                     {t('dashboard.stat.stars')}
