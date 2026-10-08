@@ -62,6 +62,12 @@ export const tr = {
       clear_filters: "filtreleri temizle",
       create: "proje oluştur",
     },
+    sort: {
+      hot: "popüler",
+      trending: "trend",
+      newest: "en yeni",
+      popular: "en çok yıldız",
+    },
   },
 
   // ─── NAVBAR ───

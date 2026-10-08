@@ -10,4 +10,7 @@ export default defineConfig({
       domain: "https://reporeef.com",
     }),
   ],
+  build: {
+    chunkSizeWarningLimit: 800, // 500 → 800
+  },
 });

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import CategoryModal from './CategoryPick';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useConfig } from '../../context/ConfigContext';
+import Chip from '../ui/Chip';
 import * as Icon from '../ui/Icons';
 
 export default function CategoryChips({ categories, selected, onChange, disabled }) {
@@ -44,34 +45,28 @@ export default function CategoryChips({ categories, selected, onChange, disabled
             const isDisabled = !isSelected && selected.length >= MAX_SELECTION;
 
             return (
-              <button
+              <Chip
                 key={cat.id}
-                type="button"
+                active={isSelected}
                 onClick={() => toggle(cat.id)}
                 disabled={disabled || isDisabled}
-                style={{ animationDelay: `${index * 30}ms` }}
-                className={`animate-chip px-3 py-1.5 text-caption font-medium rounded-pill border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
-                  isSelected
-                    ? 'bg-accent text-bg border-accent'
-                    : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
-                }`}
+                animationDelay={`${index * 30}ms`}
               >
                 {cat.name}
-              </button>
+              </Chip>
             );
           })}
 
           {categories.length > VISIBLE_LIMIT && (
-            <button
-              type="button"
+            <Chip
+              variant="dashed"
               onClick={() => setIsModalOpen(true)}
               disabled={disabled}
-              style={{ animationDelay: `${Math.min(VISIBLE_LIMIT, 12) * 30}ms` }}
-              className="animate-chip inline-flex items-center gap-1 px-3 py-1.5 text-caption font-medium rounded-pill border border-dashed border-accent/30 text-text-muted hover:border-accent hover:text-text transition-all cursor-pointer disabled:opacity-40 font-mono"
+              animationDelay={`${Math.min(VISIBLE_LIMIT, 12) * 30}ms`}
             >
               <Icon.Plus className="w-3 h-3" />
               {t('category_chips.more', { count: categories.length - VISIBLE_LIMIT })}
-            </button>
+            </Chip>
           )}
         </div>
       )}

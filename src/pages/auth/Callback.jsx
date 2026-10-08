@@ -14,7 +14,7 @@ export default function AuthCallback() {
     if (token) {
       login(token);
       refreshUser().finally(() => {
-        navigate('/dashboard', { replace: true });
+        navigate('/', { replace: true });
       });
     } else {
       navigate('/login', { replace: true });

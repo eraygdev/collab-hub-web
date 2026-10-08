@@ -62,6 +62,12 @@ export const en = {
       clear_filters: "clear filters",
       create: "create project",
     },
+    sort: {
+      hot: "hot",
+      trending: "trending",
+      newest: "newest",
+      popular: "popular",
+    },
   },
 
   // ─── NAVBAR ───

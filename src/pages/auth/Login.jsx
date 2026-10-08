@@ -13,7 +13,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate('/dashboard', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [user, loading, navigate]);
 

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useConfig } from "../../context/ConfigContext";
 import { useLanguage } from '../../i18n/LanguageContext';
 import ScrollHint from '../../components/ui/ScrollHint';
+import SortDropdown from '../../components/ui/SortDropdown';
+import Chip from '../../components/ui/Chip';
 import ProjectCard from '../../components/project/ProjectCard';
 import CategoryModal from '../../components/project/CategoryPick';
 import * as Icon from '../../components/ui/Icons';
@@ -17,8 +19,34 @@ export default function Home() {
   
   const { t } = useLanguage();
   const { limits } = useConfig();
-  const VISIBLE_LIMIT = limits.visibleCategories;
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const VISIBLE_LIMIT = isMobile ? 4 : limits.visibleCategories;
+
+  const [sortMode, setSortMode] = useState(() => {
+    try {
+      const stored = localStorage.getItem('reporeef:sort');
+      if (['popular', 'hot', 'trending', 'newest'].includes(stored)) {
+        return stored;
+      }
+    } catch {}
+    return 'popular';
+  });
+
+  // setSortMode çağrıldığında localStorage'a yaz
+  const handleSortChange = (mode) => {
+    setSortMode(mode);
+    try {
+      localStorage.setItem('reporeef:sort', mode);
+    } catch {}
+  };
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -111,6 +139,7 @@ export default function Home() {
         params.set('categoryIds', categoryIds.join(','));
         params.set('mode', mode);
       }
+      params.set('sort', sortMode);
 
       const res = await fetch(`${API}/api/projects?${params.toString()}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -124,7 +153,7 @@ export default function Home() {
       const data = await res.json();
       return Array.isArray(data) ? data : [];
     },
-    []
+    [sortMode]
   );
 
   useEffect(() => {
@@ -459,11 +488,12 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* View toggle */}
               <div className="inline-flex rounded-button border border-accent/20 p-0.5 bg-surface/60">
                 <button
                   onClick={() => setView('normal')}
-                  className={`px-3 py-1.5 text-caption font-medium rounded-button transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 text-caption font-medium rounded-button transition-all cursor-pointer ${
                     view === 'normal'
                       ? 'bg-accent text-bg shadow-sm'
                       : 'text-text-muted hover:text-text'
@@ -475,7 +505,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setView('compact')}
-                  className={`px-3 py-1.5 text-caption font-medium rounded-button transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 text-caption font-medium rounded-button transition-all cursor-pointer ${
                     view === 'compact'
                       ? 'bg-accent text-bg shadow-sm'
                       : 'text-text-muted hover:text-text'
@@ -486,39 +516,32 @@ export default function Home() {
                   <Icon.LayoutGrid className="w-3.5 h-3.5" />
                 </button>
               </div>
+
+              {/* Sort selector */}
+              <SortDropdown value={sortMode} onChange={handleSortChange} />
             </div>
           </div>
 
           {allCategories.length > 0 && (
             <div className="mb-5 flex flex-wrap gap-2">
-              <button
+              <Chip
+                variant="all"
+                active={selectedCategories.length === 0}
                 onClick={() => setSelectedCategories([])}
-                style={{ animationDelay: '0ms' }}
-                className={`animate-chip px-3 py-1.5 text-caption font-medium rounded-pill border transition-all cursor-pointer font-mono ${
-                  selectedCategories.length === 0
-                    ? 'bg-accent text-bg border-accent'
-                    : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
-                }`}
+                animationDelay="0ms"
               >
                 {t('home.categories.all')}
-              </button>
-              {allCategories.slice(0, VISIBLE_LIMIT).map((cat, index) => {
-                const isSelected = selectedCategories.includes(cat.id);
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => toggleCategory(cat.id)}
-                    style={{ animationDelay: `${(index + 1) * 30}ms` }}
-                    className={`animate-chip px-3 py-1.5 text-caption font-medium rounded-pill border transition-all cursor-pointer font-mono ${
-                      isSelected
-                        ? 'bg-accent text-bg border-accent'
-                        : 'bg-surface text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                );
-              })}
+              </Chip>
+              {allCategories.slice(0, VISIBLE_LIMIT).map((cat, index) => (
+                <Chip
+                  key={cat.id}
+                  active={selectedCategories.includes(cat.id)}
+                  onClick={() => toggleCategory(cat.id)}
+                  animationDelay={`${(index + 1) * 30}ms`}
+                >
+                  {cat.name}
+                </Chip>
+              ))}
               {allCategories.length > VISIBLE_LIMIT && (
                 <button
                   onClick={() => setIsModalOpen(true)}

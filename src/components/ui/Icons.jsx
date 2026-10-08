@@ -250,6 +250,12 @@ export const Calendar = ({ className, ...p }) => (
   </Svg>
 );
 
+export const Sort = ({ className, ...p }) => (
+  <Svg className={className} strokeWidth={2} {...p}>
+    <path d="M3 6h18M6 12h12M9 18h6" />
+  </Svg>
+);
+
 // ═══════════════════════════════════════════════════════════
 // SOSYAL
 // ═══════════════════════════════════════════════════════════

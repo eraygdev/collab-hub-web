@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import Chip from '../ui/Chip';
 import * as Icon from '../ui/Icons';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -181,20 +182,16 @@ export default function CategoryPick({
                   !isSelected && maxSelection && tempSelection.length >= maxSelection;
 
                 return (
-                  <button
+                  <Chip
                     key={cat.id}
-                    type="button"
+                    tone="bg"
+                    active={isSelected}
                     onClick={() => toggle(cat.id)}
                     disabled={isDisabled}
-                    style={{ animationDelay: `${Math.min(index, 15) * 25}ms` }}
-                    className={`animate-chip px-3 py-1.5 text-caption font-medium rounded-pill border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-mono ${
-                      isSelected
-                        ? 'bg-accent text-bg border-accent'
-                        : 'bg-bg text-text-muted border-accent/15 hover:border-accent/40 hover:text-text'
-                    }`}
+                    animationDelay={`${Math.min(index, 15) * 25}ms`}
                   >
                     {cat.name}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
