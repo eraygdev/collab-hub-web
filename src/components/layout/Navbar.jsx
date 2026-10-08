@@ -130,7 +130,7 @@ export default function Navbar({ onOpenSidebar }) {
     <>
       <header className="sticky top-0 z-50 w-full bg-bg/80 backdrop-blur-md border-b border-accent/10">
         <div className="w-full px-2 sm:px-6 lg:px-8 h-14 flex items-center gap-1.5 sm:gap-5">
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={onOpenSidebar}
               className="p-1.5 rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"

@@ -115,8 +115,8 @@ export default function Privacy() {
           </ul>
           <p>
             For your requests, write to{' '}
-            <a href="mailto:retadeveloper@gmail.com">
-              retadeveloper@gmail.com
+            <a href="mailto:hello@reporeef.com">
+              hello@reporeef.com
             </a>.
           </p>
         </>

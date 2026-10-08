@@ -242,7 +242,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ## Contact
 
 **Eray** — [@eraygdev](https://github.com/eraygdev)
-Email: retadeveloper@gmail.com
+Email: hello@reporeef.com
 
 ---
 
@@ -313,4 +313,4 @@ Bu proje **MIT Lisansı** altında lisanslanmıştır — detaylar için [LICENS
 ### İletişim
 
 **Eray** — [@eraygdev](https://github.com/eraygdev)
-E-posta: retadeveloper@gmail.com
+E-posta: hello@reporeef.com

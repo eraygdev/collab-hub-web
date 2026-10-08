@@ -105,7 +105,7 @@ export default function Footer() {
                   <Icon.Github className="w-4 h-4" />
                 </a>
                 <a
-                  href="mailto:retadeveloper@gmail.com"
+                  href="mailto:hello@reporeef.com"
                   aria-label={t('footer.aria.email')}
                   className="w-9 h-9 rounded-button bg-surface border border-accent/15 flex items-center justify-center text-text-muted hover:text-bg hover:bg-accent hover:border-accent transition-all"
                 >
@@ -165,7 +165,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="mailto:retadeveloper@gmail.com"
+                    href="mailto:hello@reporeef.com"
                     className="text-text-muted hover:text-text transition-colors"
                   >
                     {t('footer.link.contact')}
