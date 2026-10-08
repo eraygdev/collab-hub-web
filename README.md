@@ -328,3 +328,7 @@ Bu proje **MIT Lisansı** altında lisanslanmıştır — detaylar için [LICENS
 
 **Eray** — [@eraygdev](https://github.com/eraygdev)
 E-posta: hello@reporeef.com
+
+### Dev Stack
+
+📚 **[Full tech stack →](STACK.md)**
