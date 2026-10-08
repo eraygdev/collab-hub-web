@@ -6,6 +6,7 @@ import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
 import { useProjectView } from '../../hooks/useProjectView';
+import { formatCount } from '../../utils/format';
 import { getHueFromUsername } from '../../utils/color';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -334,7 +335,7 @@ export default function UserProfile() {
                 <Icon.Users className="w-4 h-4 text-text-muted shrink-0" />
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-h5 font-bold text-text font-mono tabular-nums leading-none">
-                    {formatCount(profile.stats.totalContributors)}
+                    {profile.stats.totalContributors}
                   </span>
                   <span className="text-caption text-text-muted font-mono uppercase tracking-wider">
                     {t('profile.stat.contributors')}

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useToast } from '../../components/ui/Toast';
 import { extractErrorMessage } from '../../utils/errors';
+import { formatCount } from '../../utils/format';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import JoinRequestModal from '../../components/project/JoinRequestModal';
 import ContributorCard from '../../components/project/ContributorCard';
@@ -536,12 +537,12 @@ export default function ProjectDetail() {
                     ) : project.starred ? (
                       <>
                         <Icon.StarFilled className="w-4 h-4" />
-                        {t('details.cta.starred', { count: project.stars })}
+                        {t('details.cta.starred', { count: formatCount(project.stars) })}
                       </>
                     ) : (
                       <>
                         <Icon.Star className="w-4 h-4" />
-                        {t('details.cta.star', { count: project.stars })}
+                        {t('details.cta.star', { count: formatCount(project.stars) })}
                       </>
                     )}
                   </button>

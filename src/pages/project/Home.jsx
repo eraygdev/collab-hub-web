@@ -14,6 +14,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const LIMIT = 20;
 
 export default function Home() {
+  
   const { t } = useLanguage();
   const { limits } = useConfig();
   const VISIBLE_LIMIT = limits.visibleCategories;

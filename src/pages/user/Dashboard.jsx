@@ -8,6 +8,7 @@ import ProjectCard from '../../components/project/ProjectCard';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
 import { useProjectView } from '../../hooks/useProjectView';
+import { formatCount } from '../../utils/format';
 import { getHueFromUsername } from '../../utils/color';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
