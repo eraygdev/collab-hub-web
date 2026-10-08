@@ -3,7 +3,7 @@ import { useLanguage } from '../../i18n/LanguageContext';
 import Chip from '../ui/Chip';
 import * as Icon from '../ui/Icons';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 
 let categoriesCache = null;
 

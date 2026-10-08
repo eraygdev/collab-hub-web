@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useConfig } from '../../context/ConfigContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import LoadingScreen from '../../components/ui/LoadingScreen';
 import { useDebounced } from '../../hooks/useDebounced';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharCounter from '../../components/ui/CharCounter';
@@ -12,7 +13,7 @@ import FieldError from '../../components/ui/FieldError';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import ContributorLimitPicker from '../../components/project/ContributorLimitPicker';
-import * as Icon from '../../components/ui/Icons';
+import FormBanner from '../../components/ui/FormBanner';
 import { extractError } from '../../utils/errors';
 import {
   TITLE_REGEX,
@@ -27,7 +28,7 @@ import {
   isValidGithubRepoUrl,
 } from '../../utils/validators';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 const DRAFT_KEY = 'createProjectDraft';
 
 export default function CreateProject() {
@@ -300,11 +301,13 @@ export default function CreateProject() {
           'github_url_required',
           'invalid_github_url',
           'github_repo_not_accessible',
+          'github_url_taken',
         ];
         const imageFields = ['image_url_must_be_github', 'image_too_large'];
         const demoFields = ['invalid_demo_url', 'demo_url_too_long'];
-        const titleFields = ['title_too_short', 'title_too_long', 'title_invalid_char'];
-        const descFields = ['description_too_short', 'description_too_long', 'description_invalid_char'];
+        const titleFields = ['title_too_short', 'title_too_long', 'title_invalid_char', 'title_profanity'];
+        const descFields = ['description_too_short', 'description_too_long', 'description_invalid_char', 'description_profanity'];
+        const longDescFields = ['longDescription_too_long', 'longDescription_invalid_char', 'longDescription_profanity'];
 
         if (githubFields.includes(code)) {
           showFieldError('githubUrl', message);
@@ -316,6 +319,8 @@ export default function CreateProject() {
           showFieldError('title', message);
         } else if (descFields.includes(code)) {
           showFieldError('description', message);
+        } else if (longDescFields.includes(code)) {
+          showFieldError('longDescription', message);
         } else {
           setError(message);
         }
@@ -351,11 +356,7 @@ export default function CreateProject() {
   };
 
   if (loading) {
-    return (
-      <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-body-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
-      </div>
-    );
+    return <LoadingScreen message={t('create.loading')} />;
   }
 
   if (!user) return null;
@@ -645,25 +646,9 @@ export default function CreateProject() {
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 
-          {error && (
-            <div
-              role="alert"
-              className="text-body-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
-            >
-              <Icon.Warning className="w-4 h-4 shrink-0" />
-              {error}
-            </div>
-          )}
+          <FormBanner type="error" message={error} />
 
-          {success && (
-            <div
-              role="status"
-              className="text-body-sm text-accent bg-accent/10 border border-accent/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
-            >
-              <Icon.Check className="w-4 h-4 shrink-0" />
-              {t('create.success')}
-            </div>
-          )}
+          <FormBanner type="success" message={success ? t('create.success') : ''} />
 
           <div className="flex flex-col sm:flex-row items-stretch gap-3 pt-2">
             <button

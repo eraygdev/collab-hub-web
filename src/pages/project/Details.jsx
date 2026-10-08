@@ -2,6 +2,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import LoadingScreen from '../../components/ui/LoadingScreen';
+import NotFoundScreen from '../../components/ui/NotFoundScreen';
 import { useToast } from '../../components/ui/Toast';
 import { extractErrorMessage } from '../../utils/errors';
 import { formatCount } from '../../utils/format';
@@ -13,7 +15,7 @@ import RemoveContributorModal from '../../components/project/RemoveContributorMo
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import * as Icon from '../../components/ui/Icons';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -313,51 +315,18 @@ export default function ProjectDetail() {
   };
 
   if (loading) {
-    return (
-      <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-body-sm text-text-muted font-mono">{t('details.loading')}</p>
-      </div>
-    );
+    return <LoadingScreen message={t('details.loading')} />;
   }
 
   if (error || !project) {
     return (
-      <div className="w-full bg-bg px-4 sm:px-6 lg:px-8 py-page min-h-[70vh] flex items-center justify-center relative overflow-hidden">
-        {/* Glow blob */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.05] blur-[120px] rounded-pill pointer-events-none" />
-
-        <div className="relative max-w-3xl mx-auto text-center">
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-pill border border-accent/15 bg-surface/50">
-            <span className="w-1.5 h-1.5 rounded-pill bg-accent animate-pulse" />
-            <span className="text-mono-sm font-mono tracking-wider text-text-muted uppercase">
-              {t('details.not_found_eyebrow')}
-            </span>
-          </div>
-
-          {/* #id — büyük mono */}
-          <h1 className="text-h1 font-extrabold text-text tracking-tight mb-4 font-mono">
-            #{id}
-          </h1>
-
-          {/* Açıklama */}
-          <h2 className="text-h5 font-bold text-text mb-2">
-            {t('details.not_found_title')}
-          </h2>
-          <p className="text-body-sm text-text-muted mb-8 max-w-md mx-auto leading-relaxed">
-            {t('details.not_found_desc')}
-          </p>
-
-          {/* Buton */}
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer font-mono"
-          >
-            <Icon.ArrowLeft className="w-4 h-4" />
-            {t('details.back_home')}
-          </Link>
-        </div>
-      </div>
+      <NotFoundScreen
+        eyebrow={t('details.not_found_eyebrow')}
+        bigText={`#${id}`}
+        title={t('details.not_found_title')}
+        description={t('details.not_found_desc')}
+        primaryCta={{ label: t('details.back_home'), to: '/', icon: Icon.ArrowLeft }}
+      />
     );
   }
 

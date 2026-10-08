@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useConfig } from '../../context/ConfigContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import Avatar from '../../components/ui/Avatar';
 import CharWarning from '../../components/ui/CharWarning';
 import InputClearButton from '../../components/ui/InputClearButton';
 import * as Icon from '../../components/ui/Icons';
@@ -13,7 +14,7 @@ import {
   findInvalidChar,
 } from '../../utils/validators';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 
 export default function Account() {
   const { user, loading, refreshUser } = useAuth();
@@ -155,23 +156,7 @@ export default function Account() {
 
       {/* Avatar */}
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-pill bg-bg border border-accent/15 overflow-hidden shrink-0">
-          {user.avatar_url ? (
-            <img
-              src={user.avatar_url}
-              alt={user.username}
-              loading="lazy"
-              decoding="async"
-              width="64"
-              height="64"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Icon.User className="w-8 h-8 text-text-muted" />
-            </div>
-          )}
-        </div>
+        <Avatar src={user.avatar_url} username={user.username} size="xl" />
         <div className="text-caption text-text-muted font-mono">
           <p className="font-medium text-text">{t('settings.account.avatar_label')}</p>
           <p>{t('settings.account.avatar_hint')}</p>

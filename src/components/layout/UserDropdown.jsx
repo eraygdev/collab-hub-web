@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useClickOutside } from '../../hooks/useClickOutside';
+import Avatar from '../ui/Avatar';
 import * as Icon from '../ui/Icons';
 
 export default function UserDropdown() {
@@ -11,38 +13,13 @@ export default function UserDropdown() {
 
   const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [avatarError, setAvatarError] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
     if (!open) setConfirmLogout(false);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-
-    const handleClick = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') {
-        if (confirmLogout) {
-          setConfirmLogout(false);
-        } else {
-          setOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('keydown', handleEsc);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('keydown', handleEsc);
-    };
-  }, [open, confirmLogout]);
+  useClickOutside(menuRef, () => setOpen(false), open);
 
   if (!user) {
     return (
@@ -56,39 +33,22 @@ export default function UserDropdown() {
     );
   }
 
-  const showImage = user.avatar_url && !avatarError;
-
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-8 h-8 rounded-pill bg-surface border border-accent/15 overflow-hidden cursor-pointer hover:border-accent/40 hover:ring-2 hover:ring-accent/10 transition-all"
+        className="rounded-pill cursor-pointer hover:ring-2 hover:ring-accent/10 transition-all"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('user_dropdown.menu')}
       >
-        {showImage ? (
-          <img
-            src={user.avatar_url}
-            alt={user.username}
-            loading="lazy"
-            decoding="async"
-            width="32"
-            height="32"
-            className="w-full h-full object-cover"
-            onError={() => setAvatarError(true)}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Icon.User className="w-4 h-4 text-text-muted" />
-          </div>
-        )}
+        <Avatar src={user.avatar_url} username={user.username} size="md" />
       </button>
 
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-56 bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden z-[100] animate-dropdown"
+          className="absolute right-0 mt-2 w-56 bg-surface border border-accent/20 rounded-card shadow-2xl overflow-hidden z-100 animate-dropdown"
         >
           <div className="px-4 py-3 border-b border-accent/10">
             <p className="text-body-sm font-semibold text-text truncate font-mono">

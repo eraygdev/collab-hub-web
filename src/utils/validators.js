@@ -3,7 +3,7 @@
 
 // ✅ Başlık / Kullanıcı Adı: sadece harf, rakam, _ . ve boşluk
 export const TITLE_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
-export const USERNAME_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
+export const USERNAME_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_.\- ]*$/;
 
 // ✅ Açıklamalar / Bio: harf, rakam, noktalama, boşluk (emoji/CJK yok)
 export const TEXT_REGEX =

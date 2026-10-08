@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import * as Icon from '../../components/ui/Icons';
 
@@ -23,25 +24,7 @@ export default function SettingsLayout() {
   }, [location.pathname]);
 
   // Dışına tıklayınca + ESC ile kapat
-  useEffect(() => {
-    if (!mobileOpen) return;
-
-    const handleClick = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMobileOpen(false);
-      }
-    };
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') setMobileOpen(false);
-    };
-
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('keydown', handleEsc);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('keydown', handleEsc);
-    };
-  }, [mobileOpen]);
+  useClickOutside(menuRef, () => setMobileOpen(false), mobileOpen);
 
   return (
     <div className="w-full bg-bg min-h-screen">

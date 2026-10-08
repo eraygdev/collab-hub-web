@@ -443,6 +443,7 @@ export const en = {
 
   // ─── CREATE / EDIT ───
   create: {
+    loading: "Loading project...",
     title: "Create a new project.",
     subtitle: "Introduce your project to the community, find contributors.",
     title_label: "Project Title",
@@ -491,6 +492,7 @@ export const en = {
   },
 
   edit: {
+    loading: "Loading project...",
     title: "Edit project.",
     subtitle: "Save your changes or cancel.",
     submitting: "saving...",
@@ -616,7 +618,7 @@ export const en = {
   // ─── ERRORS (backend error code → mesaj) ───
   errors: {
     generic: "Something went wrong",
-    server_error: "Server error, please try again",
+    too_many_requests: "Too many requests, please wait a bit",
 
     // auth
     missing_token: "Missing session info",
@@ -671,6 +673,16 @@ export const en = {
     // permission
     forbidden: "You don't have permission for this action",
 
+    // profanity
+    title_profanity: "Title contains inappropriate language",
+    description_profanity: "Description contains inappropriate language",
+    longDescription_profanity:
+      "Long description contains inappropriate language",
+    message_profanity: "Message contains inappropriate language",
+    bio_profanity: "About section contains inappropriate language",
+    username_profanity: "Username contains inappropriate language",
+    search_profanity: "Search text contains inappropriate language",
+
     // validation
     username_too_long: "Username is too long",
     username_invalid_char: "Username contains invalid characters",
@@ -685,6 +697,7 @@ export const en = {
       "Long description contains invalid characters",
     search_too_long: "Search text is too long",
     search_invalid_char: "Search text contains invalid characters",
+    github_url_taken: "A project with this repository already exists",
 
     // min-length
     title_too_short: "Title is too short (min 3 characters)",

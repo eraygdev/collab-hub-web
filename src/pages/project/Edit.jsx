@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useConfig } from '../../context/ConfigContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import NotFoundScreen from '../../components/ui/NotFoundScreen';
+import LoadingScreen from '../../components/ui/LoadingScreen';
 import { useDebounced } from '../../hooks/useDebounced';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import CharCounter from '../../components/ui/CharCounter';
@@ -11,6 +13,7 @@ import InputClearButton from '../../components/ui/InputClearButton';
 import FieldError from '../../components/ui/FieldError';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
+import FormBanner from '../../components/ui/FormBanner';
 import * as Icon from '../../components/ui/Icons';
 import { extractError } from '../../utils/errors';
 import {
@@ -26,7 +29,7 @@ import {
   isValidGithubRepoUrl,
 } from '../../utils/validators';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 
 export default function EditProject() {
   const { id } = useParams();
@@ -297,11 +300,13 @@ export default function EditProject() {
           'github_url_required',
           'invalid_github_url',
           'github_repo_not_accessible',
+          'github_url_taken',
         ];
         const imageFields = ['image_url_must_be_github', 'image_too_large'];
         const demoFields = ['invalid_demo_url', 'demo_url_too_long'];
-        const titleFields = ['title_too_short', 'title_too_long', 'title_invalid_char'];
-        const descFields = ['description_too_short', 'description_too_long', 'description_invalid_char'];
+        const titleFields = ['title_too_short', 'title_too_long', 'title_invalid_char', 'title_profanity'];
+        const descFields = ['description_too_short', 'description_too_long', 'description_invalid_char', 'description_profanity'];
+        const longDescFields = ['longDescription_too_long', 'longDescription_invalid_char', 'longDescription_profanity'];
 
         if (githubFields.includes(code)) {
           showFieldError('githubUrl', message);
@@ -313,6 +318,8 @@ export default function EditProject() {
           showFieldError('title', message);
         } else if (descFields.includes(code)) {
           showFieldError('description', message);
+        } else if (longDescFields.includes(code)) {
+          showFieldError('longDescription', message);
         } else {
           setError(message);
         }
@@ -333,48 +340,20 @@ export default function EditProject() {
   const debouncedImageUrl = useDebounced(form.imageUrl, 400);
 
   if (authLoading || loading) {
-    return (
-      <div className="w-full bg-bg min-h-screen flex items-center justify-center">
-        <p className="text-body-sm text-text-muted font-mono">{t('dashboard.loading')}</p>
-      </div>
-    );
+    return <LoadingScreen message={t('edit.loading')} />;
   }
 
   if (!user) return null;
 
   if (error && !form.title) {
     return (
-      <div className="w-full bg-bg px-4 sm:px-6 lg:px-8 py-page min-h-[70vh] flex items-center justify-center relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-accent opacity-[0.05] blur-[120px] rounded-pill pointer-events-none" />
-
-        <div className="relative max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-pill border border-accent/15 bg-surface/50">
-            <span className="w-1.5 h-1.5 rounded-pill bg-accent animate-pulse" />
-            <span className="text-mono-sm font-mono tracking-wider text-text-muted uppercase">
-              {t('edit.not_found_eyebrow')}
-            </span>
-          </div>
-
-          <h1 className="text-h1 font-extrabold text-text tracking-tight mb-4 font-mono">
-            #{id}
-          </h1>
-
-          <h2 className="text-h5 font-bold text-text mb-2">
-            {t('edit.not_found_title')}
-          </h2>
-          <p className="text-body-sm text-text-muted mb-8 max-w-md mx-auto leading-relaxed">
-            {t('edit.not_found_desc')}
-          </p>
-
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent text-bg text-body-sm font-bold rounded-button border border-accent hover:bg-accent/90 transition-all hover:shadow-[0_0_30px_-5px_rgba(239,228,206,0.4)] cursor-pointer font-mono"
-          >
-            <Icon.ArrowLeft className="w-4 h-4" />
-            {t('edit.back_home')}
-          </Link>
-        </div>
-      </div>
+      <NotFoundScreen
+        eyebrow={t('edit.not_found_eyebrow')}
+        bigText={`#${id}`}
+        title={t('edit.not_found_title')}
+        description={t('edit.not_found_desc')}
+        primaryCta={{ label: t('edit.back_home'), to: '/', icon: Icon.ArrowLeft }}
+      />
     );
   }
 
@@ -587,15 +566,7 @@ export default function EditProject() {
             <ImagePreview url={form.imageUrl} debouncedUrl={debouncedImageUrl} />
           </div>
 
-          {error && (
-            <div
-              role="alert"
-              className="text-body-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-button px-4 py-2.5 font-mono inline-flex items-center gap-2"
-            >
-              <Icon.Warning className="w-4 h-4 shrink-0" />
-              {error}
-            </div>
-          )}
+          <FormBanner type="error" message={error} />
 
           {success && (
             <div

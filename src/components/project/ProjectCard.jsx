@@ -1,15 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatCount } from '../../utils/format';
+import Avatar from '../../components/ui/Avatar';
 import * as Icon from '../ui/Icons';
 
 const MAX_VISIBLE = 3;
 const MAX_VISIBLE_COMPACT = 2;
 
 function ProjectCard({ project, showAuthor = true, compact = false }) {
-  const categories = project.categories || [];
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
+
+  const categories = useMemo(
+    () => project.categories || [],
+    [project.categories]
+  );
 
   const visibleCategories = useMemo(
     () => categories.slice(0, compact ? MAX_VISIBLE_COMPACT : MAX_VISIBLE),
@@ -74,26 +79,7 @@ function ProjectCard({ project, showAuthor = true, compact = false }) {
         {/* Yazar */}
         {!compact && showAuthor && project.author && (
           <div className="flex items-center gap-1.5 mb-2">
-            <div className="w-4 h-4 rounded-pill bg-bg border border-accent/20 overflow-hidden shrink-0">
-              {project.authorAvatar ? (
-                <img
-                  src={project.authorAvatar}
-                  alt={project.author}
-                  loading="lazy"
-                  decoding="async"
-                  width="16"
-                  height="16"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Icon.User className="w-2.5 h-2.5 text-text-muted" />
-                </div>
-              )}
-            </div>
+            <Avatar src={project.authorAvatar} username={project.author} size="xs" />
             <span
               onClick={(e) => {
                 e.stopPropagation();

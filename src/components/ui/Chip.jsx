@@ -42,7 +42,7 @@ export default function Chip({
     scale-[1.02]
   `;
 
-  let passiveStyles = '';
+  let passiveStyles;
 
   if (variant === 'dashed') {
     passiveStyles = `
@@ -63,8 +63,8 @@ export default function Chip({
   } else {
     // Default — tone'a göre zemin
     const passiveBg = tone === 'bg'
-      ? 'bg-gradient-to-b from-bg to-bg/70'
-      : 'bg-gradient-to-b from-surface to-surface/70';
+      ? 'bg-linear-to-b from-bg to-bg/70'
+      : 'bg-linear-to-b from-surface to-surface/70';
 
     passiveStyles = `
       ${passiveBg}

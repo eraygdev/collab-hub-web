@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const ConfigContext = createContext(null);
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../utils/api';
 
 // Fallback — backend'e ulaşamazsa veya hata verirse.
 // Değerler backend'deki constants.go ile uyumlu TUTULMALI.

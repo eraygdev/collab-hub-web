@@ -9,7 +9,7 @@ import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
 import CharWarning from '../ui/CharWarning';
 import InputClearButton from '../ui/InputClearButton';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 
 export default function UserSearch() {
   const { limits } = useConfig();
@@ -75,7 +75,7 @@ export default function UserSearch() {
     return () => {
       controller.abort();
     };
-  }, [debouncedQuery, openDropdown]);
+  }, [debouncedQuery, openDropdown, limits.maxUsersPerSearch]);
 
   useEffect(() => {
     if (!isDropdownOpen) return;

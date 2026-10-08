@@ -441,6 +441,7 @@ export const tr = {
 
   // ─── CREATE / EDIT ───
   create: {
+    loading: "Proje yükleniyor...",
     title: "Yeni proje oluştur.",
     subtitle: "Projeni topluluğa tanıt, katkıda bulunacak geliştiriciler bul.",
     title_label: "Proje Başlığı",
@@ -489,6 +490,7 @@ export const tr = {
   },
 
   edit: {
+    loading: "Proje yükleniyor...",
     title: "Projeyi düzenle.",
     subtitle: "Değişiklikleri kaydet veya iptal et.",
     submitting: "kaydediliyor...",
@@ -615,7 +617,7 @@ export const tr = {
   // ─── HATALAR (backend error code → mesaj) ───
   errors: {
     generic: "Bir hata oluştu",
-    server_error: "Sunucu hatası, lütfen tekrar dene",
+    too_many_requests: "Çok fazla istek gönderdiniz, lütfen biraz bekleyin",
 
     // oturum
     missing_token: "Oturum bilgisi eksik",
@@ -648,6 +650,7 @@ export const tr = {
     image_too_large: "Görsel çok büyük (en fazla 2MB)",
     cannot_star_own_project: "Kendi projeni yıldızlayamazsın",
     project_limit_reached: "Proje limitine ulaştın",
+    github_url_taken: "Bu repo ile bir proje zaten var",
 
     // kategori
     invalid_category_id: "Geçersiz kategori",
@@ -669,6 +672,15 @@ export const tr = {
 
     // yetki
     forbidden: "Bu işlem için yetkin yok",
+
+    // profanity
+    title_profanity: "Başlık uygunsuz ifade içeriyor",
+    description_profanity: "Açıklama uygunsuz ifade içeriyor",
+    longDescription_profanity: "Uzun açıklama uygunsuz ifade içeriyor",
+    message_profanity: "Mesaj uygunsuz ifade içeriyor",
+    bio_profanity: "Hakkımda bölümü uygunsuz ifade içeriyor",
+    username_profanity: "Kullanıcı adı uygunsuz ifade içeriyor",
+    search_profanity: "Arama metni uygunsuz ifade içeriyor",
 
     // validation
     username_too_long: "Kullanıcı adı çok uzun",

@@ -11,7 +11,7 @@ import { useDebounced } from '../../hooks/useDebounced';
 import { useSearchHistory } from '../../hooks/useSearchHistory';
 import { USERNAME_REGEX, findInvalidChar } from '../../utils/validators';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { API } from '../../utils/api';
 
 export default function Navbar({ onOpenSidebar }) {
   const { user } = useAuth();
@@ -76,7 +76,7 @@ export default function Navbar({ onOpenSidebar }) {
     return () => {
       controller.abort();
     };
-  }, [mobileDebouncedQuery, mobileSearchOpen]);
+  }, [mobileDebouncedQuery, mobileSearchOpen, limits.maxUsersPerSearch]);
 
   useEffect(() => {
     if (!mobileSearchOpen) return;
