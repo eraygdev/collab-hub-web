@@ -6,7 +6,7 @@ import {
 } from '../../utils/validators';
 import * as Icon from '../ui/Icons';
 
-export default function ImagePreview({ url, debouncedUrl }) {
+export default function ImagePreview({ debouncedUrl }) {
   const { t } = useLanguage();
   const [status, setStatus] = useState('idle');
   const [src, setSrc] = useState('');

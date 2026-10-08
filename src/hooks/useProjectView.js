@@ -8,7 +8,9 @@ function readView() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === "normal" || stored === "compact") return stored;
-  } catch {}
+  } catch {
+    // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+  }
   return DEFAULT_VIEW;
 }
 
@@ -21,7 +23,9 @@ export function useProjectView() {
     setViewState(newView);
     try {
       localStorage.setItem(STORAGE_KEY, newView);
-    } catch {}
+    } catch {
+      // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+    }
   }, []);
 
   return {

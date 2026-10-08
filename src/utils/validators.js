@@ -7,9 +7,10 @@ export const USERNAME_REGEX = /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ_. ]*$/;
 
 // ✅ Açıklamalar / Bio: harf, rakam, noktalama, boşluk (emoji/CJK yok)
 export const TEXT_REGEX =
-  /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;:'"()\[\]{}\-_/|@#$%&*+=~\s]*$/;
+  /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;: ()\[\]{}|@#$%&*+=~\s\-]*$/;
+
 export const BIO_REGEX =
-  /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;:'"()\[\]{}\-_/|@#$%&*+=~\s]*$/;
+  /^[a-zA-Z0-9çÇğĞıİöÖşŞüÜ.,!?;: ()\[\]{}|\/@#$%&*+=~\s\-]*$/;
 
 // ✅ Artık özel karakter/emoji girilemediği için length güvenli
 export function charCount(str) {

@@ -12,7 +12,7 @@ import FieldError from '../../components/ui/FieldError';
 import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import * as Icon from '../../components/ui/Icons';
-import { extractErrorMessage, extractError } from '../../utils/errors';
+import { extractError } from '../../utils/errors';
 import {
   TITLE_REGEX,
   TEXT_REGEX,
@@ -189,7 +189,9 @@ export default function EditProject() {
       setTimeout(() => {
         try {
           el.focus({ preventScroll: true });
-        } catch {}
+        } catch {
+          // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+        }
       }, 300);
 
       el.classList.remove('input-error-flash');

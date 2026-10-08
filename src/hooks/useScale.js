@@ -15,7 +15,9 @@ function readScale() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && SCALE_VALUES[stored] !== undefined) return stored;
-  } catch {}
+  } catch {
+    // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+  }
   return DEFAULT_SCALE;
 }
 
@@ -42,14 +44,18 @@ export function useScale() {
     setScaleState(next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
-    } catch {}
+    } catch {
+      // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+    }
   }, []);
 
   const reset = useCallback(() => {
     setScaleState(DEFAULT_SCALE);
     try {
       localStorage.setItem(STORAGE_KEY, DEFAULT_SCALE);
-    } catch {}
+    } catch {
+      // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+    }
   }, []);
 
   return { scale, setScale, reset };

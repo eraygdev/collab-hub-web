@@ -351,14 +351,6 @@ export const tr = {
       button: "hesabı sil (yakında)",
     },
 
-    // Sidebar navigasyon
-    nav: {
-      account: "Hesap",
-      appearance: "Görünüm",
-      notifications: "Bildirimler",
-      danger: "Tehlikeli Bölge",
-    },
-
     // Mobil menü butonu
     menu_aria: "Ayarlar menüsünü aç",
   },

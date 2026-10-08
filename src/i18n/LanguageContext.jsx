@@ -32,7 +32,9 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, lang);
-    } catch {}
+    } catch {
+      // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+    }
     document.documentElement.lang = lang;
   }, [lang]);
 

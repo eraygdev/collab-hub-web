@@ -13,7 +13,7 @@ import ImagePreview from '../../components/project/ImagePreview';
 import CategorySelector from '../../components/project/CategoryChips';
 import ContributorLimitPicker from '../../components/project/ContributorLimitPicker';
 import * as Icon from '../../components/ui/Icons';
-import { extractErrorMessage, extractError } from '../../utils/errors';
+import { extractError } from '../../utils/errors';
 import {
   TITLE_REGEX,
   TEXT_REGEX,
@@ -85,7 +85,9 @@ export default function CreateProject() {
           setMaxContributors(_maxContributors);
         }
       }
-    } catch {}
+    } catch {
+      // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+    }
     setDraftLoaded(true);
   }, [limits.allowedContributorLimits]);
 
@@ -101,7 +103,9 @@ export default function CreateProject() {
             _maxContributors: maxContributors,
           })
         );
-      } catch {}
+      } catch {
+        // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+      }
     }, 800);
     return () => clearTimeout(t2);
   }, [form, selectedCategories, maxContributors, draftLoaded]);
@@ -187,7 +191,9 @@ export default function CreateProject() {
       setTimeout(() => {
         try {
           el.focus({ preventScroll: true });
-        } catch {}
+        } catch {
+          // localStorage erişilemezse sessizce geç (private mode, kota dolu)
+        }
       }, 300);
 
       el.classList.remove('input-error-flash');
