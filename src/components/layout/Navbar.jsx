@@ -130,7 +130,7 @@ export default function Navbar({ onOpenSidebar }) {
     <>
       <header className="sticky top-0 z-50 w-full bg-bg/80 backdrop-blur-md border-b border-accent/10">
         <div className="w-full px-2 sm:px-6 lg:px-8 h-14 flex items-center gap-1.5 sm:gap-5">
-          <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex-1 flex items-center gap-1.5 sm:gap-4 lg:gap-5 min-w-0">
             <button
               onClick={onOpenSidebar}
               className="p-1.5 rounded-button text-text-muted hover:text-text hover:bg-surface transition-colors cursor-pointer"
@@ -138,6 +138,11 @@ export default function Navbar({ onOpenSidebar }) {
             >
               <Icon.Menu className="w-5 h-5" />
             </button>
+
+            <span
+              className="hidden lg:block w-px h-5 bg-accent/15 shrink-0"
+              aria-hidden="true"
+            />
 
             <Link
               to="/"
@@ -162,7 +167,7 @@ export default function Navbar({ onOpenSidebar }) {
           </div>
 
           {/* SAĞ: Mobil arama + Dil + Auth */}
-          <div className="ml-auto flex items-center gap-1 sm:gap-3 shrink-0">
+          <div className="flex-1 flex items-center justify-end gap-1 sm:gap-3 lg:gap-5 min-w-0">
 
             <button
               onClick={() => setMobileSearchOpen((v) => !v)}
@@ -174,6 +179,11 @@ export default function Navbar({ onOpenSidebar }) {
             </button>
 
             <LanguageSwitcher />
+
+            <span
+              className="hidden lg:block w-px h-5 bg-accent/15 shrink-0 lg:mr-2" 
+              aria-hidden="true"
+            />
 
             {user ? (
               <UserDropdown />
