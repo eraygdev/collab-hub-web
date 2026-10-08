@@ -616,7 +616,10 @@ export default function ProjectDetail() {
             {project.contributorsList && project.contributorsList.length > 0 && (
               <div>
                 <h2 className="text-caption font-bold text-text uppercase tracking-wider mb-3 font-mono">
-                  {t('details.section.contributors', { count: project.contributorsList.length })}
+                  {t('details.section.contributors', {
+                    count: project.contributorsList.length,
+                    max: project.maxContributors,
+                  })}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {project.contributorsList.map((contributor) => (

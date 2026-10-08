@@ -447,7 +447,7 @@ export const en = {
     long_description_placeholder:
       "Project details, tech stack, target audience... (optional)",
     github_label: "GitHub URL",
-    github_placeholder: "https://github.com/user/project (optional)",
+    github_placeholder: "https://github.com/user/project",
     github_hint: "The repository must be public. Example: github.com/user/repo",
     demo_label: "Demo URL",
     demo_placeholder: "https://project-demo.com (optional)",

@@ -29,7 +29,21 @@ developers one place to:
 
 ## Screenshots
 
-> _Coming soon — screenshots of the home page, project detail, and dashboard._
+### Home
+
+![Home page](docs/screenshots/home.png)
+
+### Project Detail
+
+![Project detail page](docs/screenshots/project-detail.png)
+
+### Dashboard
+
+![User dashboard](docs/screenshots/dashboard.png)
+
+### Mobile
+
+<img src="docs/screenshots/mobile.png" alt="Mobile view" width="320" />
 
 ## Features
 

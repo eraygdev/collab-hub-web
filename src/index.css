@@ -322,3 +322,31 @@ body {
     animation: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────
+   CUSTOM SCROLLBAR — Dark theme uyumlu
+───────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(239, 228, 206, 0.15);
+  border-radius: 9999px;
+  border: 2px solid var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 228, 206, 0.3);
+}
+
+/* Firefox için */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 228, 206, 0.15) var(--color-bg);
+}

@@ -453,7 +453,7 @@ export const tr = {
     long_description_placeholder:
       "Projenin detayları, kullanılan teknolojiler, hedef kitlesi... (opsiyonel)",
     github_label: "GitHub URL",
-    github_placeholder: "https://github.com/kullanici/proje (opsiyonel)",
+    github_placeholder: "https://github.com/kullanici/proje",
     github_hint: "Repo public olmalı. Örnek: github.com/kullanici/repo",
     demo_label: "Demo URL",
     demo_placeholder: "https://proje-demo.com (opsiyonel)",
