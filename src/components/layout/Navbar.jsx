@@ -151,7 +151,7 @@ export default function Navbar({ onOpenSidebar }) {
               aria-label={t('navbar.aria.logo')}
             >
               <img
-                src="/logo.svg"
+                src="/logo.png"
                 alt=""
                 className="w-7 h-7 shrink-0"
                 width="28"
