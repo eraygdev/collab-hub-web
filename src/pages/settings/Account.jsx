@@ -47,7 +47,7 @@ export default function Account() {
     const token = localStorage.getItem('token');
     let cancelled = false;
 
-    fetch(`${API}/api/auth/me`, {
+    fetch(`${API}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -108,7 +108,7 @@ export default function Account() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/me`, {
+      const res = await fetch(`${API}/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

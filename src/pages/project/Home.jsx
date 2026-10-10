@@ -108,7 +108,7 @@ export default function Home() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    fetch(`${API}/api/categories`, { signal: controller.signal })
+    fetch(`${API}/categories`, { signal: controller.signal })
       .then((res) => res.json())
       .then((data) => {
         clearTimeout(timeoutId);
@@ -148,7 +148,7 @@ export default function Home() {
       }
       params.set('sort', sortMode);
 
-      const res = await fetch(`${API}/api/projects?${params.toString()}`, {
+      const res = await fetch(`${API}/projects?${params.toString()}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         signal,
       });

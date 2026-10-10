@@ -58,7 +58,7 @@ export default function CategoryPick({
       setLoading(true);
       setError('');
       try {
-        const res = await fetch(`${API}/api/categories`, {
+        const res = await fetch(`${API}/categories`, {
           signal: controller.signal,
         });
 

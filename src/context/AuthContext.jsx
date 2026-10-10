@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     try {
-      const res = await fetch(`${API}/api/auth/me`, {
+      const res = await fetch(`${API}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
         signal: controller.signal,
       });

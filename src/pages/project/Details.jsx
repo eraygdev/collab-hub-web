@@ -51,7 +51,7 @@ export default function ProjectDetail() {
     setError('');
     const token = localStorage.getItem('token');
 
-    fetch(`${API}/api/projects/${id}`, {
+    fetch(`${API}/projects/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => {
@@ -83,7 +83,7 @@ export default function ProjectDetail() {
     const token = localStorage.getItem('token');
     let cancelled = false;
 
-    fetch(`${API}/api/projects/${id}/my-join-status`, {
+    fetch(`${API}/projects/${id}/my-join-status`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
@@ -113,7 +113,7 @@ export default function ProjectDetail() {
 
     setStarLoading(true);
     try {
-      const res = await fetch(`${API}/api/projects/${id}/star`, {
+      const res = await fetch(`${API}/projects/${id}/star`, {
         method,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -150,7 +150,7 @@ export default function ProjectDetail() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/projects/${id}`, {
+      const res = await fetch(`${API}/projects/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -180,7 +180,7 @@ export default function ProjectDetail() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/projects/${id}/join`, {
+      const res = await fetch(`${API}/projects/${id}/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ export default function ProjectDetail() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/projects/${id}/leave`, {
+      const res = await fetch(`${API}/projects/${id}/leave`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -262,7 +262,7 @@ export default function ProjectDetail() {
 
     try {
       const res = await fetch(
-        `${API}/api/projects/${id}/contributors/${removeTarget.user_id}`,
+        `${API}/projects/${id}/contributors/${removeTarget.user_id}`,
         {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },

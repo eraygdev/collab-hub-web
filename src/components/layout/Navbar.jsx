@@ -56,7 +56,7 @@ export default function Navbar({ onOpenSidebar }) {
       setMobileLoading(true);
       try {
         const res = await fetch(
-          `${API}/api/users/search?q=${encodeURIComponent(mobileDebouncedQuery)}&limit=${limits.maxUsersPerSearch}`,
+          `${API}/users/search?q=${encodeURIComponent(mobileDebouncedQuery)}&limit=${limits.maxUsersPerSearch}`,
           { signal: controller.signal }
         );
         if (!res.ok) throw new Error('search_failed');

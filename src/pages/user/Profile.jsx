@@ -52,7 +52,7 @@ export default function UserProfile() {
     const token = localStorage.getItem('token');
     const params = new URLSearchParams({ sort, limit: LIMIT, offset: 0 });
 
-    fetch(`${API}/api/users/${encodeURIComponent(username)}?${params}`, {
+    fetch(`${API}/users/${encodeURIComponent(username)}?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => {
@@ -88,7 +88,7 @@ export default function UserProfile() {
     const token = localStorage.getItem('token');
     let cancelled = false;
 
-    fetch(`${API}/api/me/contributions`, {
+    fetch(`${API}/me/contributions`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -122,7 +122,7 @@ export default function UserProfile() {
       });
 
       const res = await fetch(
-        `${API}/api/users/${encodeURIComponent(username)}?${params}`,
+        `${API}/users/${encodeURIComponent(username)}?${params}`,
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }

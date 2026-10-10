@@ -62,7 +62,7 @@ export default function CreateProject() {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    fetch(`${API}/api/categories`)
+    fetch(`${API}/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
@@ -278,7 +278,7 @@ export default function CreateProject() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/projects`, {
+      const res = await fetch(`${API}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

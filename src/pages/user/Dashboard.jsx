@@ -57,7 +57,7 @@ export default function Dashboard() {
     let cancelled = false;
 
     setProjectsLoading(true);
-    fetch(`${API}/api/me/projects`, {
+    fetch(`${API}/me/projects`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -97,7 +97,7 @@ export default function Dashboard() {
     let cancelled = false;
 
     setRequestsLoading(true);
-    fetch(`${API}/api/me/contributor-requests`, {
+    fetch(`${API}/me/contributor-requests`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -127,7 +127,7 @@ export default function Dashboard() {
 
     try {
       const res = await fetch(
-        `${API}/api/contributor-requests/${requestId}/${action}`,
+        `${API}/contributor-requests/${requestId}/${action}`,
         {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}` },

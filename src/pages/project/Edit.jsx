@@ -58,7 +58,7 @@ export default function EditProject() {
   const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
-    fetch(`${API}/api/categories`)
+    fetch(`${API}/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
@@ -67,7 +67,7 @@ export default function EditProject() {
   useEffect(() => {
     let cancelled = false;
     const token = localStorage.getItem('token');
-    fetch(`${API}/api/projects/${id}`, {
+    fetch(`${API}/projects/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => {
@@ -278,7 +278,7 @@ export default function EditProject() {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch(`${API}/api/projects/${id}`, {
+      const res = await fetch(`${API}/projects/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

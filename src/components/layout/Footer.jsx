@@ -57,7 +57,7 @@ export default function Footer() {
           ) : (
             <div className="flex items-center justify-center max-w-md mx-auto">
               <button
-                onClick={() => (window.location.href = `${API}/api/auth/github/login`)}
+                onClick={() => (window.location.href = `${API}/auth/github/login`)}
                 className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 text-body-sm font-bold text-text bg-transparent hover:bg-surface border border-accent/30 hover:border-accent rounded-button transition-all cursor-pointer"
               >
                 <Icon.Github className="w-4 h-4" />

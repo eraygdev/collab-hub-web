@@ -18,7 +18,7 @@ export default function Login() {
   }, [user, loading, navigate]);
 
   const handleGithub = () => {
-    window.location.href = `${API}/api/auth/github/login`;
+    window.location.href = `${API}/auth/github/login`;
   };
 
   if (loading || user) {

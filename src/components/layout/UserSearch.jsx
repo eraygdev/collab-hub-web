@@ -52,7 +52,7 @@ export default function UserSearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${API}/api/users/search?q=${encodeURIComponent(debouncedQuery)}&limit=${limits.maxUsersPerSearch}`,
+          `${API}/users/search?q=${encodeURIComponent(debouncedQuery)}&limit=${limits.maxUsersPerSearch}`,
           { signal: controller.signal }
         );
 

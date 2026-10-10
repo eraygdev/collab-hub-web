@@ -33,7 +33,7 @@ export function ConfigProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`${API}/api/config`)
+    fetch(`${API}/config`)
       .then((res) => {
         if (!res.ok) throw new Error('fetch_failed');
         return res.json();
