@@ -153,7 +153,7 @@ export default function Navbar({ onOpenSidebar }) {
               <img
                 src="/logo.png"
                 alt=""
-                className="w-7 h-7 shrink-0"
+                className="w-6 h-6 shrink-0"
                 width="28"
                 height="28"
               />

@@ -37,7 +37,7 @@ export default function UserDropdown() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="rounded-pill cursor-pointer hover:ring-2 hover:ring-accent/10 transition-all"
+        className="inline-flex items-center justify-center rounded-pill cursor-pointer hover:ring-2 hover:ring-accent/10 transition-all"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('user_dropdown.menu')}
